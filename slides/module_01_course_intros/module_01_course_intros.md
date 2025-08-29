@@ -255,3 +255,17 @@ We’ll talk more about how to read this grammar later in the course, but notice
 
 ---
 
+# Formal Languages
+
+- Mathematical expressions
+- Predicate/first-order/second-order logic
+- C
+- [Malbolge](https://en.wikipedia.org/wiki/Malbolge)
+- Python
+- Ruby
+- Scratch (yes, visual languages can be formal)
+- UML
+- The event scripting language for RPG Maker games.
+
+---
+
