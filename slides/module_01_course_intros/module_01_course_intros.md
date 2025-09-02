@@ -686,3 +686,207 @@ However, to call a procedure, there’s a bunch of work we have to do that may b
 
 ---
 
+# Structured Programming
+
+One of the major innovations that started to take place around the 1960s was the use of structures in code.
+
+What are structures?
+
+Well, in C, all structures have curly braces after them (there are a couple of structures that *don't* such as the ternary operator, but we'll focus on the big ones).
+
+That is, functions, if-statements, and loops are all structures.
+
+Why does that matter?
+
+---
+
+# Structured Programming (2)
+
+The original idea behind structured programming was that each structure had only one entrance and one exit.
+
+That means each structure had to be entered from the top:
+- You cannot jump from outside of a function into the middle of a function.
+- You cannot into a random branch of an if-statement without running the condition.
+- You cannot jump *into* a loop from outside the loop without first checking the guarded condition at the top.
+
+---
+
+# Structured Programming (3)
+
+These may seem like common sense now, but they were absolutely not required in assembly. A jump/goto can go *anywhere*, including into the middle of a function. 
+
+Originally, structures were supposed to only have one exit as well. So there was no "early return" idea.
+
+Over time, structured programmers became comfortable with the idea of early returns and ifs with no elses (mostly), so this stopped being seen as a problem.
+
+Only *entering* at one point was non-negotiable, however.
+
+---
+
+# Structured Programming (4)
+
+It may seems like common sense to not allow someone to jump into a random part of a function, but really think about why...
+
+One reason is that it could violate the ABI. What if we remove 16 bytes from the stack at the end of the function, but the jumper didn't push 16 bytes? Big problem.
+
+But we can be careful and just not do that. The real issue is that random jumps mean that we cannot, just by looking at the code, establish invariants that let us know exactly which properties about it are true.
+
+For example, if a function requires that arguments not be negative, it can check, at compile time or run time that this is the case. If we can jump into the function, we would bypass that check. So inside the function we lose the ability to know what's true. We don't know the state of the program.
+
+---
+
+# State
+
+This is a big word, we'll be hearing it again and again.
+
+State means, basically, the values in memory/registers. It can also include the values stored in external devices, like GPUs and hard drices.
+
+The "state" of a program is the map of values to variables/registers/IO that are all relevant.
+
+So if I change the value in a variable, I change that variable's state.
+
+Classic imperative programming allowed state to be changed in an unrestricted way. Different paradigms have different ways of managing it.
+
+---
+
+# Structured Programming (5)
+
+Structured programming was heavily motivated by dislike for GOTO/Jump
+
+The famous Dijkstra essay [“Go-to statement considered harmful”](https://www.cs.utexas.edu/users/EWD/ewd02xx/EWD215.PDF) had a major impact on public perception.
+
+Opening quote: “Since a number of years I am familiar with the observation that the quality of programmers is a decreasing function of the density of go to statements in the programs they produce.”
+
+One of Dijkstra's points is that humans are better at understanding static relationships than dynamic ones. And the complexity of a dynamic (code) process can be related to asking the question: suppose we stop at a random point in time. How much would we have to undo to reach a point where we could restart the program from that point?
+
+---
+
+# Structured Programming (6)
+
+That Lisp language we saw earlier does support structures. It has an equivalent to if, while, etc. However, it also supports unrestricted variable changes.
+
+Here's a language that is widely considered to have popularized the structured programming paradigm: [ALGOL](https://en.wikipedia.org/wiki/ALGOL_60
+)
+
+The language was highly anticipated, but its committee had trouble agreeing on many things, and its implementations were delayed. However, its ideas were influential. See if you can recognize its syntax...
+
+---
+
+# Algol 60 code
+
+```algol
+procedure Absmax(a) Size:(n, m) Result:(y) Subscripts:(i, k);
+    value n, m; array a; integer n, m, i, k; real y;
+comment The absolute greatest element of the matrix a, of size n by m,
+    is copied to y, and the subscripts of this element to i and k;
+begin
+    integer p, q;
+    y := 0; i := k := 1;
+    for p := 1 step 1 until n do
+        for q := 1 step 1 until m do
+            if abs(a[p, q]) > y then
+                begin y := abs(a[p, q]);
+                    i := p; k := q
+                end
+end Absmax
+```
+
+---
+
+# It’s actually readable
+
+You can probably read that code without knowing the language.
+
+ALGOL is probably the first langauge that "looks modern".
+
+We are very used to structured programming. It is so fundamental that we think of "if statements" and "while loops" as being the basic units of programming. It's strange to think that they had to be invented.
+
+But the real key to structured programming is more subtle than that: it's those "begin" and "end" blocks.
+
+---
+
+# Blocks of code
+
+The key behind structured programming is the idea that we can break code up into sequences of statements, called "blocks", and use those as atomic units.
+
+It's not that we can't jump into the middle of a function, a branch, or a loop. Its that all of those things require a block, and we cannot jump into a block.
+
+In C, a block is between curly braces: `{ a(); b(); c(); }`
+
+Blocks can be nested:
+```c
+if (something) {
+    a();
+    if (something else) { b(); c(); d(); }
+}
+```
+
+In Algol, blocks were between "begin" and "end", but it's the same idea.
+
+---
+
+# The tree structure
+
+Blocks can be nested.
+
+We could think of the whole program as a kind of super-block. It might have function definitions inside of it.
+
+Each function body is a block, which can have blocks inside of it: maybe loops, ifs, or local functions.
+
+This tree-like organization, where each block "contains" child blocks, is often easier to understand than a giant list of instructions with little labels inserted every so often.
+
+---
+
+# Structured Languages
+
+Nowadays, structured programming is so pervasive, we don't really call a language a "structured programming language".
+
+However, probably all your favorite languages are structured (unless you love assembly language: no judgement for that).
+
+C, C++, Java, Python, JavaScript, TypeScript, Rust, etc. are all structured
+
+Interestingly, C supports non-structured programming with goto and set/longjmp. Goto is still useful in C for resource management.
+
+However, other non-structured C features have been criticized (e.g., switch statements with fall through, unhygenic macros)
+
+---
+
+# Imperative languages
+
+It's also almost certain that the languages you know so far are *imperative*.
+
+That means that programs are seen as being lists of instructions on how to *change* the current state.
+
+This seems so fundamental that there is no alternative, but I assure you, there are alternatives.
+
+---
+
+# The functional paradigm
+
+This class will introduce you to several "strange" ways to think about programming. In particular, we'll be learning Lisp (a list/macro paradigm language), and we'll learn about Prolog (a logical language).
+
+However, the main paradigm we'll be learning is "Functional" programming.
+
+This paradigm is *fundamentally* different from the imperative paradigm. It doesn't even have "variables" (in the sense that they aren't allowed to change)
+
+And yet, it's *just as powerful* as the imperative paradigm. This may seem shocking, but there's nothing you can't do in a functional language (besides change a variable, obviously, but there are ways to do make things happen without doing that in the language).
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Programming paradigms
+
+---
+
+# Key takeaways
+
+Make sure you understand these concepts:
+- High-level vs. low-level langauges
+- Blub, and how we are all vulnerable to the Blub Paradox
+- What structured programming is
+- What a programming paradigm is
