@@ -881,6 +881,178 @@ And yet, it's *just as powerful* as the imperative paradigm. This may seem shock
 
 # Programming paradigms
 
+Paradigm (in general) is a way of viewing the world. For example, if we believe that all physical behavior is explained by collisions between particles, it would be a "new paradigm" to discover electromagnetic waves. 
+
+We would now see the world differently, and it would give us ideas on new hypotheses to test.
+
+When it comes to programming, there are different paradigms too. A programming paradigm is a "way of looking at programming"
+
+---
+
+# The four kinds of English sentence
+
+Can anyone recall the four kinds of English sentence?
+
+---
+
+# The four kinds of English sentence
+- Declarative: "I went to the store."
+- Imperative: "Go to the store."
+- Interrogative: "Did you go to the store?"
+- Exclamatory: "AHHHHH!!!! I went to the store!!!!"
+
+All of these (except exclamatory) have a corresponding programming paradigm.
+
+There are more besides, but this is a good starting point.
+
+---
+
+# The imperative paradigm
+
+We've already seen the imperative paradigm. Your favorite languages are mostly going to be imperative.
+
+The fundamental idea behind it is that "every program is a list of imperatives".
+
+What's an imperative? An order. When you give someone an order, you issue an imperative.
+
+In programming, an imperative is an order to change the world in some way:
+- Change a variable
+- Output something
+- Change modes, etc.
+
+---
+
+# The imperative paradigm (2)
+
+The CPU fundamentally works this way, so it's not surprising that it's kind of the "default" paradigm.
+
+There are dozens/hundreds of instructions. Each one takes registers, memory addresses, or immediate values, and modifies a register or memory state according to the instruction.
+
+Each instruction is an imperative.
+
+---
+
+# Imperative HLLs
+
+An imperative high level langauge uses "statements".
+
+A statement modifies memory in some way. It changes state.
+
+In c: `4 + 2` by itself is *not* a statement. If you just write:
+```c
+void whatever(void) { 4 + 2; }
+```
+
+You've turned it into a statement by adding a semicolon, but this has no effect on the program. The resulting `6` just dissappears.
+
+However, this *is* a statement. It changes the value of `x`: `x = 4 + 2;`
+
+Imperative languages allow you to come up with elegant ways of arranging statements and running them conditionally. But the core object of the language is the statement.
+
+---
+
+# Declarative programming
+
+It might seem weird that other options exist, but consider this: instead of *telling* the computer what to *do*, instead *describe* what you *want*.
+
+Consider this webpage:
+```html
+<html>
+    <head><title>Awesome page</title></head>
+    <body><p>Welcome to my awesome page!</p></body>
+</html>
+```
+
+What does this page do?
+
+---
+
+# Declarative programming (2)
+
+That depends on the browser. It's supposed to have the title "Awesome page" and show a paragraph of text that says "Welcome to my awesome page!", but it's up to the browser to actually render the text and print it out.
+
+Notice that we aren't telling the browser how to do its job. There is no code like: if user is on page, then render text "Welcome to my awesome page!", then copy that text to the visible framebuffer, etc.
+
+We are simply describing what we want.
+
+This is the essence of declarative programming.
+
+---
+
+# Declarative programming (3)
+
+At first glace, declarative programming can seem kind of like a toy.
+
+"Cool, I can draw a paragraph of text, but only if you let me by providing the `p` tag."
+
+But consider this: mathematical functions are also declarative.
+
+When we write `f(x) = x + 9`, we are describing something. We are describing how to compute `f(x)`.
+
+What if we could treat a program as a description of how to take input values into values that get printed? Suddenly, we're simply describing the wires that connect input to output, rather than ordering that anything happen.
+
+---
+
+# Functional programming
+
+This might seem to be a strange distinction, but I promise it's not.
+
+Treating our program as a function from inputs to outputs has many benefits:
+- It's easier to prove things about it because it's mostly static.
+- It is typically easier to parallelize (for reasons we will discuss)
+- It is often shorter.
+- It is often easier to test.
+
+This is the programming paradigm that we will use the most in this course.
+
+---
+
+# Functional programming (2)
+
+In a *pure* functional language, we don't even permit statements. That is, nothing is permitted to change state.
+
+If we say, mathetmatically `x = 7`, and then later write `x = 8`, that is either a redefinition or an error. We said `x = 7`, so either we want a new `x` or we made a mistake. It makes no sense to *change* it.
+
+Following this discipline of never changing variables sounds impossible at first, but it's not, and it leads to some interesting benefits. 
+
+The Haskell programming language is a *pure* functional language. It is very strict about following this paradigm. This is the language we will use for this class primarily.
+
+---
+
+# Query-based programming
+
+What about interrogative sentences?
+
+Well, this might look familiar:
+`SELECT * FROM Students WHERE Grade >= 80 ORDER BY Grade DESC`
+
+Here, the language is built around asking questions. Who are the students with at least a B-? 
+
+There's a declaration here too: we want the result to be ordered by grade.
+
+And how does data get into the table to begin with? We need some `INSERT INTO` statements. 
+
+So query-based programming kind of touches all three: imperatives, declarations, and interrogation.
+
+---
+
+# More paradigms
+
+These aren't the only paradigms.
+
+There is the list/macro paradigm that Lisp uses. We will become very familiar with it.
+
+There is also the paradigm of "parallel programming", which is kind of a cross-cutting super paradigm.
+
+Many modern languages deal with it: you've learned/are learning about mutexes and semaphores in your systems programming class.
+
+Functional languages can do parallel programming effortlessly, something that will be exciting to explore
+
+---
+
+# Questions
+<!-- _class: invert questions -->
+
 ---
 
 # Key takeaways
@@ -890,3 +1062,27 @@ Make sure you understand these concepts:
 - Blub, and how we are all vulnerable to the Blub Paradox
 - What structured programming is
 - What a programming paradigm is
+
+---
+
+Before next time:
+
+Work through (meaning, follow along and do all the exercises for) these chapters:
+- [Getting set up](https://en.wikibooks.org/wiki/Haskell/Getting_set_up)
+- [Variables and functions](https://en.wikibooks.org/wiki/Haskell/Variables_and_functions)
+
+After installing Haskell with GHCup, try saving this hello world program as `main.hs`:
+```haskell
+main = putStrLn "Hello, world!"
+```
+
+Compile and run with `ghc main.hs` and then `main.exe` on windows or `./main` on *nix.
+
+We'll talk more next time about the strange functional paradigm. It's not a coincidence that we write `main =` instead of `main() {...}` or `main: ...`
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
