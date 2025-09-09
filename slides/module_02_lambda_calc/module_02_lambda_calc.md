@@ -481,7 +481,7 @@ The reason we need several groups of parentheses is that we aren't calling one f
 a = f(7)
 b = a(8)
 c = b(9)
-# c is now 24. a and b are lambda functions.
+# c is now 24. a and b are lambda functions. Try printing f, a, and b.
 ```
 
 But in functional languages, currying is the default way to have multiple parameters.
@@ -497,3 +497,191 @@ But in functional languages, currying is the default way to have multiple parame
 # What does 7 mean?
 
 I have been using expressions from general math that aren't actually lambda terms according to our definition.
+
+Remember our definition of a lambda term? It's either a bound variable, a lambda abstraction, an application, with or without parentheses.
+
+Where is 7?
+
+Where is anything for that matter?
+
+---
+
+# Is everything contained in lambda calculus?
+
+In order for lambda calculus to be a model of computation, it can't require external symbols or operations.
+
+Turing machines don't. Turing machines have a tape alphabet, but there's no requirement the things we write on the tape are even numbers. They could be completely made-up symbols.
+
+And everything we do on a Turing machine is defined by the behavior of the machine. There is a set of turing states that will add two numbers together, so we don't need addition to be defined ahead of time.
+
+So do we need to have an "alphabet" of built-in symbols and operations we can use?
+
+---
+
+# Defining stuff
+
+Not exactly...
+
+It turns out, in Lambda Calculus, everything is a lambda function.
+
+*everything*
+
+Even 7.
+
+But let's start simple. Very simple. What about bools?
+
+---
+
+# Bools in lambda
+
+There are two boolean values: true and false.
+
+There are many ways to encode them, but Church encoded them like this:
+- true $= \lambda a. \lambda b. a$
+- false $= \lambda a. \lambda b. b$
+
+That is, both true and false are curried functions of two arguments. True returns its first argument, false returns its second argument.
+
+And what are those arguments? They are also functions, but they can be whatever functions you want. True takes the first, false takes the second.
+
+It's functions all the way down...
+
+---
+
+# Wait, where does it stop?
+
+If "true" is a function, then that means we have to pass it a value. But what value should we use? Even our simplest boolean values are still functions!
+
+We don't actually have to evaluate every function.
+
+If you're writing a lambda program to compute a boolean function, it can return "true" as a function. You can then recognize that the return value is $\lambda a. \lambda b. a$, signifying a true result. You don't have to run it on anything.
+
+It's kind of like how a turing machine can return a "screen", we just have to interpret the symbols on the tape as colors. Here's we're looking into the function to figure it out.
+
+We could have defined true to be $\lambda a. \lambda b. \lambda c. \lambda \mathrm{hi}. a \; (b \; (c  \; \mathrm{hi}))$ if we wanted. (we don't)
+
+But there are some nice properties of the definition we picked.
+
+---
+
+# Defining and
+
+Now that we have:
+- true $= \lambda a. \lambda b. a$
+- false $= \lambda a. \lambda b. b$
+
+How do we define and? That is, we want:
+- and true true = true
+- and true false = false
+- and false true = false
+- and false false = false
+
+This is a puzzle. Any ideas?
+
+---
+
+# Defining and (2)
+
+and = $\lambda a. \lambda b. a \; b \; \mathrm{false}$
+
+So there are two arguments, $a$ and $b$. These are supposed to be booleans.
+
+In this system, booleans are functions. They take two values.
+
+So we pass $b$ to the function $a$.
+
+If $a$ represents true, it returns its first argument, $b$.
+If $a$ represents false, it ignores $b$ and returns its second argument, which is false.
+
+Therefore, the only way to get true, is for $a$ to be true, and when it returns $b$, $b$ must also be true.
+
+---
+
+# Worked boolean function practice
+
+- Define 'or'
+- Define 'not'
+- Define 'xor'
+
+---
+
+# Boolean function answers
+
+- or = $\lambda a \; b. a \; \mathrm{true} \; b$
+    If $a$ is true, just return true. Otherwise, return $b$.
+    (Also I'm using the short syntax for curried functions)
+- not = $\lambda a. a \; \mathrm{false} \; \mathrm{true}$
+    If $a$ is true, it returns false; if $a$ is false it returns true. And vice versa.
+- xor = $\lambda a \; b. a \; (\mathrm{not} \; b) \; b$
+    If $a$ is true, $b$ must be false. If $a$ is false, $b$ must be true.
+    This works too, but is more verbose:
+        $\lambda a \; b. \mathrm{and} \; (\mathrm{or} \; a \; b) \; (\mathrm{not} \; (\mathrm {and} \; a \; b))$
+
+But what about 'if'?
+
+---
+
+# What about 'if'?
+
+True and false both behave kind of like little if-statements. If the function is true, it returns its first argument, and if false, returns its second.
+
+But a true if-function is a 3 argument function. It takes:
+- A condition
+- A result if the condition is true
+- A result if the condition is false
+
+Any ideas?
+
+---
+
+# If in lambda
+
+if = $\lambda c \; a \; b. c \; a \; b$
+
+It takes 3 arguments, the condition and two terms.
+
+If $c$ is true, it will return a. If $c$ is false, it will return b.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Natural number encoding
+
+There are actually different ways to encode natural numbers. The most common are Church numerals (named after Alonzo Church).
+
+The first natural number (for computer scientists) is 0. But let's start with 1 (it will make sense in a bit).
+
+For Zero, we use the simplest function. What is that?
+
+---
+
+# Zero encoding
+
+The identity function: $\lambda x. x$
+
+That is the function that takes its argument and just returns it. It doesn't change it.
+
+This is the simplest possible value we can express in pure Lambda calculus. 
+
+You might think a variable "x" is sipler, but that variable has to come from somewhere. If we're using pure lambda calculus, that 'x' has to be a parameter or another definition. 
+
+Either way, $\lambda x. x$ is the simplest complete lambda term.
+
+---
+
+# What about one?
+
+Church encoded 1 as a function that takes another function and applies it 1 time.
+
+Formally: $1 = \lambda f. \lambda x. f \; x$
+
+Let's break this down:
+- This is a function (the whole function is the)
+
+---
+
