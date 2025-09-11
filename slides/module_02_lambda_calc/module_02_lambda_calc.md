@@ -391,6 +391,8 @@ This can be a little challenging to understand, so let's do some drills:
 1. Define a term that has 3 parameters and adds them together.
 2. What is the result of partially applying that term on the values 7 and 8? (we say partially applying because we haven't supplied all 3 arguments).
 3. Is it meaningful to only give that function 2 arguments? Why?
+4. Suppose $f = \lambda a \; b \; c. \; \ldots$
+   Should $f \; 1 \; 2 \; 3$ be equivalent to $f \; (1 \; (2 \; 3))$ or $((f \; 1) \; 2) \; 3$ or is it something else? 
 
 ---
 
@@ -399,8 +401,9 @@ This can be a little challenging to understand, so let's do some drills:
 1. $\lambda a. (\lambda b. (\lambda c. a + b + c))$ or equivalently, $\lambda a. \lambda b. \lambda c. a + b + c$
 2. $(\lambda a. \lambda b. \lambda c. a + b + c) \; 7 \; 8 =\lambda c. 7 + 8 + c =\lambda c. 15 + c$
 3. Yes, it is meaningful because the result is a function that adds 15 to things.
+4. $f \; 1 \; 2 \; 3 \equiv ((f \; 1) \; 2) \; 3$, and this makes sense because it means we don't need parentheses to pass multiple arguments. If it were the other way around, we'd be trying to call 2 on 3, instead of passing 2 as the second argument to $f$.
 
-Note: it doesn't matter with the addition example, but lambda application is *left associative*. That means we apply the arguments from left to right.
+Note for #4: this means lambda application is *left associative*. That means we apply the arguments from left to right.
 
 ---
 
@@ -498,7 +501,7 @@ But in functional languages, currying is the default way to have multiple parame
 
 I have been using expressions from general math that aren't actually lambda terms according to our definition.
 
-Remember our definition of a lambda term? It's either a bound variable, a lambda abstraction, an application, with or without parentheses.
+Remember our definition of a lambda term? It's either a variable, a lambda abstraction, or an application, with or without parentheses.
 
 Where is 7?
 
@@ -654,34 +657,139 @@ If $c$ is true, it will return a. If $c$ is false, it will return b.
 
 There are actually different ways to encode natural numbers. The most common are Church numerals (named after Alonzo Church).
 
-The first natural number (for computer scientists) is 0. But let's start with 1 (it will make sense in a bit).
+If everything is a function, how do we represent numbers?
 
-For Zero, we use the simplest function. What is that?
+Well...with functions.
 
----
+Specifically, a natural number is just a function that takes another function and a starting value and executes it a certain number of times!
 
-# Zero encoding
-
-The identity function: $\lambda x. x$
-
-That is the function that takes its argument and just returns it. It doesn't change it.
-
-This is the simplest possible value we can express in pure Lambda calculus. 
-
-You might think a variable "x" is sipler, but that variable has to come from somewhere. If we're using pure lambda calculus, that 'x' has to be a parameter or another definition. 
-
-Either way, $\lambda x. x$ is the simplest complete lambda term.
+Let's take a look...
 
 ---
 
-# What about one?
+# The encoding of 1
 
-Church encoded 1 as a function that takes another function and applies it 1 time.
+One is a function: $\lambda \ldots$
 
-Formally: $1 = \lambda f. \lambda x. f \; x$
+That takes a function and a starting value: $\lambda f \; x. \; \ldots$
 
-Let's break this down:
-- This is a function (the whole function is the)
+And executes the function once: $\lambda f \; x. f \; x$
+
+That's...not very interesting. 
+
+But what about two?
 
 ---
 
+# The encoding of 2 and 0
+
+Now we define a function, that takes a function and a starting value, and executes that function twice.
+
+This means, it calls the function on the result of calling the function on the starting value:
+$\lambda f \; x. f \; (f \; x)$
+
+Sometimes, computer scientists write this repeated application of the same function like this: $f^2\;x$. Note, this is different from $(f \; x)^2$, which is squaring/applying the result rather than the function.
+
+And zero is encoded by just not calling the function and returning $x$: $\lambda f \; x. x$ 
+
+Quick knowledge check: [how do we encode 3?]
+
+---
+
+# Higher order functions
+
+In lambda calculus (and functional programming in general), it is very common to make use of higher order functions.
+
+A higher order function is a function that takes another function as an argument. 
+
+It can be hard to think about, but you do see this even in imperative languages. In C, for example, `qsort` takes a pointer to a function that is used to compare values in an array.
+
+So a number is a higher order function. It is a function that takes another function (and a value), applies the other function a certain number of times.
+
+---
+
+# What about successor?
+
+The successor to a natural number, unfortunately written "succ", is one more than it. 
+
+For example: $\mathrm{succ} \; 2 = 3$
+
+How could we, given a number, increment it by one?
+
+That is, how do we express succ as a lambda function?
+
+---
+
+# Defining the successor function
+
+$\mathrm{succ} = \lambda n. \lambda f \; x. f \; (n \; f \; x)$
+
+Why? First we take a number, and then we *return* a function (which represents a new number). We take the given number, and "execute it" (which means applying $f$ $n$ times starting on $x$), and then run $f$ one more time on the result of that.
+
+The function that does this is the successor. It takes a number and returns another number that runs its function one more time.
+
+---
+
+# Using the syntactic sugar
+
+In programming language design, syntactic sugar refers to making syntax nicer to express without changing the power of the language. In this case, $\lambda n \; f \; x. \; \ldots$ is syntactic sugar for $\lambda n. \; \lambda f \; x. \; \ldots$ (which itself is sugar for $\lambda n. \lambda f. \lambda x. \; \ldots$)
+
+We could also have written this:
+$\mathrm{succ} = \lambda n \; f \; x. f \; (n \; f \; x)$
+
+Now it looks like a function that takes 3 arguments. *But nothing has changed*.
+
+Writing it as a function that took a number and which returned a function of two arguments was just a way of notating it that expressed its purpose. The person using the function will typically only supply the first argument. But this was just a way of communicating, it did not change the function!
+
+---
+
+# Questions
+<!-- _class: invert questions -->
+
+---
+
+# What about addition
+
+If we treat $a$ as meaning $f^a x$ for some x, and $b$ means $f^b x$
+
+What is $a + b$?
+
+How do we define it as a lambda function?
+
+---
+
+# Addition
+
+What we really want is $f^{(a + b)} x$. Equivalently, $f^a \; (f^b \; x)$
+
+The parentheses are important here. We'll see why in a bit.
+
+Addition looks like this:
+plus = $\lambda a \; b. \lambda f \; x. a \; f \; (b \; f \; x)$
+
+That is, first we apply $f$ to $x$ $b$ times (remember, $b$ is a number, which means it is a function that takes another function and a value to repeatedly call it on)
+
+Then we apply $f$ to the result $a$ times. So a total of $a + b$ applications took place.
+
+[Would it matter if we swapped the order of $a$ and $b$?]
+
+What about multiplication?
+
+---
+
+# Multiplication
+
+We want to add $b$, $a$ times. Or alternatively $a$, $b$ times.
+
+Remember how numbers were just functions that apply another function?
+
+What if the function we're applying is "add 5 to this"? 
+And we pass that function to the number 4, which represents "run this 4 times"?
+Well, then we would be running "add 5 times" 4 times, which would be 4 times 5 (or 5 times 4).
+
+times = $\lambda a \; b.$
+
+
+---
+
+---
