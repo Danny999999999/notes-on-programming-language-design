@@ -787,9 +787,92 @@ What if the function we're applying is "add 5 to this"?
 And we pass that function to the number 4, which represents "run this 4 times"?
 Well, then we would be running "add 5 times" 4 times, which would be 4 times 5 (or 5 times 4).
 
-times = $\lambda a \; b.$
+times = $\lambda a \; b \; f \; x. a \; (b \; f) \; x$
+
+Here, we're applying "run $f$ $b$ times" $a$ times, which has the effect of running $f$ $a \times b$ times.
+
+---
+
+# Multiplication (2)
+
+Of course, we don't have to express our function with so much detail. 
+
+What if we wrote this?
+times = $\lambda a \; b. a \; (\mathrm{plus} \; b) \; 0$
+
+This is actually equivalent, and nicer to read, too. It says "timesing is the same as taking two numbers, $a$ and $b$, and applying 'plus $b$' to 0, $a$ times.
+
+But it's starting to get complicated. It's not clear what variables refer to, anymore. 0 is actually a function. And plus is a function, and $b$ is a function, but they're different kinds of function. They require different parameters.
+
+We'll take a look at how to straighten this out in a second, but first, a strange question...
+
+---
+
+# Exponentiation
+
+One way of defining it:
+exp = $\lambda a \; b \; f \; x. b \; a \; f \; x$
+
+notice the lack of parentheses. we're not calling $a$ with $f$ and $x$. 
+we're instead passing $a$ as the function itself for $b$.
+and we're passing $f$ as the *value* for $b$. that is, we're doing this:
+
+exp = $\lambda a \; b \; f \; x. (b \; a) \; f \; x$
+
+So we're passing the "do something $a$ times" function to $b$...
+
+---
+
+# Exponentiation (2)
+
+So imagine we call exp 3 2. This is what happens after beta reduction. Just replace $a$ and $b$ with 3 and 2:
+exp $3 \; 2 = \lambda f \; x. (2 \; 3) \; f \; x$
+And remember: $2 = \lambda f \; x. f \; (f \; x) = \lambda f \; x. f^2 x$
+$3 = \lambda f \; x. f \; (f \; (f \; x)) = \lambda f \; x. f^3 x$
+
+After substituting (pretend lexical scoping rules apply):
+exp $3 \; 2 = \lambda f \; x. (2 \; 3) \; f \; x$ = $(\lambda f \; x. f^2 x) (\lambda f \; x. f^3 x)$
+=$(\lambda f \; x. f^3 x)^2 x$
+=$\lambda f \; x. f^9 x$
+
+(if we apply $f^3$ to itself twice, we end up with $f^9$, not $f^6$, because we're tripling twice)
+
+---
+
+# Exponentiation (3)
+
+But, again, we can just use our earlier building blocks to make exponentiation.
+
+exp $a \; b = b \; (\mathrm{times} \; a) \; 1$
+
+We're just applying "multiply by a", b times
+
+TODO ex1
+
+---
+
+# Function calling notation
+
+---
+
+
+# The point
 
 
 ---
 
+# Questions?
+
+<!-- _class: questions invert -->
+
 ---
+
+# Types
+
+---
+
+# What is plus times plus?
+
+I *highly* recommend watching [this video](https://www.youtube.com/watch?v=RcVA8Nj6HEo), to give you a deeper appreciation for all this lambda calculus.
+
+It also teaches a [cool notation for lambda terms that look like something that aliens carved into a rock 20,000 years ago](https://tromp.github.io/cl/diagrams.html).
