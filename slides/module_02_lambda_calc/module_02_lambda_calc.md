@@ -294,6 +294,20 @@ So, to perform a single application, just do one round of $\beta$ reduction.
 
 ---
 
+# Normal form
+
+If you keep applying until you can't anymore, you reach *normal form*.
+
+For example: $(\lambda x. x + y) \; 4$ is not in normal form, because we can apply the function.
+Normal form means we cannot reduce anymore.
+
+We could apply the function to 4, and get this:
+$(\lambda x. x + y) \; 4 = 4 + y$
+
+We cannot reduce $4 + y$ anymore, so now we're in normal form.
+
+---
+
 # Abstraction and application practice
 
 1. Define a lambda function to triple a number and apply it to 7 in a single expression.
@@ -846,18 +860,142 @@ But, again, we can just use our earlier building blocks to make exponentiation.
 exp $a \; b = b \; (\mathrm{times} \; a) \; 1$
 
 We're just applying "multiply by a", b times
+But what is the "1" for?
+It's the starting value. We're going to run "times $a$" $b$ times starting with the value 1.
 
-TODO ex1
+So we will get: $f^9 1$
+But remember, 1 itself is a function that takes a function and a value.
+We aren't specifying those values, so "exp $a$ $b$" is actually a proper number. That is, it's a function that takes two values.
+
+---
+
+# Exponentiation ($)
+
+Compare to: times $a \; b = b \; (\mathrm{plus} \; a) \; 0$
+
+"call 'plus a' b times, starting with a value of 0"
+"call 'times a' b times, starting with a value of 1"
+
+We're starting to see how smaller lambda abstractions can build into bigger ones.
+
+Unlike turing machines, which are kind of awkward to work with unless you show the equivalence of RAM and registers to tape, lambda calculus can just keep scaling. 
 
 ---
 
 # Function calling notation
 
+One last thing, I used this notation:
+
+exp $a \; b = \ldots$
+
+That's equivalent to:
+
+exp $= \lambda a \; b. \ldots$
+
+The difference is just notational. 
+
 ---
 
+# Questions?
+This is rough stuff, I know.
+<!-- _class: invert questions -->
+
+---
+
+# Types
+
+We've been saying things like "a and b are numbers", but what even is a number?
+
+It's a function, right?
+
+Is it possible to use it *wrong*? Like, what if something is expecting a function.
+
+Is it even *possible* for something to not be a function?
+
+---
+
+# Not really
+
+In lambda calculus, literally everything is a function.
+
+Classic lambda calculus is called "untyped lambda calculus". 
+
+The simplest possible value is: $\mathrm{id} = \lambda x. x$, the identity function.
+
+It takes one argument, and it returns it. So what is "id id id"?
+
+Is it possible to write a bad lambda expressions? At least, when all the variables are bound?
+
+
+---
+
+# Again, not really
+
+It's just "id". Because id id id = (id id) id = id id = id.
+
+We can absolutely write bugs in lambda calculus. We can also write infinite loops like this one: $(\lambda x. x \; x) (\lambda x. x \; x)$.
+
+But type errors we cannot write. Because there is only one type, and no way to produce anything else.
+
+---
+
+# Is that good?
+
+This seems like a cause for celebration, but it's not.
+
+Sometimes we have to interact with things outside our pristine lambda program. 
+
+Suppose we eventually want to run machine code. Now we want to store "ints".
+
+At this precise point, we have to care. Because if $x$ is an int, it becomes wrong to say $(x \; x)$. You can't "call" an int with anything, so this expression makes no sense.
+
+And that's really the point to all this. Believe it or not, lambda calculus isn't just a theoretical thing. It's actually "assembly language" for functional programming, and we need some way to connect it to the real world.
+
+And types give us a way to make sure we're doing that correctly.
+
+---
+
+# Basic types
+
+There is a whole syntax for typed lambda terms, but we aren't going to learn it.
+
+Just be aware that there is a way to say "in this lambda term, $x$ is an int and not a function or anything else.".
+
+We'll see how Haskell handles types next module.
+
+---
 
 # The point
 
+We have just learned an arcane way of expressing computation. Even more arcane than turing machines. We have learned confusing symbols, Greek letters, and some complex mathematical re-definitions.
+
+Why?
+
+Because this is fundamentally how functional programming works. 
+
+Many functional programming languages are convenient wrappers around, effectively, lambda calculus.
+
+They also use the underlying machine more effectively. 8 will be an integer in a register, not a function applied 8 times (although it's interesting to know it could be).
+
+---
+
+# The point (2)
+
+Haskell, the main language of this class, has an intermediate language called [*Core*](https://downloads.haskell.org/~ghc/7.0.1/docs/core.pdf).
+
+*Core* is basically lambda calculus, plus types, plus basic syntax for binding expressions to names. It's Haskell minus advanced features.
+
+And it turns out, it's kind of a subset. That is, Haskell supports lambda calculus out of the box. It is useful.
+
+And the features that Haskell provides are pretty minor syntactic convenience. Most code will be functions, and all functions are lambda functions.
+
+---
+
+# What is plus times plus?
+
+I *highly* recommend watching [this video](https://www.youtube.com/watch?v=RcVA8Nj6HEo), to give you a deeper appreciation for all this lambda calculus.
+
+It also teaches a [cool notation for lambda terms that look like something that aliens carved into a rock 20,000 years ago](https://tromp.github.io/cl/diagrams.html).
 
 ---
 
@@ -867,12 +1005,100 @@ TODO ex1
 
 ---
 
-# Types
+# The quiz
+
+We will have our first practice quiz on [insert date here].
+
+(I will put the actual date on Canvas).
+
+This quiz will be 10 minutes if you take it in class.
+
+You can bring any written or printed material into the exam, but no electronic devices (except to submit at the very end--when you've put away your pens or pencils).
+
+For extended time or other accomodations, you must take the quiz at the access center.
 
 ---
 
-# What is plus times plus?
+# The quiz (2)
 
-I *highly* recommend watching [this video](https://www.youtube.com/watch?v=RcVA8Nj6HEo), to give you a deeper appreciation for all this lambda calculus.
+When studying, be sure to spend time studying under a time limit.
 
-It also teaches a [cool notation for lambda terms that look like something that aliens carved into a rock 20,000 years ago](https://tromp.github.io/cl/diagrams.html).
+As you take practice quizzes, you will notice the time it takes you go down. That's the grind working!
+
+I'm going to give several practice quizzes here. For more, you can create your own lambda expressions, or alternatively, ask an AI to generate more quizzes and grade them. This is a way to use AI as a good learning tool.
+
+---
+
+# Practice Quiz 1
+
+Show/explain work for partial credit.
+
+1. (10%) Reduce $(\lambda x \; y. x) \; z$ to normal form.
+2. (20%) Reduce $((\lambda x \; y. y \; x) \; w) \; (\lambda z. z)$ to normal form.
+3. (20%) Define a curried function that computes $2*a + 3*b + c$ for some values $a, b, c$. You can use the arithmetic operator "+" and multiplication operator "*".
+4. (20%) What is 6 expressed as a church numeral? Show the full lambda function.
+5. (30%) Let true = $\lambda a \; b. a$ and false = $\lambda a \; b. b$.
+    Define nand a b = not (and a b) as a lambda function (your final answer should only include pure lambda terms and 'true' and 'false, but intermediate steps can include the definitions of boolean functions we have learned)
+
+---
+
+# Practice Quiz 1 answers
+
+1. $\lambda y. z$. We replaced $x$ with $z$ and removed one layer of abstraction.
+2.  $((\lambda x \; y. y \; x) \; w) \; (\lambda z. z)=((\lambda y. y \; w) \; (\lambda z. z) =(\lambda z . z) \; w = w$
+3. $\lambda a. \lambda b. \lambda c. 2 * a + 3 * b + c$
+   $\lambda a \; b \; c. 2 * a + 3 * b + c$ is also correct.
+4. $\lambda f \; x. f \; (f \; (f \; (f \; (f \; (f \; x)))))$
+5. nand $a \; b = a \; (b \; \mathrm{false} \; \mathrm{true}) \; \mathrm{true}$
+
+---
+
+# Practice quiz 2
+
+1. (10%) Reduce $(\lambda x. \lambda y. y) \; (\lambda z. z)$ to normal form.
+2. (20%) Reduce $(\lambda f. f \; (f \; a)) \; (\lambda g. g \; b)$ to normal form.
+3. (20%) Define a curried function that computes $a^2 + b^2 + c^2$ for some values $a, b, c$. You may use arithmetic operators + and *.
+4. (20%) Define a function that takes 2 numbers and returns 5 if they are equal, otherwise returning 7. You may use `==` as an equality operator returning a Church bool. Otherwise, use only lambda terms (no assuming that `if` is defined).
+5. (30%) Let true = $\lambda a \; b. a$ and false = $\lambda a \; b. b$. Define 
+xor $a \; b = \mathrm{or} \; (\mathrm{and} \; a \; (\mathrm{not} \; b)) \; (\mathrm{and}\; b \; (\mathrm{not} \; a))$ as a lambda function (only include pure lambda terms and 'true' and 'false, but intermediate steps can include the definitions of boolean functions we have learned)
+
+---
+
+# Practice quiz 2 answers
+
+1. $(\lambda y. y)$ (the $x$ isn't used anywhere, so the argument dissappears)
+2.  1. $(\lambda f. f \; (f \; a)) \; (\lambda g. g \; b)$
+    2. $(\lambda g. g \; b) ((\lambda g. g \; b) \; a)$
+    3. $((\lambda g. g \; b) \; a) \; b$
+    4. $(a \; b) \; b$
+3. $\lambda a \; b \; c. a * a + b * b + c * c$
+4. $\lambda a \; b. (a == b) \; 5 \; 7$
+5. xor $a \; b = a \; (b \; \mathrm{false} \; \mathrm{true}) \; (b \; \mathrm{true} \; \mathrm{false})$ 
+
+---
+
+# Practice quiz 3 (unworked)
+
+1. (10%) Reduce $(\lambda x. x \; x) \; (\lambda y. y)$ to normal form.
+2. (20%) Reduce $(\lambda x. \lambda y. x \; y) \; (\lambda z. z + 1) \; 5$ to normal form. (you can treat numbers and `+` as built in arithmetic)
+3. (20%) Define a curried function that computes $a + 2 * b$
+4. (30%) Using Church booleans, define an if-elseif-else function that takes one condition for the if, a value if that condition is true, a condition for the else if, a value for when that condition is true, and then a value for when neither condition is true.
+5. (20%) Let true = $\lambda a \; b. a$ and false = $\lambda a \; b. b$. Define the function *implies*, where implies true true = true, implies true false = false, implies false true = true, and implies false false = true.
+
+---
+
+# Practice quiz 4?
+
+Now make your own quiz.
+
+Alternatively, copy and paste the markdown version of this entire lecture into your favorite LLM and ask it to generate a quiz. Most LLMs know how to read markdown and mathjax.
+
+They can grade the quiz too.
+
+I recommend a reasoning model for both tasks. Otherwise there's a high chance it hallucinates.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
