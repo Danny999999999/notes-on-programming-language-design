@@ -1099,6 +1099,21 @@ I recommend a reasoning model for both tasks. Otherwise there's a high chance it
 
 ---
 
+# Required reading
+
+In addition to studying for the quiz, make sure you're keeping up on your reading.
+
+We're assuming you already read the first two chapters of the Haskell Wikibook.
+
+Now, work through:
+- [Truth Values](https://en.wikibooks.org/wiki/Haskell/Truth_values) to learn about boolean functions.
+- [Type Basics](https://en.wikibooks.org/wiki/Haskell/Type_basics) to learn how to describe types.
+- [Lists and Tuples](https://en.wikibooks.org/wiki/Haskell/Lists_and_tuples) to learn how to describe lists and tuples.
+
+We are going to cover some of these briefly, but I'm really relying on you to the basic legwork in working through these chapters.
+
+---
+
 # Questions?
 
 <!-- _class: invert questions -->

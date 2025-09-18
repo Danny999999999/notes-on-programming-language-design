@@ -151,7 +151,7 @@ The latter is a bad idea: if you miss everything, I can't give you an incomplete
 
 # Mastery areas: before midterm
 
-1. Demonstrate an understanding of programming paradigms, and the special role that lambda calculus plays as the foundation of functional programming. Demonstrate a basic understanding of lambda calculus, including anonymous functions, partial application, and curried definitions.
+1.  Demonstrate a basic understanding of lambda calculus, including anonymous functions, partial application, and curried definitions.
 2. Demonstrate a basic level of competence with Haskell. E.g., define types, use functions, write some non-trivial functions.
 3. Demonstrate an understanding of functional operators such as map, filter, and fold.
 
