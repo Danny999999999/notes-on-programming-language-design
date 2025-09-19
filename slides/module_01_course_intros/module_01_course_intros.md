@@ -160,8 +160,8 @@ The latter is a bad idea: if you miss everything, I can't give you an incomplete
 # Mastery areas: before second term
 
 4. Demonstrate an understanding of type-classes, especially Functor and Applicative.
-5. Demonstrate an understanding of logic programming.
-6. Demonstrate an understanding of the dreaded monad, especially the bind operation (either implementing, using, or both).
+5. Demonstrate an understanding of the dreaded monad, especially the bind operation (either implementing, using, or both).
+6. Evaluate and classify a programming language according to the design paradigm and features provided.
 
 ---
 

@@ -464,3 +464,302 @@ Take a second to convince yourself it works, and consider that we just "looped" 
 
 ---
 
+# Running it
+
+Since you've been working the book exercises, I don't need to put this here, but in the incredibly unlikely scenario you've been holding off on installing Haskell...
+
+Download [GHCup](https://www.haskell.org/ghcup/) to install GHC, the compiler.
+
+In a new console window, you can write `ghci` to enter interactive mode, in which you type one line at a time, or `ghc <filename>.hs` to compile it to `<filename>.exe` on Windows or just a binary `<filename>` on *nix. 
+
+Be sure to do the knowledge checks.
+
+---
+
+# Haskell Basics
+
+Let's understand that code better and review the basics of Haskell that you've already seen from your reading.
+
+First, Haskell is a statically-typed language. Every expression has a well-defined type that is known at compile time.
+
+A Haskell source file is a list of definitions where are largely either functions or constants (ignoring modules for now). Each definition has an equals sign: `=`.
+
+Each defition can have a type explicitely listed, or Haskell can try to infer it. Usually we like to list them, especially for functions, for documentation. Types can be hard to parse by eye. 
+
+--- 
+
+# Expressions vs. statements
+
+A definition looks like this:
+```haskell
+name :: type
+name arg1 arg2 ... = expression
+```
+
+An expression is something that has a value.
+
+A statement is a command that changes state.
+
+Haskell *does not* have statements. It does not permit state to change (within the program). There is no *if statement*. It is an *if expression*.
+
+Every definition, including `main`, has an expression as its right-hand side.
+
+---
+
+# Names
+
+Variables in Haskell aren't really variables, because they can't change.
+
+But we call them that anyway.
+
+Anyway, they can be named the same as C variables: no number up front, but any combination of lowercase, uppercase, and numeric chars. 
+
+Haskell usually uses camelCase rather than snake_case, but you can use either.
+
+However, unlike C, you can put a `\` ` ("prime") anywhere but the first character.
+
+So `hello'` and `world''` and technically `w''orld` (but don't do that) are valid names.
+
+---
+
+# Basic Types
+
+Haskell has a number of basic types that should be pretty familiar:
+- Int: a fixed-width int that is at least 29 bits wide.
+- Bool: a boolean value (true or false)
+- Float: an IEEE-754 32-bit float
+- Double: an IEEE-754 64-bit float
+- Char: a unicode codepoint*
+- Integer: a bigint that can store integers of any length that fit in memory.
+- (): the "unit" type. Both a type and a value. Used when no meaningful value is necessary.
+
+
+<div class="footnote">
+
+* most common printed characters have exactly one codepoint unless you're doing Zalgo text or something. Can be more than one codepoint for complicated characters or visual characters.
+
+</div>
+
+---
+
+# Compound Types
+
+Haskell also has an equivalent to structs. 
+They are a little weirder, so we'll be saving that for next module. 
+
+However, some important compound types:
+- [Type]: a list of types. E.g., [Int] is a list of Ints. [Float] is a list of float.
+- String is just a renaming of [Char]. It's a list of Chars.
+- Ratio (requires `import Data.Ratio`). A rational number, *not a float*, actually stores the fraction as numerator/denominator as two Integers, so e.g., 3/10 can be represented exactly.
+- IO Type: a program that, when it is eventually run (by someone else), it will result in "Type". E.g., IO Int is a program that will do some I/O and then return an Int.
+- (TypeA, TypeB, ...): a tuple. (Int, Float) is a pair of an int and a float.
+
+---
+
+# The most important type
+
+But the most important type of all is the function. It's a functional language, after all.
+
+Function types are written with an arrow: `->`
+
+Example: `Int -> Int` is the type of a function that takes an `Int` and returns an `Int`
+
+`Float -> String` is the type of a function that takes a `Float` and returns a `String`.
+
+[What is the type of a function that takes *two* ints and returns an int?]
+
+---
+
+# Functions are curried
+
+`Int -> Int -> Int`
+
+Functions are curried by default. This is equivalent to `Int -> (Int -> Int)`.
+
+Consider this function:
+```haskell
+add :: Int -> Int -> Int
+add a b = a + b
+```
+
+What is the type of
+```haskell
+add 7
+```
+?
+
+---
+
+# Currying and partial application
+
+We filled in the first int in an `Int -> (Int -> Int)`
+
+So the result is an `Int -> Int`.
+
+Specifically, it's a function that adds 7 to things.
+
+We can even partially apply the addition operation itself. `(+) :: Int -> Int -> Int`
+
+`(+7)` is a function that adds 7 to things, as is `(7+)`.
+
+And we can write this:
+```haskell
+add7 :: Int -> Int
+add7 = (7+) 
+```
+
+`add7` has type `Int -> Int`, and so does `(7+)`, so this type checks successfully.
+
+---
+
+# Types and values are different!
+
+If I ask for the type of a function, like `(+)`, the answer is `Int -> Int -> Int`
+
+If I ask for the definition of a function that adds two values together, you can say:
+```haskell
+whatever a b = a + b
+```
+or
+```haskell
+whatever = (+)
+```
+
+or 
+```haskell
+whatever = \a -> \b -> a + b -- these are lambdas btw
+```
+
+In Haskell we write `\a -> expr` instead of $\lambda a. \mathrm{expr}$, but it's the same thing.
+
+---
+
+# Types and values are different! (2)
+
+A datatype represents a set of values. For example, `Int` is the set of all integers of a certain bit width.
+
+There is another kind of type called a *type class* (not the same thing as an object-oriented class) that we'll talk about later.
+
+A value represents an element of a datatype. 
+
+So `Int` is a type, and `7` is a value.
+
+---
+
+# Are they entirely separate? Dependent typing.
+
+
+
+---
+
+
+# Knowledge Check 1
+
+1. Define a function, named `foo` that takes a Float named `x` and doubles it.
+2. What is a type that function could be?
+3. Define a function with the type `Float -> Float -> Float -> Float`
+4. Define a function that takes an Integer and then ignores it and returns `7`. Give it a type as well.
+
+---
+
+# Knowledge Check 1 answers
+
+1. `foo x = 2.0 * x` or `foo = (2.0 *)`
+2. `Float -> Float` or `Double -> Double` are good answers.
+3. `evalLinear a b x = a * x + b` is one answer.
+4. 
+```haskell
+justBe7 :: Integer -> Integer
+justBe7 x = 7
+-- or
+justBe7 :: Integer -> Integer
+justBe7 = const 7
+```
+`const` is a function that takes a value, and then returns a function that throws its argument away and returns the value you gave to `const`.
+
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# More about const
+
+It's sometimes possible to pretend functional programming languages are normal.
+
+But `const` illustrates how they're not.
+
+`const` is a function that returns a function. And the function it returns just returns whatever value you gave const.
+
+It's kind of a good way to determine if you've mastered lambda calculus. [Try writing it?]
+
+---
+
+# Const
+
+A few options, assuming the type is `Int`:
+
+```haskell
+const' :: Int -> Int -> Int
+const' x = \ _ -> x
+-- or
+const'' :: Int -> Int -> Int
+const'' x _ = x
+```
+
+The top one returns a lambda that returns `x`.
+
+The bottom one actually does too, because of currying.
+
+In general, if there's a variable we don't care about, we name it `_`. It's a valid name, but it's special because many variables can be named `_` without conflicting.
+
+but what if we don't know the type?
+
+---
+
+# Type parameters
+
+Sometimes we want a function that works with any type, as long as its consistent.
+
+For example `x -> x`, fill in `x`, but make sure the return is the same type.
+
+That's one thing we can do:
+```haskell
+const''' :: x -> x -> x
+const''' x _ = x
+```
+
+Every defined type is required to have an uppercase name. If a type name is lowercase, it is a type variable. Also called a type parameter.
+
+Here, the purpose is to make sure that the two values have the same type.
+
+But wait, we don't ever use the second parameter. Why does it need to be the same? Could we do something else?
+
+---
+
+# The real type of `const`
+
+The actual type is this:
+```haskell
+const :: a -> b -> a
+const x _ = x
+```
+
+---
+
+# Questions?
+
+<!--  -->
+
+---
+
+# Parametric functions
+
+
+
+---
+
+# Parametric polymorphism
