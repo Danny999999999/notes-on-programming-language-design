@@ -1050,6 +1050,30 @@ Functional languages can do parallel programming effortlessly, something that wi
 
 ---
 
+# More paradigms (2)
+
+So far, you've done a lot of programming in imperative langauges.
+
+It's fairly easy to learn a new one now. You kind of know what to do: "How do I make variables? How do I write loops? How do I define procedures?"
+
+But that's only imperative languages. Functional languages can be *radically* different. 
+
+Consider [this graph](https://griffsgraphs.wordpress.com/wp-content/uploads/2012/07/programming-languages_label.png)...
+
+---
+
+# More paradigms (3)
+
+With an imperative background, we can learn about half that graph fairly straightforwardly.
+
+But the other half of the graph will seem completely opaque.
+
+The purpose of this class is so that no programming paradigm will feel completely out there.
+
+Which is good, because it's actually common for programming lanugages to borrow features from other paradigms.
+
+---
+
 # Questions
 <!-- _class: invert questions -->
 
