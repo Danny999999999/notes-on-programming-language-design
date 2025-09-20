@@ -1109,8 +1109,10 @@ Now, work through:
 - [Truth Values](https://en.wikibooks.org/wiki/Haskell/Truth_values) to learn about boolean functions.
 - [Type Basics](https://en.wikibooks.org/wiki/Haskell/Type_basics) to learn how to describe types.
 - [Lists and Tuples](https://en.wikibooks.org/wiki/Haskell/Lists_and_tuples) to learn how to describe lists and tuples.
+- [Next steps](https://en.wikibooks.org/wiki/Haskell/Next_steps) to learn control structures.
+- [Building vocabulary](https://en.wikibooks.org/wiki/Haskell/Building_vocabulary) to learn about composition
 
-We are going to cover some of these briefly, but I'm really relying on you to the basic legwork in working through these chapters.
+These chapters aren't too long, but what's really important is the thinking afterward. Really consider how Haskell "feels" and what the pain points are, if any.
 
 ---
 

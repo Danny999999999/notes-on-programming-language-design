@@ -526,7 +526,7 @@ So `hello'` and `world''` and technically `w''orld` (but don't do that) are vali
 
 Haskell has a number of basic types that should be pretty familiar:
 - Int: a fixed-width int that is at least 29 bits wide.
-- Bool: a boolean value (true or false)
+- Bool: a boolean value (True or False)
 - Float: an IEEE-754 32-bit float
 - Double: an IEEE-754 64-bit float
 - Char: a unicode codepoint*
@@ -582,11 +582,12 @@ add :: Int -> Int -> Int
 add a b = a + b
 ```
 
-What is the type of
+If you leave the type off, Haskell will try to infer it. 
+
+What type will it infer of this?
 ```haskell
 add 7
 ```
-?
 
 ---
 
@@ -616,7 +617,7 @@ add7 = (7+)
 
 If I ask for the type of a function, like `(+)`, the answer is `Int -> Int -> Int`
 
-If I ask for the definition of a function that adds two values together, you can say:
+If I ask for a function itself that adds two values together, you can say:
 ```haskell
 whatever a b = a + b
 ```
@@ -644,9 +645,48 @@ A value represents an element of a datatype.
 
 So `Int` is a type, and `7` is a value.
 
+You will never see:
+```haskell
+someFunction :: 7 -> Int
+```
+
+Becuase `7` is not a type, so you can't write a funciton that takes the type "`7`".
+
+---
+
+# The distinction
+
+That doesn't mean you can't write a function that only is defined on seven:
+```haskell
+onlyTakes7 a =
+    if a == 7 then True
+    else error "Ahh!!! Only 7s!!!"
+```
+
+But the type of that function is something like `Int -> Bool`, not `7 -> Bool`.
+
+Likewise, we can't have a function return a type:
+
+```haskell
+returnsInt = Int
+```
+
+You can define type aliases, which is kind of similar, but functions take and return values, and types describe other types. They are two separate categories.
+
+
 ---
 
 # Are they entirely separate? Dependent typing.
+
+In some programming languages, like [this one](https://rocq-prover.org/), types and values aren't entirely different.
+
+You could write a function that takes 7. Well, it would take an Int, and then a proof that the Int is exactly 7.
+
+You could also write a function that takes a list of 7 values.
+
+The type can depend on values, so this is called *dependent typing*.
+
+But Haskell is not a dependently-typed language (unless extensions are used). Types and values are different, and it's very important to understand the difference.
 
 
 
@@ -748,18 +788,343 @@ const :: a -> b -> a
 const x _ = x
 ```
 
+Notice the `b`. The function that is returned can take anything, it doesn't have to be the same type that is returned. 
+
+This is permitted, for example:
+```haskell
+alwaysReturnHello :: Int -> String
+alwaysReturnHello = const "Hello"
+
+-- somewhere else:
+print (alwaysReturnHello 29) -- prints "Hello"
+```
+
 ---
 
-# Questions?
+# Parametric type
 
-<!--  -->
+A type that has at least one type parameter is called a parametric type.
 
----
+You've already seen these, in Java or C++, an `ArrayList<Integer>` or a `vector<int>` are both parametric types.
 
-# Parametric functions
+You need to know what the list is storing to create it.
 
+In Haskell, there isn't any special syntax to define parameteric types. No angle brackets. You just make the type parameter lowercase.
 
+So instead of `List<T>`, we write `[t]`
 
 ---
 
 # Parametric polymorphism
+
+We'll talk more about polymorphism in future modules, but Haskell relies more on parametric polymorphism than Java or C++ do.
+
+Polymorphism is just the idea that a function can do something different based on the types of its arguments.
+
+For example, printing a list is different than printing an integer.
+
+Parametric polymorphism is when the parameters to a function can be different types, and those types are resolved at compile time.
+
+There's also sub-type polymorphism, where we inherit from something to change its behavior. We'll see this later.
+
+---
+
+# Knowledge check 2
+
+1. Define a type that takes three arguments of any type and returns something of the same type as the first argument.
+2. Define a function of that type.
+3. Define a function that's like `const`, but the function it returns takes two values of any type (instead of one) before ignoring them and returning the argument to const (also of any type).
+4. What is the type of that function?
+
+---
+
+# Knowledge check 2 answers
+
+1. `x -> y -> z -> x`
+2. `pickTheFirstOne a _ _ = a`
+3. same as answer 2
+4. same as answer 1 
+
+---
+
+# Questions?
+
+<!-- _class: invert questions  -->
+
+---
+
+# Back to functions
+
+In functional programming, functions are values just like any other. Just like ints.
+
+What can we do with ints? We can add them, multiply them, all kinds of stuff.
+
+What can we do with functions?
+
+---
+
+# Back to functions (2)
+
+Well, one thing is we can call them. Easy.
+
+We can also define new ones.
+
+But how can we combine two functions? We can add two ints together. Are functions really like that?
+
+[what do you think? Maybe from one of the readings?]
+
+---
+
+# Yes: composition
+
+We can absolutely combine functions.
+
+In Haskell, it uses the 'dot' operator.
+
+`f . g` is "f composed with g". 
+
+But what does that mean?
+
+---
+
+# Mathematically
+
+In math, we write $(f \circ g)(x)$ to mean $f(g(x))$
+
+It means "first do g, then do x"
+
+But why bother? For the math you've been introduced to so far, it's not all that important.
+
+But the benefit is, it gives us a way to create new functions in very little code.
+
+---
+
+# Some examples
+
+All of these pairs of functions are equivalent:
+
+```haskell
+something x = 2*x + 7
+something' = (+7) . (2*)
+```
+
+```haskell
+doubleAndPrint x = print (2 * x)
+doubleAndPrint' = print . (2*)
+```
+
+```haskell
+plus2 x = x + 2
+plus2' = (+2)
+plus2'' = (+1) . (+1)
+```
+
+---
+
+# Why?
+
+We'll see how this can be convenient later, but it enables us to think of functions as "pipelines" from one value to another.
+
+With a function like `stuff x = print (2*x + 1)`, notice that your attention has to bounce around. First the `x` gets multiplied by `2`, then we add `1` to it, but then we move back to the left to `print` it.
+
+Instead, `stuff' = print . (+1) . (2*x)` describes what happens as an exact pipeline. First we double, then we add 1, then we print. Done.
+
+This "pipeline" style of programming is central to functional programming. We don't allow variables to change, so the "pipes" that feed one value to another are more important.
+
+---
+
+# Point-free programming
+
+Notice that when we do this, the variable goes away on the left-hand side:
+```haskell
+stuff x = print (2*x + 1) -- versus
+stuff' = print . (+1) . (2*x)
+```
+
+The reason is that the composition operators create a function that takes a value, so we don't need a variable.
+
+This style of coding is called "point free". The point in question is the parameter*. Ironically there are a lot of points in the sense of `.` . 
+
+It's an optional coding style that is culturally popular in Haskell. It can be intimidating at first, but you'll get better at reading it.
+
+<div class="footnote">
+
+\* Calling parameters "points" comes from homotopic geometry or something.
+
+</div>
+
+---
+
+# Knowledge Check 3
+
+1. Define a function point free that evaluates the polynomial $x^2 + 2x + 9$ point free.
+2. What is a type that is compatible with the function you defined? (That is, it wouldn't be wrong to put that type above it).
+3. What is the type of `(*2.5) . (*2.5) . (*2.5)`?
+4. Rewrite that function but not point-free.
+
+
+
+---
+
+# Knowledge Check 3 answers
+
+1. `f = (+9) . (2.5*) . (^2)`
+2. `Float -> Float`
+3. `Float -> Float`
+4. `f x = 2.5 * 2.5 * 2.5 * x` or `f x = 15.625 * x`
+
+
+---
+
+# Let, where, and guards
+
+So far, all of our variables have been definitions. At the top level, we've said:
+```haskell
+someName = some expression
+```
+
+This is fine, but we don't want all of our names to be global. Sometimes we just want something named "foo" or "x" and we don't want Haskell to complain that we're redefining this important term.
+
+This is where let-expressions come in.
+
+---
+
+# Let
+
+The let keyword "lets" you define one or more temporary constants or functions that are only used in one expression.
+
+For example:
+```haskell
+add3 =
+    let add1 = (+1)
+        add2 = (+2)
+    in  add1 . add2 
+```
+
+Here, we're basically saying "first define add1 and add2, and then replace the values in this expression here. The result is add3.
+
+Haskell is whitespace sensitive, but it's more flexible than python. Here, the definitions in the let need to have the same indentation.
+
+---
+
+# Let-in is an expression
+
+Note: this is not a statement! It is an expression. We can use "let" anywhere an expression is allowed.
+
+`print (let x = 2 in x * x)` will print `4`
+
+
+Inside of a `do` block, there is no `in`, the definition just continues throughout the block. We haven't really talked about `do` blocks in detail yet, so we won't say too much more about this now.
+
+So with `let`, we can just simplify complicated expressions into a single variable or define little temporary functions. Both can improve readability.
+
+---
+
+# Where
+
+Sometimes it's nice to define the functions *after* they are needed. It can keep function bodies clean.
+
+For this, there is the `where` keyword:
+```haskell
+add3andDouble :: Int -> Int
+add3andDouble = double . add1 . add2
+ where
+    double :: Int -> Int
+    add1 :: Int -> Int 
+    add2 :: Int -> Int
+    double = (2*)
+    add1 x = 1 + x
+    add2 = add1 . add1
+```
+
+---
+
+# Where (2)
+
+The `where` keyword needs to be more indented than the function it is describing, which is why I gave it that one space.
+
+One major benefit of `where` over `let` is that it lets you define types for the functions.
+
+The types don't have to all be at the top of the where block either, I just did that to show you that type declarations don't need to be directly adjacent to the function they are about.
+
+`where` is not an expression though, you can't just put it anywhere. It has to go beneath definitions.
+
+Which should you use? I like to use let for small temporaries, and where when the temporary functions have complicated types.
+
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Important odds and ends
+
+There are a few Haskell features that are important, but that deeper coverage of which requires some more time.
+
+We'll learn more about these soon, but for now, here's all you need to know.
+
+---
+
+# pattern matching
+
+You can define a function on several values, and Haskell will pick the definition that matches.
+
+```haskell
+f :: Int -> Int
+f 0 = 0
+f 1 = 1
+f x = x + 1
+```
+
+In this case, if I write `f 7`, you get `8`, but if I write `f 0` you get `0`.
+
+When you write `f 7`, haskell checks "is it `0`? no, okay is it `1`?" in order from top to bottom. So order matters.
+
+---
+
+# Tuples
+
+What if we want a function to return two values?
+
+Well, we can. Using a tuple:
+
+```haskell
+doubleAndAdd3 = Int -> (Int, Int)
+doubleAndAdd3 x = (2*x, x + 3)
+```
+
+Here, `(Int, Int)` is the type "a pair of ints".
+
+But how do we get values back out?
+
+---
+
+# Tuples (2)
+
+There are two functions, `fst` and `snd`:
+```haskell
+fst (1, 2) == 1
+snd (1, 2) == 2
+```
+
+It feels weird to use functions to unpack a tuple 
+
+---
+
+# Read and show
+
+
+---
+
+# Mod, div, rem
+
+---
+
+# Next steps
+
+Work through the chapter on [Simple input and output](https://en.wikibooks.org/wiki/Haskell/Simple_input_and_output)
+
+Work through the chapter on [Recursion](https://en.wikibooks.org/wiki/Haskell/Recursion).
