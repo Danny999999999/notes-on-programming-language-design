@@ -1334,6 +1334,30 @@ Just remember, "*In functional programming, functions come first.*"
 
 ---
 
+# Programming language design
+
+This is actually a good illustration of how programming languages can be "designed".
+
+You might think it's dumb that ``-x `mod` y`` means ``-(x `mod` y)``, and it kind of is, but how do you fix it?
+
+There's a nice, simple rule in Haskell: functions first. Super easy to remember, and very useful when parsing expressions.
+
+If you make it something like "unary operators first, then functions, then everything else", it's now more complicated. And what if you don't want unary operators to always come first? What if they need to be allowed to vary?
+
+---
+
+# Programming language design (2)
+
+Here, we are balancing simplicity versus intuition.
+
+We could make things even simpler by removing operator precedence entirely, but then `x + y * z` would be `(x + y) * z`. That would fool a lot of people who are expecting a more mathematical order of operations.
+
+But, unironically, for me, I think it might be worth it. I kind of like precedence-free languages, and I'll be showing you some later.
+
+When you don't like something in a programming language, try considering what desires were being balanced, and what limitations prevented everything from being realized.
+
+---
+
 # Questions?
 
 <!-- _class: invert questions -->
