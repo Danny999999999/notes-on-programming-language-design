@@ -1060,17 +1060,17 @@ Which should you use? I like to use let for small temporaries, and where when th
 
 ---
 
-# Important odds and ends
+# Important extra features
 
 There are a few Haskell features that are important, but that deeper coverage of which requires some more time.
 
-We'll learn more about these soon, but for now, here's all you need to know.
+We'll learn more about these soon, but for now, here's what you need to know.
 
 ---
 
 # pattern matching
 
-You can define a function on several values, and Haskell will pick the definition that matches.
+You can define a function on specific values, and Haskell will pick the definition that matches.
 
 ```haskell
 f :: Int -> Int
@@ -1110,16 +1110,233 @@ fst (1, 2) == 1
 snd (1, 2) == 2
 ```
 
-It feels weird to use functions to unpack a tuple 
+It feels weird to use functions to unpack a tuple. What if we want a triple? Do we need another set of functions?
+
+```haskell
+-- these don't exist
+fstOf3 (1, 2, 3) == 1
+sndOf3 (1, 2, 3) == 2
+thdOf3 (1, 2, 3) == 3
+```
+
+---
+
+# Pattern matching with tuples
+
+In fact, we just use pattern matching again.
+
+In Haskell (and many functional languages), **pattern matching is the main way that we get data out of compound data types**.
+
+That is, there's no "dot notation" here. And we don't use array notation for tuples like we do in Python.
+
+Instead, we use definitions to break them apart...
+
+---
+
+# Pattern matching with tuples
+
+One way to use pattern matching to get data out is to define a function on the patterns. This is how `fst` and `snd` are defined:
+
+```haskell
+fst :: (a, b) -> a
+fst (x, _) = x
+
+snd :: (a, b) -> b
+snd (_, y) = y
+```
+
+Here, when you call `fst (7, 8)`, Haskell sees that `fst` is defined on a tuple. It will bind `7` to `x`, and `8` to `_` (and remember that `_` means "we don't care"). Then it returns `x`.
+
+---
+
+# Pattern matching with let (2)
+
+Another way to use pattern matching is to use `let`.
+
+Suppose I want to get both the first and second values out of a pair. Suppose I have a pair, `nameAndEmployeeId = ("Bob", "12345")` I could do this (rather inefficiently):
+
+```haskell
+-- this is not a great way to do it
+employeeData :: String
+employeeData = 
+    let name = fst nameAndEmployeeId -- name == "Bob"
+        employeeId = snd nameAndEmployeeId -- employeeId == "12345"
+    in  "Employee: " ++ name ++ "; Id: " ++  employeeId
+```
+
+`++` is the operator for string concatenation.
+
+But this is inefficient. We're having to use two function calls just to get some data out of a tuple. Is there a better way?
+
+---
+
+# Pattern matching with let (3)
+
+Instead of doing that, try this:
+
+```haskell
+employeeData :: String
+employeeData = 
+    let (name, id) = nameAndEmployeeId  -- we do need the parentheses
+    in  "Employee: " ++ name ++ "; Id: " ++  employeeId
+```
+
+Here, we use pattern matching. When Haskell sees `(x, y)` on the left of an equals, it looks to the right side and unpacks the first element into `x`, and the second into `y`.
+
+This also applies to triples, which brings me to the knowledge check...
+
+---
+
+# Knowledge check 4
+
+1. What should the type of `sndOf3` be?
+2. Write an implementation of `sndOf3`.
+   (Note: implementing a function means defining it)
+3. Write both the type and implementation of a function that takes a 4-tuple where the first and last elements are floats, but the middle elements can be anything. The function should return the sum of the first and last element.
+4. Is `sumFstAndLst (4, "blip", [1,2,3], 5)` correctly-typed? Haskell will interpret `4` as `4.0`, but what about the string and list?
+
+---
+
+# Knowledge check 4 answers
+
+1. `(a, b, c) -> b`
+2. `sndOf3 (_, b, _) = b`
+3.
+``` haskell
+sumFstAndLst :: (Float, a, b, Float) -> Float
+sumFstAndLst (a, _, _, b) = a + b
+```
+
+Note for that last one: values are allowed to have the same name as type paramters. 
+
+4. Yes. The middle two shouldn't matter if you wrote the right type.
+
+---
+
+# Questions?
+<!-- _class: invert questions -->
 
 ---
 
 # Read and show
 
+How do we cast a value to a string?
+
+In Haskell, there isn't really a special "cast" operator. We don't do like `(String)20` or something. Instead, we call a function.
+
+The function for converting things into a string is `show`.
+
+For example, `show 20 == "20"`.
+
+If you look at the type of `show`, you get something a little weird:
+`show :: Show a => a -> String`
+
+---
+
+# Read and show (2)
+
+What is the capitalized `Show`? That's called a typeclass.
+
+Despite the name, typeclasses aren't classes. They are more like interfaces. 
+
+In this case, the type is read: "given some type `a` that is an instance of `Show`, I will take an `a` and return a `String`.
+
+Basically, the thing you call `show` on has to be "showable". Which most basic and even compound datatypes are. 
+
+Int, Float, tuples of showable things, and lists of showable things, are all showable.
 
 ---
 
 # Mod, div, rem
+
+Lastly, there's division. I put this off because it's annoying.
+
+You can divide floats like this:
+```haskell
+2 / 5 == 0.4
+```
+
+The `/` operator *only* works with floats, so here, `2` and `5` are being interpreted as floats (not casted, it's as if you wrote `2.0` and `5.0`).
+
+You can't do this:
+```haskell
+let x = 2 :: Int
+    y = 5 :: Int
+in x / y
+```
+
+---
+
+# Mod, div, rem (2)
+
+The problem here is that the `/` function is only defined on Fractional numbers, and Int doesn't count:
+`(/) :: Fractional a => a -> a -> a`
+
+`Fractional` is another of those type class things. Floats and Doubles are fractional, and so are Ratios, but Ints are not.
+
+So how do you divide integers?
+
+---
+
+# Fixity
+
+You use the `div` function: `div 5 2 == 2`
+
+"Eww, do I really have to write it like a function?`
+
+Sort of, but `div` is a binary function, meaning, it's a function of two arguments. Haskell lets you write binary functions in *infix* position. 
+
+The *fixity* of an operator tells us where it can appear. A prefix operator (which functions normally are) goes before its operand (argument).
+
+A postfix operator goes *after*. `++` in C can be either prefix (`++x`) or postfix (`x++`) in that language. Haskell does not have any postfix operators.
+
+---
+
+# Precedence
+
+However, Haskell allows you to turn *any* binary function into an infix operator by putting backticks `` ` ` `` around it.
+
+So you can do this: ``5 `div` 2``, which returns `2`.
+
+Normally, when we talk about operators, we also talk about precedence, which is the order of operators being applied. For example, `*` has higher precedence than `+`, because `1 + 2 * 3 + 4` is treated as `1 + (2 * 3) + 4`.
+
+However, functions always have the highest possible precdence. 
+
+---
+
+# Mod, div, rem (3)
+
+There are also `mod` for modulus, and `rem` for remainder. 
+
+Wait, there's a difference? 
+
+For positive numbers, no.  But for negative numbers: ``(-2) `mod` 5`` actually is `3`, because the *mod* function treats numbers like they're on a clock.
+
+Since `4` is the largest number we can have mod `5`, `-1` is the same as `4` mod `5` (wrapping around from zero), and `-2` mod `5` is `3`.
+
+If you haven't encountered this concept before, [here's an excerpt from a contemporary math textbook that explains it](https://openstax.org/books/contemporary-mathematics/pages/3-7-clock-arithmetic).
+
+`rem`, on the other hand, is just the remainder. So ``(-2) `rem` 5`` is just `-2`.
+
+But why did we need parentheses in ``(-2) `mod` 5``? Well... 
+
+---
+
+# Precedence (2): A strange, unfortunate interaction
+
+...Because functions (whether infix or prefix) have the highest precedence, that means unary minus signs do not.
+
+So this: ``-2 `mod` 5`` means ``-(2 `div` 5)``, and not ``(-2) `mod` 5`` like you would expect.
+
+This is easy to forget, but the basic rule that causes it is easy to remember: functions have the highest precedence, no matter what.
+
+Just remember, "*In functional programming, functions come first.*"
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
 
 ---
 
