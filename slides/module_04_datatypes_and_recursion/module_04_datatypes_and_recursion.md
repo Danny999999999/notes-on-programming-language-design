@@ -118,7 +118,128 @@ They are actually extremely common in actual professional code, but you may not 
 
 Enums are very common as a way to describe states or commands.
 
-For example, a webserver has certain `modes` for connections, where it might be parsing, authenticating, 
+For example, a webserver has certain `modes` for connections, where for each one it might be parsing requests, authenticating, or sending data.
+
+And games have states, too...
+
+---
+
+# Gamestate enum
+
+Suppose we’re making a basic video game in C.
+
+It’s common to implement states as enums:
+```c
+typedef enum {
+    STATE_SPLASH_SCREEN = 1, //skip state 0, maybe use it to debug
+    STATE_MAIN_MENU,
+    STATE_CHAR_SELECT,
+    STATE_IN_GAME,
+    STATE_LOADING
+} GameState;
+```
+How do we use them?
+
+---
+
+# States in old-school C
+
+Typically there’s some kind of if-statement or switch where we do something depending on which state we’re on:
+
+```c
+if( current_state == STATE_SPLASH_SCREEN )
+    update_splash_screen( time_remaining );
+else if( current_state == STATE_MAIN_MENU )
+    update_main_menu();
+else if( current_state == STATE_CHAR_SELECT )	
+    update_char_select( secret_chars_unlocked );
+else if …
+```
+
+(protip, if you start your states at 0 or close to 0, you can then use the state variable as an index into an array of function pointers.
+
+`GameState state_impls[] = { &DoDebug, &DoSplash, &DoMenu, … }; )`
+
+---
+
+# Explanation
+
+Here, we're using an enum to describe all the states we could be in.
+
+When we're in a state, we do some unique action. I'm glossing over that part.
+
+The only issue is, the data the state needs to access is probably global with this approach. Not the end of the world, but not always good. For example, in the webserver example, there might be thousands of connection objects.
+
+It's possible to attach each state enum to a void* data. This is called a "tagged union". But it's not 100% typesafe: we have to make sure to always interpret the `void*`...
+
+```c
+typedef Connection {
+    ConnectionState state; // CONNECTING, SENDING, PARSING, etc.
+    void* data; // unique data for each state.
+}
+```
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Back to Haskell
+
+So, what about our game we're writing in Haskell?
+
+Haskell doesn't have `void*`, (technically, it's possible but not recommended). 
+
+Instead, it has typesafe ways of doing this.
+
+We want to associate data for each state:
+- For the splashscreen, maybe how much time has passed so we can fade in.
+- For the main menu, no extra data.
+- For character select, which extra characters have been unlocked.
+- For the in-game state, probably a lot of data. Which characters were selected, their health and meters, the time left, the stage, etc.
+- For the loading state, what data are we loading?
+
+---
+
+# Back to Haskell (2)
+
+At first glance, Haskell seems like it has an exact substitute for enums.
+
+We use `data` to define a new datatype...
+
+```haskell
+data GameState = 
+        Splash	
+    |  	MainMenu
+    |   CharSelect	
+    |   Loading	
+    |   InGame
+```
+
+Use the vertical bar `|` to separate variants.
+
+----
+
+# Differences between C and Haskell enums/datas
+
+You don’t define the actual number that each variant takes. (that’s hidden by the compiler)
+
+You separate with `|` instead of `,`
+
+We use initial camel case instead of all-caps snake case. 
+
+In Haskell you *may not* mix variants from other types.
+
+Suppose `f :: GameState -> Bool`
+This is allowed: `f InGame`
+This is forbidden: `f Red`
+
+Haskell is very strictly-typed here. The variants are not just constants. They are real values that can't be mixed with incompatible types.
+
+---
 
 
 
