@@ -1218,6 +1218,61 @@ Note for that last one: values are allowed to have the same name as type paramte
 
 ---
 
+# Case
+
+Sometimes we want to do pattern matching outside of a function, but with more than one kind of pattern.
+
+For example, let is useful if we want to destructure a tuple: `let (x, y) = pair in ...`
+
+But what if we want to do one thing if x is exactly 2?
+
+There's another destructuring expression called `case`.
+
+```haskell
+let result = 
+    case pair of
+        (2, y) -> y
+        (x, y) -> x
+```
+
+This makes `result == y` if `fst pair == 2`, and `snd pair` otherwise.
+
+---
+
+# Guards
+
+Sometimes we want to define a function or expression with more complicated rules than just specifying all the patterns.
+
+Like maybe it does one thing for even values and a different thing for odd values. Or maybe it gives a different result for values greater than 10...
+
+We can do that like this:
+```haskell
+maxEsrbRatingForAge :: Int -> String  
+maxEsrbRatingForAge age 
+    | age <= 3 = "EC" -- the indentation is significant
+    | age <= 12 = "E"
+    | age < 17 = "T"
+    | otherwise = "M"
+```
+
+---
+
+# Guards (2)
+
+This is equivalent to using ifs, but nicer:
+```haskell
+maxRating age = 
+    if age <= 3 then "EC"
+    else if age <= 12 then "E"
+    else if age < 17 then "T"
+    else "M"
+```
+
+Guards have a nicer syntax, but they can only be used when defining functions.
+
+
+---
+
 # Read and show
 
 How do we cast a value to a string?
@@ -1386,3 +1441,7 @@ When you don't like something in a programming language, try considering what de
 Work through the chapter on [Simple input and output](https://en.wikibooks.org/wiki/Haskell/Simple_input_and_output)
 
 Work through the chapter on [Recursion](https://en.wikibooks.org/wiki/Haskell/Recursion).
+
+The real grind: do some codewars! At this point, you should be able to do most Haskell problems of 8-kyu difficulty. Go [here](https://www.codewars.com/kata/search/haskell?q=&r%5B%5D=-8&beta=false&order_by=sort_date%20desc) and start grinding!
+
+This is the best practice. Don't forget to look at the top solution! It will sometimes be bizarre, but you can learn a lot from ultra-elegant Haskell code.
