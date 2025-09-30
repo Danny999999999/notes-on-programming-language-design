@@ -1247,6 +1247,23 @@ Int, Float, tuples of showable things, and lists of showable things, are all sho
 
 ---
 
+# Read and show (3)
+
+The opposite of `show` is `read`. 
+
+`show` is a function that turns things into strings. `read` is a funciton that turns strings into other things.
+
+Any type that supports construction from a string implements `Read`. For example, `Int` implements `Read`.
+
+```haskell
+foo :: Int
+foo = read "123"
+```
+
+If you pass an invalid string, you just get a runtime error.
+
+---
+
 # Mod, div, rem
 
 Lastly, there's division. I put this off because it's annoying.
