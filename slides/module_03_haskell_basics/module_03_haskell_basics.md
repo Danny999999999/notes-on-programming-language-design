@@ -1436,6 +1436,37 @@ When you don't like something in a programming language, try considering what de
 
 ---
 
+# Last Knowledge Check
+
+1. Write a recursive funciton, fully typed, that computes the factorial. It should take and return `Integer`.
+2. Write a point-free function and its type where it takes a string and prints three times its length.
+3. Write a function with appropriate type that takes two leg lengths of a right triangle and returns the length of the hypotenuse.
+
+---
+
+# Last Knowledge Check Answers
+
+1. 
+```haskell
+fact :: Integer -> Integer
+fact 0 = 1
+fact n = n * fact (n - 1)
+```
+
+2.
+```haskell
+thriceLength :: String -> Int
+thriceLength = (3*) . length
+```
+
+3.
+```haskell
+hypo :: Double -> Double -> Double
+hypo a b = sqrt (a * a + b * b)
+```
+
+---
+
 # Next steps
 
 Work through the chapter on [Simple input and output](https://en.wikibooks.org/wiki/Haskell/Simple_input_and_output)
