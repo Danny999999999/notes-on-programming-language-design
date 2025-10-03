@@ -1089,7 +1089,7 @@ Make sure you understand these concepts:
 
 ---
 
-Before next time:
+# Before next time:
 
 Work through (meaning, follow along and do all the exercises for) these chapters:
 - [Getting set up](https://en.wikibooks.org/wiki/Haskell/Getting_set_up)
@@ -1103,6 +1103,16 @@ main = putStrLn "Hello, world!"
 Compile and run with `ghc main.hs` and then `main.exe` on windows or `./main` on *nix.
 
 We'll talk more next time about the strange functional paradigm. It's not a coincidence that we write `main =` instead of `main() {...}` or `main: ...`
+
+---
+
+# Before next time (2):
+
+Also make sure to familiarize yourself with the Haskell REPL.
+
+REPL stands for "read evaluate print loop". It's when you interactively write code one line at a time and it evaluates the line you typed in. Python has this too.
+
+For us, the REPL will be called "GHCI". The I stands for "interactive". You can write :t <expression> to print the type of the given expression, which is very useful.
 
 ---
 

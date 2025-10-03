@@ -221,6 +221,12 @@ data GameState =
 
 Use the vertical bar `|` to separate variants.
 
+We can then define a variable of this type:
+```haskell
+startingState :: GameState
+startingState = Splash
+```
+
 ----
 
 # Differences between C and Haskell enums/datas
@@ -237,9 +243,357 @@ Suppose `f :: GameState -> Bool`
 This is allowed: `f InGame`
 This is forbidden: `f Red`
 
-Haskell is very strictly-typed here. The variants are not just constants. They are real values that can't be mixed with incompatible types.
+Haskell is very strictly-typed here. The variants are not just constants. They are fully unique values that can't be mixed with incompatible types.
 
 ---
+
+# Constructors
+
+In fact, Haskell does not call these *variants*...
+
+It calls them **constructors**!
+
+Yes, the same term as OO, but used differently.
+
+Consider this datatype: `data Rgb = Red | Green | Blue`
+
+Here, `Red`, `Green`, and `Blue` are all constructors in Haskell.
+
+They are ways of constructing data. If you write `Red`, you have constructed an `Rgb`. Likewise for `Green` or `Blue`.
+
+---
+
+# Knowledge check 1
+
+1. Define a type with two constructors.
+2. Define a different type with four constructors.
+3. Define a function and its type that takes the first type and returns the second.
+4. Call the function. What is the result?
+
+---
+
+# Knowledge check 1 answers
+1. `data Blip = blip | blop`
+2. `data Foo = foo | bar | baz | quux`
+3.
+```haskell
+blorp :: Blip -> Foo
+blorp blip = foo
+blorp blop = baz
+```
+4. `blorp blip`. The result is `foo`.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Real data types
+
+Now we get to something that is clasically confusing. We're going to learn about true tagged unions in a functional language.
+
+This feature isn't just in functional languages anymore. Rust has it for example. It's a nice way of implementing datatypes.
+
+You see, these data types don't just have to be distinct constructors. Each constructor can also carry different data.
+
+For example, what if I want a data type to represent single data values, *or* pairs of values?
+
+We can still do that, and this is where Haskell's data types can do something that a basic C enum cannot do...
+
+---
+
+# Single or Double example
+
+```haskell
+data SingleOrPair =
+        Single Int
+    |   Pair Int Int
+```
+
+Here we've created a new datatype with two constructors: one for single ints, and one for pairs of ints.
+
+`SingleOrPair` is a type. `Single` and `Pair` are constructors, not types.
+
+These two constructors require either one `Int` or two in order to be called.
+
+This is weird, so let me show you how this is used.
+
+---
+
+# Single or Double example
+
+Let's say I want to define a Single or pair: 
+```haskell
+s :: SingleOrPair
+s = Single 20 -- this is fine
+
+t :: SingleOrPair
+t = Pair 30 40 -- also fine
+```
+
+A variable of type `SingleOrPair` can be filled with either a `Single` or `Pair`.
+
+---
+
+# Constructors are not types
+
+We can think of `Single` and `Pair` as different families of values. A `SingleOrPair` can either be a `Single` or a `Pair`. However `Single` is not a type, and neither is `Pair`. 
+
+You *cannot* do this: `s :: Pair`
+because the thing after the `::` is expected to be a type, but `Pair` is a constructor.
+
+Think of `Single` and `Pair` as functions, rather than types, and this will make sense.
+
+But with the `data` keyword, we are expected to exhaustively define all the ways of creating the value.
+
+---
+
+# Datatypes are exhaustive
+
+This is an important point. When you create a data type in Haskell, you must list *all* of its constructors. 
+
+This means, Haskell knows at that point, all of the possible values it could take.
+
+But how do we get the values out? Suppose I have a `Pair 20 30`? How do I get that `20` and `30` back out of it?
+
+---
+
+# Pattern matching
+
+Pattern matching is the main, basic way we get data out of data structures.
+
+Not only in Haskell, but it's fairly common in many functional languages.
+
+One simple way to do it is using case expressions...
+
+---
+
+# Case expressions
+
+This Haskell code will take a `SingleOrPair` and either print the value if it's a single, or print the sum of both values if it's a pair:
+
+```haskell
+main = do
+    let x = Pair 20 30
+    case x of
+        Single y -> print y
+        Pair y z -> print (y + z)
+```
+
+(remember that `let` expressions don't have an `in` clause inside of `do` blocks. We'll talk more about `do` blocks when we get to monads.)
+
+Here, we're using `case` to consider all the possible values that `x` could have. Crucially, *Haskell will warn us if we miss one!* Something that C enums can't always do.
+
+---
+
+# Pattern-matched definitions
+
+Alternatively, we can define functions on particular constructors:
+
+```haskell
+singleOrSum :: SingleOrPair -> Int
+singleOrSum (Single x) = x
+singleOrSum (Pair x y) = x + y
+```
+
+This is saying: `singleOrSum` is a function that, when it receives an `Int` named `x`, it just returns `x`, but when it receives a `Pair` of `x` and `y`, it returns `x + y`.
+
+This works exactly the same as pattern matching on basic values like `Int`:
+```haskell
+fibo 0 = 0
+fibo 1 = 1
+fibo n = fibo (n - 1) + fibo (n - 2)
+```
+
+Here, `Pair 20 30` is just as much a value as `1`.
+
+---
+
+# Knowledge check 2
+
+1. Rewrite that case expression so that there is only one `print`. We're repeating code unecessarily.
+2. Define a data type called `NilOrTriple` which has a constructor `Nil` which takes no arguments, or a triplet of Ints.
+3. Write a function that returns the second value if it is a `Triple`, or `0` if it is a `Nul`. Include its type.
+
+---
+
+# Knowledge Check 2 answers
+
+1. `print (case x of Single y -> y ; Pair y z -> y + z)`
+   (note: we can use semicolons instead of newlines)
+   Make sure this one makes sense: `case` is an expression, not a statement. It has a value that can be substituted for the argument of `print`.
+2. `data NilOrTriple = Nul | Triple Int Int Int`
+3. 
+```haskell
+secondOrZero :: NothingOrTriple -> Int
+secondOrZero x = 
+    case x of Nil -> 0 ; Triple _ y _ -> y
+
+-- or, this is nicer imo vvv
+secondOrZero Nil = 0
+secondOrZero (Triple _ y _) = y 
+```
+
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Behind the scenes
+
+Data types in Haskell work in roughly the same way as they do in C behind the scenes.
+
+There is a number stored in the value for each constructor.
+
+This number is hidden to you, but Haskell keeps track of it.
+
+That means there's a small bit of overhead. And if there is only one constructor, that overhead is optional...
+
+---
+
+# Newtype
+
+Sometimes we know that the data type will have exactly one constructor that takes exactly one piece of data.
+
+This happens when we use types as *wrappers*. That is, we have a basic type, like a String, but it represents something specific, like an Id.
+
+We could do this:
+`data Id = Id String`
+(you're allowed to have constructors with the same name as the datatype)
+
+Here, we're saying an `Id` is just a string. But the user has to explicitly use the constructor so that it's clear they know the string is being used as an `Id`.
+
+---
+
+# Newtype (2)
+
+However, this might involve overhead. What if the Haskell implementation is storing data about the variant, but there's only one variant so it's pointless?
+
+There's a keyword you can use to suggest to Haskell that it should not do this:
+```haskell
+newtype Id = Id String
+```
+
+Here, `newtype` is just like `data`, but it can *only* be used when there is a single constructor that has exactly one field.
+
+Not zero fields: `newtype Blark = Blorp -- wrong!`
+Not two fields: `newtype Bloink = Blip Int Float`
+Exactly one field `newtype Blomp = Bloop Int`
+
+---
+
+# Newtype (3)
+
+Newtype is kind of a janky feature. You don't have to use it, it was added as a tiny optimization.
+
+In programming language design, we often don't like features like this. We generally like features that are *orthogonal*. 
+
+*Orthogonal* features are those that behave the same way consistently, or that interact well with a large number of other features.
+
+---
+
+# Orthogonality
+
+For example, functions in Haskell are a very orthogonal feature. Their basic mechanics are responsible for almost all the features of the language.
+
+Case expressions are also orthogonal: case can be used to match any expression.
+
+`newtype` is not very orthogonal. It only works with a very specific kind of datatype. It's the kind of feature that makes programming language designers say "ugh".
+
+So does that mean we shouldn't have it?
+
+---
+
+# Unfortunately we need it
+
+`newtype` actually does fill a tiny but important role.
+
+You might think "just check to see if there is only one constructor with one field and then omit the extra information that `data` stores."
+
+The problem is that the extra information here also allows the constructor to store erroneous values without crashing the program.
+
+This is getting esoteric, but there is a certain value, called "bottom" (written $\bot$) that basically represents an "unreachable" value.
+
+---
+
+# Unfortunately we need it (2)
+
+With lazy evaluation, a constructor that holds a field with bottom in it will not be considered an error by itself. In rare circumstances this can be desierable. For example, deliberately leaving and undefined value when I know I won't need it but I want to crash if I'm wrong.
+
+I don't expect this all to make sense right now. The main point I'm making is that programming languages aren't things that emerge naturally, or that are necessarily perfect.
+
+Instead, they are things that are engineered. And engineering involves tradeoffs. Every language is going to have something janky in it, and Haskell is no exception.
+
+---
+
+# One more option
+
+There's one more, slightly less janky way of defining new datatypes.
+
+The `type` keyword is useful. It lets you define a *type alias*.
+
+A type alias is literally just another name for a type. Like this:
+
+```haskell
+type Blip = String
+```
+
+Now, everytime I write `Blip`, it will be interpreted as `String`.
+
+```haskell
+f :: Blip -> Blip
+f x =
+    | x == "Hi" = "Hi back at you!"
+    | otherwise = "You said: " ++ x
+```
+(reminder that `++` is string concatination)
+
+---
+
+# Knowledge check 3
+
+1. Use newtype. Just use it to define some kind of type that takes a String as a field.
+2. Now use `type` to define an alias of that type.
+3. Now redefine the function `f` on the previous slide to take your alias. Be sure to use the constructor when defining the function. You can't create an instance of a custom type defined with `data` or `newtype` without calling the constructor, and you can't get data out without some kind of pattern matching (either directly or in a function).
+
+---
+
+# Knowledge check 3 answers
+
+1. `newtype Blop = Blop String`
+2. `type Bloop = Blop`
+3. 
+```haskell
+f :: Bloop -> Bloop
+f (Blop "Hi") = "Hi back at you!"
+f (Blop whatever) = "You said" ++ whatever
+```
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+
+
+---
+
+# Lists
+
+Now that we understand datatypes, let's build a linked list!
+
+Ignore the fact that we already have them. We're trying to understand them better.
+
 
 
 
@@ -259,8 +613,5 @@ For example, if we don't want the head, we can return a new list without the hea
 
 ---
 
-# Pattern Matching
 
----
-
-# Guards
+the function call operator
