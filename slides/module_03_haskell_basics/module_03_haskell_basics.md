@@ -1473,6 +1473,7 @@ Work through the chapter on [Simple input and output](https://en.wikibooks.org/w
 
 Work through the chapter on [Recursion](https://en.wikibooks.org/wiki/Haskell/Recursion).
 
+
 The real grind: do some codewars! At this point, you should be able to do most Haskell problems of 8-kyu difficulty. Go [here](https://www.codewars.com/kata/search/haskell?q=&r%5B%5D=-8&beta=false&order_by=sort_date%20desc) and start grinding!
 
 This is the best practice. Don't forget to look at the top solution! It will sometimes be bizarre, but you can learn a lot from ultra-elegant Haskell code.

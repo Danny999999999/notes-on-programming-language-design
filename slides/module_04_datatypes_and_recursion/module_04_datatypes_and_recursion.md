@@ -584,34 +584,658 @@ f (Blop whatever) = "You said" ++ whatever
 
 ---
 
-
-
----
-
-# Lists
+# Let's make a list!
 
 Now that we understand datatypes, let's build a linked list!
 
 Ignore the fact that we already have them. We're trying to understand them better.
 
+When you took data structures, you probably saw a linked list node like this (Java):
+```java
+class Node<T> {
+    Node<T> next;
+    T data;
+}
+```
 
+So it seems like we could do something like this...
+
+---
+
+# Wrong list
+
+```haskell
+data Node t = Cons t (Node t)
+```
+
+(note: a list node in functional languages is often called a `Cons`. It comes from Lisp)
+
+How do we interpret this?
+
+There is a type, `Node t`. This type is *parameterized*. We're saying that the type `Node` is not complete by itself. It requires an additional type.
+
+Just like in Java we would write `Node<Integer>`, in Haskell we write `Node Integer`.
+
+---
+
+# Wrong list (2)
+```haskell
+data Node t = Cons t (Node t)
+```
+
+
+Once we provide a `t` for the type, we now know the type of the constructor.
+
+For example, the type `Node Int` has a constructor that takes an `Int` (for the first argument) and a `(Node t)` for the second argument.
+
+If you're curious, Haskell also has "records" which are like classes:
+`data Node t = Cons { val :: t, next :: (Node t) }`
+We'll cover these later.
+
+But there's a reason why the title of the last two slides is "Wrong list"...
+
+Can anyone tell me why we cannot construct this type?
+
+---
+
+# No null
+
+In Java, if we want a node to be the last node in the list, we make it `null`.
+
+`null` is regarded by its inventor (computer scientist [Tony Hoare](https://en.wikipedia.org/wiki/Tony_Hoare)) as a [huge mistake](https://en.wikipedia.org/wiki/Null_pointer#History).
+
+I agree with him. `null` basically adds a special untyped value to the language that is a member of every type.
+
+For example, you thought you defined a simple color:
+`data Color = Red | Green | Blue`
+
+But if Haskell had `null`, the color could also be `null`. So there would be 4 possibilities.
+
+---
+
+# No null (2)
+
+Haskell data types are always exhaustive. 
+
+If I have a case expression like this:
+```haskell
+case color of
+    Red -> ...
+    Green -> ... 
+```
+
+The compiler knows there's an issue because we're not handling `Blue`.
+
+We get a warning.
+
+This is actually a great safety feature: it lets us be sure that we have considered every possibility. There's no runtime crash if we handle all the values.
+
+---
+
+# No null (3)
+
+Null would prevent this nice feature. If every type can be null, then every single time we use a value we get from another function, it could potentially be null.
+
+All of these null checks would be annoying, so most languages with pervasive nulls just don't require checking.
+
+So you end up with "null reference exception" sometimes.
+
+This is not a problem with languages with stricter type systems (like Haskell).
+
+---
+
+# Fixing the list
+
+So I said the list was wrong:
+```haskell
+data Node t = Node t (Node t)
+```
+
+What's wrong with it?
+
+There's nothing we can put in the "next" pointer (the `Node t`) when the list is over.
+
+Like, suppose I want a list with the values `20` and `30`:
+`Node 20 (Node 30 (... uh?))`
+
+What goes in the `... uh?`? There is no null?
+
+[any ideas on how to fix this?]
+
+---
+
+# Fixing the list (2)
+
+Just add a constructor:
+```haskell
+data Node t = Nothing | Cons t (Node t)
+```
+
+Now, there are two kinds of `Node`. A `Nothing`, and a `Cons`.
+
+If we want an empty list, we just make a `Nothing`:
+```haskell
+justAnEmptyList :: Node Int -- I gave it a type...
+justAnEmptyList = Nothing -- ...Nothing can be a list of anything
+```
+
+And if we want a list of one:
+```haskell
+aSingletonList = Cons 20 Nothing
+```
+
+---
+
+# Knowledge check 4
+
+1. Define a binary search tree node data type that works on Integers.
+2. Write a function (and its type) that inserts a node into the tree.
+3. Write a function (and its type) that determines how many nodes are in the tree.
+4. Homework: write a function and its type that looks up a node in the tree.
+
+---
+
+# Knowledge check 4 answers
+
+1. 
+```haskell
+data Bst = Empty | 
+    Node Integer Bst Bst
+    deriving Show
+```
+
+2. 
+```haskell
+bstInsert :: Integer -> Bst -> Bst
+bstInsert val Empty = Node val Empty Empty
+bstInsert val (Node x left right) 
+    | x == val = (Node val left right)
+    | x < val = (Node x (bstInsert val left) right)
+    | otherwise = (Node x left (bstInsert val right))
+```
+
+---
+
+# Knowledge check 4 answers (2)
+
+3. 
+```haskell
+bstSize :: Bst -> Int
+bstSize Empty = 0
+bstSize (Node _ left right) =
+    1 + bstSize left + bstSize right
+```
+
+4. Hint: the answer for `bstInsert` gives a clue for how to think about how to build this function recursively.
+
+Try testing your tree:
+```haskell
+main = do
+    let tree = bstInsert 2 (bstInsert 3 (bstInsert 1 (bstInsert 2 Empty)))
+    print tree
+    print (bstSize tree)
+```
+
+---
+
+# Questions
+
+<!-- _class: invert questions -->
+
+---
+
+# Sum types vs product types
+
+One brief bit of terminology. 
+
+Suppose we have these data types:
+```haskell
+data PrimaryColor = Red | Green | Blue
+data ShinyColor = Bronze | Silver | Gold
+data Color = Primary PrimaryColor | Shiny ShinyColor
+```
+
+1. How many distinct values of `PrimaryColor` are there?
+2. How many distinct values of `ShinyColor` are there?
+3. How many different values of `Color` are there? List them.
+
+---
+
+# Sum types vs product types (2)
+
+1. 3
+2. 3
+3. 3 + 3, which is 6. `Primary Red, Primary Green, Primary Blue, Shiny Bronze, Shiny Silver, Shiny Gold.`
+
+Notice that the number of `Color`s are the number of `PrimaryColor`s plus the number of `ShinyColor`s. It's the sum.
+
+When we use *alternation* (the `|` symbol) to define a datatype, we are defining something called a *sum type*.
+
+Sum types are types in which the number of values is the sum of all the alternatives.
+
+---
+
+# Sum types
+
+Enums and unions in C are another example of sum types.
+
+If you have an enum with 5 variants, and an enum with 10 variants, then if you create union of both enums, it will have 15 possible (valid) values.
+
+In general, Haskel's data types offer features of both unions and enums. However, they can also be *product types*...
+
+---
+
+# Product types
+
+Let's use `PrimaryColor` and `ShinyColor` again.
+
+How many different values of `(PrimaryColor, ShinyColor)` are there?
+
+This is a tuple of two values, one primary and one shiny.
+
+---
+
+# Product types (2)
+
+There are *9* possibilities, not 6!
+
+`(Red, Bronze), (Red, Silver), (Red, Gold), (Green, Bronze), (Green, Silver), (Green, Gold), (Blue, Bronze), (Blue, Silver), (Blue, Gold)`
+
+This is also the case if we declare a data type with multiple arguments:
+`data ColorCombo = ColorCombo PrimaryColor ShinyColor`
+
+Record types (which we'll talk more about later) and structs in C are also product types:
+```c
+struct ColorIntensity {
+    Color c; // RED, GREEN, or BLUE
+    Intensity i; // DIM, NORMAL, BRIGHT
+}
+```
+
+Here, `struct ColorIntensity` has 9 valid values.
+
+---
+
+
+# Questions?
+<!-- _class: invert questions -->
+
+---
+
+# Lists are already built-in
+
+Let's stop using custom Cons. Lists are already in the language.
+
+Who can do pattern matching on lists directly:
+```haskell
+isEmptyList :: [a] -> Bool
+isEmptyList [] = True
+isEmptyList _ = False
+```
+
+In fact, the operator that creates lists, `:`, is already called the "Cons operator".
+
+```haskell
+push7 :: [Int] -> [Int]
+push7 list = 7 : list
+-- or, more elegantly
+push7 = (7:)
+```
+
+---
+
+# Using the cons operator
+
+*Destructuring* is when we use pattern matching to pull data out of a data type.
+
+In the same way that we can destructure a `Cons` or a `Bst`, we can also destructure a `:` that is used to build a list.
+
+For example, the `head` function returns the first element in a list. Here's how we can write it with pattern matching:
+
+```haskell
+head :: [a] -> a
+head (x : xs) = x
+```
+
+---
+
+# But wait...
+
+There's the possibility of a runtime error here, right after I said Haskell was so cool with its type system.
+
+If the list is empty, it won't match `x : xs`, because it's not a `Cons`.
+
+Sometimes we actually *do* want the ability to say "hey, sometimes we can return nothing".
+
+But we want it to be clear *when* we can return nothing. 
+
+We don't want literally every type to have a "null" option, but we want the ability to let some types have 'Nothing' as an option.
+
+---
+
+# Maybe
+
+The type is called `Maybe`. It looks like this:
+```haskell
+data Maybe a = Nothing | Just a
+```
+
+So a `Maybe Int` has two constructors. "Nothing" (which is a constructor for every type of maybe) and "Just Int". That is:
+```haskell
+x :: Maybe Int
+x = Nothing -- valid
+
+y :: Maybe Int
+y = Just 20 -- valid
+
+z :: Maybe Int
+z = 20 -- invalid. 20 is not one of the constructors: Just or Nothing.
+```
+
+---
+
+# Maybe is not the same thing as null
+
+The closest approximation of Maybe in other languages is not null, but rather "nullable".
+
+`null` is a value. It's not a type. `Maybe t` is a type. 
+Specifically, a parametrized type (an "of" type).
+
+For those who took Typescript with me, `Maybe t` is like `t | undefined` or `t | null`.
+
+If a function returns a Maybe, it's saying "it might be nothing".
+
+How do we make a version of `head` that returns `Nothing` when the list is empty, and `Just x` when the list starts with `x`?
+
+---
+
+# Maybe (2)
+
+```haskell
+head' :: [a] -> Maybe a
+head' [] = Nothing
+head' (x : xs) = Just x
+```
+
+Here, if we try to get the head of an empty list, it ends up being "Nothing".
+
+However, if there actually is a list, the result is `Just` the first element.
+
+But once the value is wrapped in a `Maybe`, how do we get it out?
+
+---
+
+# Same as always
+
+You use pattern matching to get values out of data structures:
+
+```haskell
+print (
+    case head' myList of
+        Just x -> show x
+        Nothing -> "nothing"
+)
+```
+
+But wait, who can tell me why this is a little goofy? Is there a better way to get the value out other than `head'`?
+
+---
+
+# A better option
+
+What if we just used pattern matching to begin with?
+
+Head functions can be useful (when we compose), but we don't really need one here.
+
+```haskell
+print (
+    case myList of
+        (x : xs) -> x
+        _ -> "nothing"
+)
+```
+
+Here, we just used pattern matching directly on the list to get the head rather than an additional function to get the data out.
+
+---
+
+# Knowledge check 5
+
+1. Write `sum'`, which computes the sum of a list. Include the type.
+2. Write `tail'` which returns a maybe, but it returns the rest of the list excluding the head. Include the type.
+3. Write `headOfTail` which returns the head of the tail if there is one, or `Nothing` otherwise. Include the type.
+
+---
+
+# knowledge check 5 answers
+
+```haskell
+sum :: [Integer] -> Integer
+sum [] = 0
+sum (x : xs) = x + sum xs
+```
+
+```haskell
+tail' :: [a] -> Maybe [a]
+tail' [] = Nothing
+tail' (x : xs) = Just xs
+```
+
+```haskell
+headOfTail :: [a] -> Maybe [a]
+headOfTail [] = Nothing
+headOfTail [x] = Nothing -- or headOfTail (x : []) = Nothing
+headOfTail list = Just (head (tail list))
+```
+
+---
+
+# The function application operator, $
+
+There's a weird operator that you've probably seen if you've been diligent about doing your Haskell codewars practice (and if you haven't, please do this. It's fun and good.)
+
+It's the weird dollar sign:
+```haskell
+print $ head [1, 2, 3]
+```
+
+This has the same meaning as 
+```haskell
+print (head [1, 2, 3])
+```
+
+But it has one less keystroke, and it also avoids lots of nested parentheses:
+```haskell
+print $ head $ tail [1, 2, 3] -- prints 2
+```
+
+---
+
+# $ (2)
+
+How does it work?
+
+One thing we've glossed over but will cover later: operators in Haskell are just functions.
+
+You can actually add more operators if you want. You just tell it the associativity, the precedence, and what function you want it to call when the operator is used.
+
+They have types, and behind the scenes, Haskell just maps them to a function. 
+
+Let's check the type in `ghci`:
+```haskell
+ghci> :t ($)
+($) :: (a -> b) -> a -> b
+```
+
+Can anyone help me interpret this type signature?
+
+---
+
+# $ (3)
+
+This is a binary operator. That is, an operator with two operands.
+
+The first argument is a function `(a -> b)`. All we know about it is that it takes one argument and returns one, so it's a normal lambda function.
+
+There is no restriction at all on the types of the operands.
+
+The second argument is just an `a`. That is, whatever the type the function takes.
+
+---
+
+# $ (4)
+
+So all this operator does is take a function from `a -> b`, a value of type `a`, and then it applies the function and returns the result of type `b`.
+
+It's literally just "give me a function, now give me an `a`. I will apply the function to it.
+
+Also, it associates to the right. [What does that mean?]
+
+In general, what is the difference between left, right, and full associativity?
+
+---
+
+# Associativity
+
+An associative operator is one in which it doesn't matter whether you evaluate the left side first or the right side first.
+
+For example, `+` and `*` are both associative operators, because `(1 + 2) + 3` and `1 + (2 + 3)` are the same. Same for times.
+
+`-` and `/` are not associative. `(2 / 3) / 4 != 2 / (3 / 4)`
+
+So if `/` is not associative, what does this mean? `2 / 3 / 4`?
+
+---
+
+# Left vs right associativity
+
+Haskell interprets `2 / 3 / 4` as `(2 / 3) / 4`. This is called left associativity.
+
+Compare to exponentiation, `2 ^ 3 ^ 4` becomes `2 ^ (3 ^ 4)`. This is the integer exponentiation function.
+
+The floating point one is `**`, and it is also right associative: 
+`2 ** 3 ** 4 == 2 ** (3 ** 4)`
+
+---
+
+# For associative operators it doesn't matter
+
+For associative operators, it doesn't matter. Left or right, you still get the same result. For these, it's common to just pick one.
+
+For example, `+` is left associative behind the scenes. It doesn't matter, and you'd get the same result as if it were right associative.
+
+`++`, the concatentation operator is right associative, but again, it doesn't matter.
+
+---
+
+# For backticks
+
+Remember that we can surround a binary function in backticks to turn it into a binary infix operator. For example: ``8 `div` 2``
+
+When we do this, Haskell just chooses left associativity arbitrarily.
+``8 `div` 2 `div` 4 == (8 `div` 2) `div` 4``
+
+Honestly you should probably use parentheses if you are going to do this.
+
+Also remember, function calls always have the highest precedence. Operators can have lower precedence.
+
+---
+
+# `$` vs `.`
+
+Remember that `.` is the function composition operator. It takes two functions and returns a function that combines them (right first, then left).
+
+`$` is the function application operator. It takes a function and an argument, and then applies the function to the argument. It has a super low precedence, so it is good for avoiding parentheses.
+
+The types are different:
+```haskell
+(.) :: (b -> c) -> (a -> b) -> a -> c
+-- equivalent to (b -> c) -> (a -> b) -> (a -> c) because -> is right associative
+-- i.e., take two functions, return a function that takes an a and spits out a c
+```
+
+```haskell
+($) :: (a -> b) -> a -> b
+-- take a function and a value, run the function on the value.
+```
+
+---
+
+# Knowledge check 6
+
+1. Consider the xor operator from C. Is it associative?
+2. How is associativity different from commutativity? Can you give an example of a function that is associative without being commutative?
+3. Write a function that doubles an `Int`. Then write a function that computes double the length of a given string, but use the `$` operator and apply your first function. Don't use any parentheses in the second function. Show its type.
+4. Rewrite that function to be point free, and use the `.` operator instead of `$`
+
+---
+
+# Knowledge check 6 answers
+
+1. Yes. `(x ^ y) ^ z == x ^ (y ^ z)`. 
+2. Commutativity is when `a R b == b R a` for some relation `R`. String concatenation is not commutative: `"hello" ++ "world"` is not `"world" ++ "hello"`. However, as we stated before, it is associative: `"hi" ++ ("hello" ++ "hey") == ("hi" ++ "hello") ++ "hey"`
+
+3 and 4:  
+```haskell
+twoX :: Int -> Int
+twoX = (2*)
+
+twiceLength :: String -> Int
+twiceLength s = twoX $ length s
+
+twiceLength' :: String -> Int
+twiceLength' = twoX . length
+```
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Project
+
+The project has you writing some simple recursive code, just like we've seen.
+
+We'll be working with strings, which are just lists of characters.
+
+Let's take a look!
+
+---
+
+# Homework
+
+Work through [Recursion](https://en.wikibooks.org/wiki/Haskell/Recursion), List [mapping](https://en.wikibooks.org/wiki/Haskell/Lists_II), [folding](https://en.wikibooks.org/wiki/Haskell/Lists_III), [data types](https://en.wikibooks.org/wiki/Haskell/Type_declarations), and [pattern matching](https://en.wikibooks.org/wiki/Haskell/Pattern_matching).
+
+Most of this material has already been covered. You can skim through as long as the exercises are easy for you.
+
+If they aren't, please read carefully first.
+
+---
+
+# Homework (2)
+
+More codewars! You should now be able to do [7-kyu difficulty Haskell problems](https://www.codewars.com/kata/search/haskell?q=&r%5B%5D=-7&beta=false&order_by=sort_date%20desc).
+
+Remember to look at the answer when you've fully submitted. It might show an elegant solution that you never considered.
+
+There might be a prize for doing lots of codewars later in the semester. I strongly recommend doing it!
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Insert practice quizzes
 
 
 ---
 
-start with datatypes and lists, end with recursion
+# Questions?
 
----
-
-# Lists and conses
-
-One of the most important datatypes in functional programming is the linked list.
-
-Why? Because all the useful operations on them don't have to delete anything.
-
-For example, if we don't want the head, we can return a new list without the head. The old value will be cleaned up later by the garbage collector.
-
----
-
-
-the function call operator
+<!-- _class: invert questions -->
