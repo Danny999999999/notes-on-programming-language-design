@@ -20,6 +20,22 @@ Feel free to submit fixes, improvements, and new material [here](https://github.
 
 ---
 
+# Last time
+
+We learned about lexing. [what is it?]
+
+We learned about functional operators. [what are they?]
+
+---
+
+# This time
+
+Way more functional operators! (I know you think they're awesome)
+
+Tail recursion (an optimizable way to write recursive functions)
+
+---
+
 # Tail recursion
 
 Is recursion really good enough?
@@ -36,7 +52,7 @@ Well, most of the time there really is some overhead to it. But not *always*...
 
 # Tail recursion (2)
 
-There's a special time in which recursion doesn't really involve overhead.
+There's a special time in which recursion doesn't necessarily require much more overhead than a loop does.
 
 It's when the last thing we do (the "return") is the recursive call. 
 
@@ -202,7 +218,133 @@ So now, because of the `$!`, we actually reduce the `acc + x` into a single valu
 
 # Foldl?
 
-So, what about `foldl` and `foldr`? Remember when we defined 
+So, what about `foldl` and `foldr`? Remember when we defined those?
+
+I don't, because we only defined `fold`, so here it is:
+```haskell
+foldl'' :: (b -> a -> b) -> b -> [a] -> b
+foldl'' _ init [] = init
+foldl'' f acc (x : xs) = foldl'' f (acc `f` x) xs
+
+foldr'' :: (a -> b -> b) -> b -> [a] -> b
+foldr'' _ init [] = init
+foldr'' f acc (x : xs) = f x (foldr'' f acc xs)
+```
+
+Notice that `foldl` is tail-recursive and `foldr` is not.
+
+So does that mean we should use `foldl` when we can? Because it's tail recursive? Well, not really... I mean, first, we should notice that it's lazy, not eager!
+
+---
+
+# Foldl (2)
+
+There's actually another version of `foldl` that forces strict evaluation.
+
+You have to `import Data.List` to use it...
+
+It's called...[drumroll]
+
+`foldl'`
+
+It's the same as `foldl`, but it's strict. So `sum = foldl' (+) 0` won't stack overflow.
+
+There's also `foldr'`, but it seems less useful to me, because it's still not tail recursive, so the stack keeps growing.
+
+---
+
+# Should I use it?
+
+So if `foldl'` is tail-recursive and eager, that must be the fastest one, right?
+
+It makes sense, but we should test it. 
+
+I'm going to make a simple microbenchmark, but first, **big warning**: microbenchmarks are highly specific. They show you how a language performs on a very specific task on a specific platform at a specific point in time and phase of the moon. 
+
+I'm going to show you what happens when we use `foldl'` instead of `foldl` specifically to sum a giant list of `Int` (not `Integer`) *and* the list has already been fully constructed (not lazily) *and* it's running on Windows *and* probably a bunch of other stuff I haven't controlled for.
+
+---
+
+# A microbenchmark
+
+```haskell
+main :: IO ()
+main = do
+    let count = 100000000
+    let xs = [1..count] :: [Int]
+    deepseq xs (return ()) -- force construct list first: I'll explain this
+    
+    start <- getCurrentTime 
+    print $ foldl (+) 0 xs
+    end <- getCurrentTime
+    putStrLn $ "foldl time: " ++ show (diffUTCTime end start)
+
+    start <- getCurrentTime
+    print $ foldl' (+) 0 xs
+    end <- getCurrentTime 
+    putStrLn $ "foldl' time: " ++ show (diffUTCTime end start) 
+```
+
+Note: if you want to do this, import `Data.List`, `Data.Time`, and  `Control.DeepSeq`
+
+---
+
+# Results
+
+On my specific computer I get this:
+```
+5000000050000000
+foldl time: 15.7061889s
+5000000050000000
+foldl' time: 0.5516658s
+```
+
+So it actually made a huge difference.
+
+But note: *big* list. I've seen another person online run this test in different circumstances online and they said that it actually slowed it down.
+
+Also, in other news, `foldr` is actually faster for me than `foldl`. Probably because it doesn't end up needing to build thunks for each addition.
+
+Okay, now let me answer your other question...
+
+---
+
+# What is `deepseq`
+
+`deepseq` is related to `$!`. 
+
+In fact, there is a function called `seq` that is closely related to `$!`. 
+
+`seq a b` means "slightly simplify `a`, then return `b`
+
+This technically means it has a side effect. It is one of the few haskell "functions" with side effects. If they are observable, you probably don't want to use it.
+
+We can define `$!` in terms of `seq`: `f $! x = f (seq x x)`
+
+What is "slightly simplify"? In the case of a list, it will remove the outer thunk and expose the *cons*: `seq (1 : 2 : []) (1 : 2 : [])` will create a single list node with a value of `1`, whose next pointer is a thunk that will construct `2 : []`
+
+
+---
+
+# What is `deepseq`? (2)
+
+That's all `seq` does. Calling it again won't help. It just consumes the outer thunk.
+
+For arithmetic operations, it actually does simplify the whole thing, but those are a special case. 
+
+Since seq isn't that helpful, if we want to thoroughly construct the entire list, we use `deepseq`. 
+
+This consumes the thunk and replaces it with a fully initialized list, so that we can compare `foldl` and `foldl'` directly without also including the time it takes to allocate list nodes.
+
+`deepseq x (return ())` means "first compute `x`, and then do nothing". `return` in Haskell does not mean what it means in C. It's a constructor for monads. In this case, an IO object that does nothing and returns `()`. We'll talk about this later.
+
+---
+
+# $!!
+
+In the same way that `$!` does `seq` before calling a function, `$!!` does `deepseq`.
+
+We don't need to do these things often, but it can occassionally be important, especially when doing performance optimization.
 
 ---
 
@@ -212,16 +354,85 @@ So, what about `foldl` and `foldr`? Remember when we defined
 
 ---
 
-# Knowledge check 5
+# Knowledge check 1
 
 1. Define a function `reverse'`, which should take a list an reverse it. Include its type. Do not use tail recursion.
 2. What is the big-O runtime of this function?
 3. Define a tail-recursive version. Include its type.
 4. What is the big-O runtime of this function? This is the one I warned you about earlier when I said tail recursion would have a huge impact on performance. 
+5. Now use one of the folds to define `reverse`.
+6. Suppose we had a giant list we wanted to reverse. How could we force evaluation to reverse it before we needed to use it later. 
+
+---
+
+# KC 1 answers (1)
+
+1.
+```haskell
+reverse' :: [a] -> [a]
+reverse' [] = []
+reverse' (x : xs) = reverse' xs ++ [x]
+```
+
+2. It's quadratic! Because `++` is linear and we're doing it `n` times, where `n` is the length of the list. It's much slower than you'd think.
+3. 
+```haskell
+reverse'' :: [a] -> [a] -> [a]
+reverse'' acc [] = acc
+reverse'' acc (x : xs) = reverse'' (x : acc) xs
+```
+
+---
+
+# KC 1 answers (2)
+
+4. This one is actually linear. We're prepending each value in the list to the front of the accumulator, which is fast (constant time). We do this for each value in the list.
+
 5. 
+```haskell
+reverse''' :: [a] -> [a]
+reverse''' = foldl (flip (:)) [] 
+```
+
+More explanation about `flip` on the next slide.
 
 ---
 
-# KC 5 answers
+# `flip`
+
+`flip` is a function that takes a function and flips its arguments. It's defined like this: `flip f = \y x -> f x y`. So instead of `:` taking a value and a list and prepending the left argument to the right, `flip (:)` returns a function that takes a list and then a value to prepend.
+
+We run this on each value of the list. It's like using a stack to reverse a list. We push each value from left to right onto the front of the return list.
+
+[can you do it without flip given the definition above?]
 
 ---
+
+# KC 1 answers (3)
+
+6. `let reversed = deepseq (reverse l) (reverse l) in ...`
+
+Here, `deepseq` makes it so that the list is fully allocated and not just a bunch of thunks that perform the `cons` operation. 
+
+It's really not required to do this. Remember that premature optimization is the root of all evil.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# More operators: zip
+
+I know what you're thinking.
+
+"We love functional programming, but there aren't enough higher order functions. Please teach us another functional operator!"
+
+Okay, let's learn about `zip`. This is a surprisingly useful operator that doesn't show up very often in imperative languages (although Python has it).
+
+---
+
+# `zip`
+

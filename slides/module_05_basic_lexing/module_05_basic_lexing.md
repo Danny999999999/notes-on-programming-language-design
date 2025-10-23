@@ -963,23 +963,21 @@ Suppose we want to reduce a list with the `-` operator:
 `100 - 9 - 8 - 7 == 91 - 8 - 7 == 83 - 7 = 76`
 
 This makes sense, but the problem is that `-` is *not* an associative operator. Let's consider what happens when we run fold on it:
-`fold 0 subtract [100, 9, 8, 7]`
+`fold 0 (-) [100, 9, 8, 7]`
 
 How does this simplify? Remember that in functional programming, we can replace a function call with its appropriate definition.
-
-(Note: in haskell the `-` operator is unary. I.e., -7. The binary operator is `subtract`. 10 `subtract` 3 is 7)
 
 ---
 
 # Associativity (2)
 
 ```haskell
-fold 0 subtract [100, 9, 8, 7] ==
-100 `subtract` (fold 0 subtract [9, 8, 7]) ==
-100 `subtract` (9 `subtract` fold 0 [8, 7] ) ==
-100 `subtract` (9 `subtract` (8 `subtract` (fold 0 [7]))) ==
-100 `subtract` (9 `subtract` (8 `subtract` (7 `subtract` fold 0 []))) ==
-100 `subtract` (9 `subtract` (8 `subtract` (7 `subtract` 0))) ==
+fold 0 (-) [100, 9, 8, 7] ==
+100 - (fold 0 (-) [9, 8, 7]) ==
+100 - (9 - fold (-) 0 [8, 7] ) ==
+100 - (9 - (8 - (fold (-) 0 [7]))) ==
+100 - (9 - (8 - (7 - fold (-) 0 []))) ==
+100 - (9 - (8 - (7 - 0))) ==
 92
 ```
 
