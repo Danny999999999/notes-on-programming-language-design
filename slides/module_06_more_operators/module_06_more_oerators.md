@@ -436,3 +436,282 @@ Okay, let's learn about `zip`. This is a surprisingly useful operator that doesn
 
 # `zip`
 
+Sometimes we have two lists that we want to "pair up" somehow.
+
+For example, maybe there are a lists of names, and their employee ids and we want to print them out together.
+
+First, let's see how we would do this in C...
+
+---
+
+# Pairing up lists in C
+
+The most common way I see imperative programmers solve this problem is by using the same index in both lists.
+
+```c
+char* names[] = { "Alice", "Bob", "Camille", "Dan", ... };
+char* eids[] = { "1234", "5678", "9123", "4567", ... }
+
+void print_names_and_eids(char** names, char** ids, size_t n) {
+    for (size_t i = 0; i < n; i++) {
+        printf("%s: %s\n", names[i], ids[i]);
+    }
+}
+```
+
+Here, `i` is an index (a `size_t`, which is usually an `unsigned long`).
+
+We iterate through both lists with the same index, so we "pair up" names and eids which are in the same order.
+
+---
+
+# Pairing up lists in Haskell
+
+There is no reason we can't do this in Haskell, too:
+
+```haskell
+printNamesAndEids :: [String] -> [String] -> IO ()
+printNamesAndEids _ [] = return ()
+printNamesAndEids [] _ = return ()
+printNamesAndEids (name : names) (eid : eids) = do
+    putStrLn $ name ++ ": " ++ eid 
+    printNamesAndEids names eids
+```
+
+(Note: I don't expect you to understand what `return ()` does yet, or what an `IO ()` really is. I'm just showing you that Haskell can do the same thing as C.)
+
+However, as you might have started noticing, even though recursion is important to functional programming, we usually end up finding elegant ways of solving problems that handle the recursion for us.
+
+---
+
+# Using `zip` to pair up lists
+
+That is what we will do here. We will use `zip`.
+
+`zip` is a function that takes a pair of lists, and returns a list of pairs.
+
+That is, `zip ["Alice", "Bob", "Camille"] ["123", "456", "789"] ==`
+`[("Alice", "123"), ("Bob", "456"), ("Camille", "789")]`
+
+Let's do a bit of clean up.
+
+---
+
+# Using `zip` to pair up lists
+
+```haskell
+import Control.Monad -- we will learn more about monads later. Just a taste!
+names = ["Alice", "Bob", "Camille"]
+ids = ["123", "456", "789"]
+
+namesAndEids :: [String]
+namesAndEids = map (\(n, e) -> n ++ ": " ++ e) $ zip names eids
+
+printNamesAndEids' :: IO ()
+printNamesAndEids' = mapM_ putStrLn $ namesAndEids names ids  
+```
+
+Don't worry to much about the `mapM_` function. It's kind of like Haskell's version of "foreach" in that it applies a function to a list. 
+
+The important thing is that `map ... zip` above...
+
+---
+
+# Using `zip` (2)
+
+Here it is again
+
+```haskell
+namesAndEids :: [String]
+namesAndEids = map (\(n, e) -> n ++ ": " ++ e) $ zip names eids
+```
+
+`zip names eidss` is returning a list of pairs.
+
+Then, `map (\(n, e) -> n ++ ": " ++ e) ...` is applying that lambda function to each pair. It is taking the name and eid and pasting them together with `": "`.
+
+The result is just a list of strings like "Alice: 123", "Bob: 456", "Camille: 789"
+
+---
+
+# `zip` and `map` together
+
+Using map with zip is so common, there's a special combination operator: `zipWith`:
+
+```haskell
+namesAndEids' = zipWith (\n e -> n ++ ": " ++ e) names ids
+```
+
+It also automatically uncurries the function, so we can write `\n e` instead of `\(n, e)`.
+
+[what is currying and uncurrying again?]
+
+---
+
+# Knowledge check 2
+
+1. Use zip to create a list of `(n, n^2)` for each natural number `n`. This should be an infinite list.
+2. Print the first 10 elements of that infinite list.
+3. Now construct a new infinite list that is the sum of each element of the first list. So `(0 + 0^2), (1 + 1^2), (2 + 2^2), (3 + 3^2), ...`
+4. Print the first 10 elements of this infinite list.
+5. Now, use `zipWith` to construct the same list as 3 without needing `uncurry`.
+
+---
+
+# KC 2 answers
+
+1. 
+```haskell
+nAndN2 :: [(Integer, Integer)]
+nAndN2 = zip [0..] $ map (^2) [0..]
+```
+
+2. `print $ take 10 nAndN2`
+
+3. `sumNAndN2 = map (uncurry (+)) nAndN2`
+
+4. `print $ take 10 sumNAndN2`
+
+5. `sumNAndN2' = zipWith (+) [0..] $ map (^2) [0..]`
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Making `zip`
+
+Can we define `zip` ourselves?
+
+First, [what should its type be?]
+
+---
+
+# Making `zip`
+
+```haskell
+zip :: [a] -> [b] -> [(a, b)]
+```
+
+"Give me a list of `a`s and a list of `b`s and I will give you a list of `(a, b)` pairs.
+
+Now, [code it up]. First, let's use recursion...
+
+---
+
+# Making `zip`
+
+```haskell
+zip :: [a] -> [b] -> [(a, b)]
+zip _ [] = []   
+zip [] _ = [] 
+zip (x : xs) (y : ys) = (x, y) : (zip xs ys)
+```
+
+If either list is empty, we're done.
+
+Otherwise, we pair up the head of both remaining lists, and append it to the end of the result.
+
+This is the most straightforward way to do it. It's hard to use one of the `fold`s to make `zip`, because it takes 2 list arguments instead of 1. 
+
+It's technically possible, but it involves some goofy coding, like having the accumulator be a tuple of the 2nd list and an empty list of pairs and such. It's easier recursively.
+
+---
+
+# What about the opposite?
+
+If there is a zip, which takes two lists and makes a list of pairs, is there also an unzip?
+
+[What do you think?]
+
+---
+
+# Of course there is!
+
+And if there weren't, we could make it ourselves.
+
+`unzip [(1, 'a'), (2, 'b'), (3, 'c')]` should be
+`([1,2,3], ['a', 'b', 'c'])`
+
+Right?
+
+What would its type be?
+
+---
+
+# `unzip`'s type
+
+```haskell
+unzip :: [(a, b)] -> ([a], [b])
+```
+
+"Give me a list of pairs, I will give you a pair of lists."
+
+How do we code it?
+
+Start recursively...
+
+---
+
+# `unzip`
+
+```haskell
+unzip' :: [(a, b)] -> ([a], [b])
+unzip' [] = ([], [])
+unzip' ((x, y) : rest) =
+    let (xs, ys) = unzip' rest
+    in  (x : xs, y : ys)
+```
+
+The wrinkle here is that we need to bind the `xs` and `ys` from the recursive call so we can push new values onto them.
+
+You might have preferred the recursive solutions to these built-in operators so far, but I think you'll like the one using fold for this one.
+
+First, which fold do we use? `foldl` or `foldr`?
+
+---
+
+# `unzip` (2)
+
+`foldl` would end up reversing the order (trace through it to see why!). We use `r`.
+
+```haskell
+unzip'' :: [(a, b)] -> ([a], [b])
+unzip'' = foldr (\(x, y) (accx, accy) -> (x : accx, y : accy)) ([], [])
+```
+
+Here, we start with an empty pair of lists. The binary function appends each of the pair in the original list to the appropriate value in the accumulator.
+
+When we're done, the accumulator holds our result.
+
+It ends up being in the right order because we push from right to left. `foldl` would push from left to right and flip the order!
+
+---
+
+# Is `unzip` the inverse of `zip`?
+
+We say that `g` is the inverse of `f` if `g . f` is equivalent to `id`. 
+
+`id` is the identity function. `id x = x`. It's just the lambda that returns its argument without doing anything.
+
+If applying `g` after `f` is the same as doing nothing at all, `g` is an inverse of `f`.
+
+It seems like `unzip` "undoes" `zip`. So are they inverses?
+
+---
+
+# Not quite
+
+
+
+---
+
+# Questions?
+
+<!-- _class: questions invert -->
+
+---
+
