@@ -670,9 +670,9 @@ Add the head to the result, and take one fewer from the tail.
 
 # Knowledge check 2
 
-1. Implement `skip` which is the opposite of take. Instead of taking three items, `skip 3` skips over the next three items and returns the rest of the list. Include its type.
-2. What would `skip 3 $ take 10 $ map (*2) [1..]` return?
-3. What would `take 10 $ skip 3 $ map (*2) [1..]` return?
+1. Implement `drop` which is the opposite of take. Instead of taking three items, `drop 3` skips over the next three items and returns the rest of the list. Include its type.
+2. What would `drop 3 $ take 10 $ map (*2) [1..]` return?
+3. What would `take 10 $ drop 3 $ map (*2) [1..]` return?
 4. Why do you think `take` and `skip` use `Int` instead of `Integer`?
 
 ---
@@ -681,9 +681,9 @@ Add the head to the result, and take one fewer from the tail.
 
 1. 
 ```haskell
-skip' :: Int -> [a] -> [a]
-skip' 0 l = l -- only one base case this time
-skip' n (h : t) = skip' (n - 1) t
+drop' :: Int -> [a] -> [a]
+drop' 0 l = l -- only one base case this time
+drop' n (h : t) = drop' (n - 1) t
 ```
 
 2. `[8, 10, 12, 14, 16, 18, 20]`
