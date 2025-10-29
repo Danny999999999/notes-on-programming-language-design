@@ -621,6 +621,116 @@ It's technically possible, but it involves some goofy coding, like having the ac
 
 ---
 
+# Zip on infinite lists
+
+Remember when we talked about the Fibonacci series?
+
+Here was our definition of a Fibonacci function:
+
+```haskell
+fibo :: [Integer] -> [Integer] -> [Integer]
+fibo 0 = 0
+fibo 1 = 1
+fibo n = fibo (n - 1) + fibo (n - 2)
+```
+
+This works, but it's very slow. It re-calculates Fibonacci terms. It ends up taking exponential time (we'll cover the details of that in CS 450). 
+
+We can make it faster by using two accumulators to store the previous two values in the series [how?]
+
+---
+
+# `fibo` with accumulator
+
+Like this:
+
+```haskell
+fibo n = fibo' n 0 1
+    where
+    fibo' 0 _ b = b
+    fibo' n a b = fibo' (n - 1) b (a + b)
+```
+
+This is much faster. We are basically adding the previous 2 numbers in the list `n` times.
+
+But it turns out there's a way to do this with raw lists. We don't need a function. We can just store the Fibonacci series as an infinite list using `zip` and lazy evaluation.
+
+Any ideas how? [this one is a brain-bender, but instructive]
+
+---
+
+# Here's how
+
+```haskell
+fibo :: [Integer]
+fibo = [0, 1] ++ zipWith (+) fibo (drop 1 fibo)
+
+main = print $ take 100 fibo
+```
+
+This actually works. It generates an infinite list of Fibonacci numbers. It's also reasonably fast (it doesn't require exponential time).
+
+But why? Well, `fibo` is the concatenation of two lists: `[0, 1]` and that `zipWith` term.
+
+`[0, 1]` just tells us the first two values. 
+
+But then the real clever trick happens...
+
+---
+
+# Lazy `fibo`
+
+```haskell
+fibo = [0, 1] ++ zipWith (+) fibo (drop 1 fibo)
+```
+
+After that, we append `zipWith (+) fibo (drop 1 fibo)`
+
+This is self-referential: `fibo` refers to the list itself, and `drop 1 fibo` refers to the list itself but skipping the zeroth element.
+
+`zipWith (+)` applies the `+` operation to the head of its two arguments, which start off at `0` and `1`.
+
+This causes it to produce `1` for its first result.
+
+*But then it starts to consume itself.* It produces 2, because `1 +` its first output is `2`. Because this function is lazy, it's able to pull from lists that it is creating, indefinitely. 
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Knowledge check 3
+
+1. Define an element-wise multiplication function using `zipWith`. That is `mul [1, 2, 3] [4, 5, 6] == [1, 10, 18]`
+2. Now define a dot product that treats the vectors as lists, using the `mul` function you just defined. The dot product of two vectors `a` and `b` is `ax * bx + ay * by + az * bz + ...`. That is, we multiply each component together and we sum all the piecewise multiplications together.
+
+---
+
+# KC 3 answers
+
+1.
+```haskell
+mul :: [Integer] -> [Integer] -> [Integer]
+mul = zipWith (*)
+```
+
+2. 
+```haskell
+dot :: [Integer] -> [Integer] -> Integer
+dot x y = sum $ x `mul` y 
+```
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
 # What about the opposite?
 
 If there is a zip, which takes two lists and makes a list of pairs, is there also an unzip?
@@ -699,13 +809,31 @@ We say that `g` is the inverse of `f` if `g . f` is equivalent to `id`.
 
 If applying `g` after `f` is the same as doing nothing at all, `g` is an inverse of `f`.
 
-It seems like `unzip` "undoes" `zip`. So are they inverses?
+It seems like `unzip` "undoes" `zip`. Is that true?
 
 ---
 
 # Not quite
 
+We can do this: `unzip $ zip xs ys` and we get back `(xs, ys)`
 
+It's not quite the same though. We get the arguments packed into a pair, whereas previously they weren't stored that way.
+
+The identity function has a definite meaning. It's a unary function. The issue is that `zip` is a binary function. So `unzip . zip` isn't really the same as `id`.
+
+What about the other way around? Is `zip` the inverse of `unzip`?
+
+---
+
+# No
+
+`unzip` returns a tuple, but zip takes two singles, so `zip . unzip` is a type error. We can't compose those two functions.
+
+Is there a way to do it?
+
+---
+
+# Composability
 
 ---
 
@@ -715,3 +843,4 @@ It seems like `unzip` "undoes" `zip`. So are they inverses?
 
 ---
 
+# Odds and ends: indexing lists
