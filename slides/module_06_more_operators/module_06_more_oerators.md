@@ -829,11 +829,142 @@ What about the other way around? Is `zip` the inverse of `unzip`?
 
 `unzip` returns a tuple, but zip takes two singles, so `zip . unzip` is a type error. We can't compose those two functions.
 
-Is there a way to do it?
+There is a way to do it, though. `zip` normally takes 2 arguments. 
+
+Is there a way we can make it take one? Specifically, one pair of two lists?
+
+---
+
+# Yes
+
+Remember `curry` and `uncurry`? Here, we want to `uncurry zip`.
+
+`uncurry zip . unzip` is equivalent to `id`.
+
+That is, call unzip on a list of pairs, and then called the uncurried version of zip on the result to zip them back together.
+
+Example: 
+`(uncurry zip . unzip) [(1,'a'), (2,'b'), (3, 'c')]` returns 
+`[(1,'a'), (2,'b'), (3, 'c')]`, the same thing that `id` returns.
 
 ---
 
 # Composability
+
+Remember that `.` is the composition operatorer.
+
+The reason we care about composition at all? Because in functional programming, it's the main way we build bigger functions out of smaller ones.
+
+If two functions are compatible with each other (that is, we can pass the result of one to the other), we call them "composable".
+
+At the very least, we need type-composability. That is, if `f` and `g` are functions, then:
+
+```haskell
+f :: a -> b
+g :: b -> c
+f . g :: a -> c
+```
+
+---
+
+# Composability (2)
+
+Composability becomes an issue when we start making our programs more complicated.
+
+For example, suppose I have a random function like `f = div 100`.
+
+This function divides 100 by integers. So `f 25 == 4` and `f 10 == 10`.
+
+Suppose I want to compose this function with the function `show` to make it a string.
+
+So in `g = show . f`, `g` is a function that takes a number, divides it into 100, and then converts the result into a string. It is compatible with the type `Integer -> String`. 
+
+But here's a question: what happens if we write `g 0`? [What string do we get?]
+
+---
+
+# Composability (3)
+
+We don't get a string, we get an error:
+`"*** Exception: divide by zero`
+(there's a double quote there but it's not a string, it's the text in the exception)
+
+The issue is that `div n` is a *partial function*. That is, it's a function that isn't defined on all its arguments. In this case, `0`.
+
+So we don't have anything to give to show. `div n` is not perfectly composable.
+
+We could return an optional value. So if there is a quotient, we return it, but if there isn't we return a "nothing" kind of value. What is a good candidate for that?
+
+---
+
+# Maybe
+
+Consider this version of division:
+```haskell
+divMaybe :: Integer -> Integer -> Maybe Integer
+divMaybe _ 0 = Nothing
+divMaybe x y = Just $ x `div` y
+```
+
+Now there's no immediate problem:
+```haskell
+divMaybe 100 25 == Just 4
+divMaybe 100 0 == Nothing
+```
+
+Suppose `f = divMaybe 100` like before. [What is the type of `f`?]
+
+---
+
+# Composing maybe
+
+`f :: Integer -> Maybe Integer`
+
+Which means now `g = show . f` stil works, but now it prints "Just"...
+
+What if we only want to print the value if it's there and "Error" if it's not?
+
+[Class, write that for me]
+
+---
+
+# Composing maybe (2)
+
+```haskell
+g (Just x) = show x
+g Nothing = "Error"
+```
+
+Now `g $ f 25` returns `"4"`
+And `g $ f 0` returns `"Error"`
+
+Which is correct, but it also made `g` less elegant. We had to handle both cases. Previously we just wrote `g = show . f`.
+
+---
+
+# Composability (4)
+
+Composability is a major part of functional software design.
+
+We like functions that are composable.
+
+Does that mean we don't like `Maybe`? Because it makes it harder to compose?
+
+No, it turns out there's an easier way. We can compose with `Maybe`, we just have to extend our idea of `map` so that it works with `Maybe` instead of only lists.
+
+What would that look like?
+
+---
+
+# `map` on lists
+
+Remember that `map` takes a function and a list and it returns a new list in which the function is applied to every element of the original list.
+
+
+
+---
+
+# `fmap`
 
 ---
 
@@ -844,3 +975,20 @@ Is there a way to do it?
 ---
 
 # Odds and ends: indexing lists
+
+---
+
+# `words`
+
+---
+
+# `unwords`
+
+---
+
+# `intercalate`
+
+---
+
+# Questions?
+<!-- _class: questions invert -->
