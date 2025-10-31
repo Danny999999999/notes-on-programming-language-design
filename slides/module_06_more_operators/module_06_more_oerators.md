@@ -960,12 +960,91 @@ What would that look like?
 
 Remember that `map` takes a function and a list and it returns a new list in which the function is applied to every element of the original list.
 
+So `map show [1,2,3] == ["1", "2", "3"]`
+and `map show [] == []`
 
+And what is a `Maybe` but a list of either 1 or 0 elements?
 
 ---
 
 # `fmap`
 
+The concept of "thing that we can map over" is more general than just a list.
+
+In fact, we can do it to `Maybe`s, too.
+
+Instead of `map`, we call this function `fmap`:
+
+```haskell
+g :: Integer -> Maybe String
+g = (fmap show) . f
+```
+
+Now, we get `Nothing` if the argument is `0`, and `Just` a string if the argument.
+
+...which isn't what we want. We want it to say `"Error"`, and we want the result to be a `String`, not a `Maybe String`.
+
+But before we fix that, let's briefly consider: why is it called `fmap`? What is the `f`?
+
+---
+
+# The `f` in `fmap`
+
+The `f` stands for `Functor`. 
+
+A `Functor` is anything that can be mapped on. Lists are functors, but so are `Maybe`s.
+
+In fact, almost every data structure is a `Functor`. We frequently want to do something to ever member of a data structure, so it makes sense to map over them.
+
+`Functor` is a term from category theory, an advanced and abstract area of mathematics. Haskell takes many terms from category theory. Frankly, I don't know very much about category theory, so I will explain these things differently. You don't need to know category theory in order to make sense of Haskell. (Although it probably wouldn't hurt).
+
+---
+
+# Fixing the function
+
+Okay, so `g = (fmap show) . f`
+
+But we don't want a `Maybe String`. We want a regular `String`, and if there isn't one, we want it to be replaced by `"Error"`
+
+This is a function we could easily write. It replaces `Nothing` with a default value:
+```haskell
+replaceNothing :: a -> Maybe a -> a
+replaceNothing def Nothing = def
+replaceNothing def (Just x) = x
+```
+
+This function already exists. It's called `fromMaybe`:
+```haskell
+import Data.Maybe
+fromMaybe :: a -> Maybe a -> a
+```
+
+---
+
+# Fixing the function (2)
+
+So now we can finally fix it:
+```haskell
+g :: Integer -> String
+g = (fromMaybe "Error") . (fmap show) . f
+```
+
+If `f` returns `Just` a number, `fmap show` turns that into `Just` a string, and `fromMaybe` turns it into a regular string.
+
+---
+
+# Is that good?
+
+So it's more complicated now, but that makes sense: we added more requirements.
+
+But it's not *dramatically* more complicated. It's still just a chain of compositions. There still aren't any `if` expressions in our final answer.
+
+`divMaybe` has an implicit one, but it also kind of needs one: `0` is a special case.
+
+Managing complexity in an object-oriented language is more about encapulating code into classes. But here, we don't really hide anything. We just put together a pipeline that does what we want.
+
+Functional programming instruction focuses a lot on immutability and functions (obviously), but to me, the core of functional programming is composition and creating "pipelines" of code.
+
 ---
 
 # Questions?
@@ -974,21 +1053,104 @@ Remember that `map` takes a function and a list and it returns a new list in whi
 
 ---
 
-# Odds and ends: indexing lists
+# Odds and ends
+
+These are just some important odds and ends. You need to know these things, and they are in the required reading, but I didn't know where to put them in lecture...
+
+
+---
+
+# Indexing lists (`!!`)
+
+If you want to get, e.g., the 3rd element of a list (starting from 0), you can write `l !! 3`.
+
+So `[0, 1, 2, 3, 4, 5] !! 3` == `3`
+
+Practice: treat the `(!!)` operator as a function and define it. What is the base case?
 
 ---
 
 # `words`
 
+There is a function that lets you take a `String` and split it into a list of `String`s on whitespace. It's called `words`:
+
+```haskell
+words :: String -> [String]
+words "Hello, world! How are you today?" ==
+    ["Hello,","world!","How","are","you","today?"]
+```
+
+What if we want to split on something other than whitespace?
+
+Surprisingly, there isn't a built-in "split" method that lets us split on other things besides whitespace. 
+
+Practice: make one. 
+
 ---
 
 # `unwords`
+
+The opposite of `words`. Takes a list of strings and pastes them together with single spaces in between:
+
+`unwords ["hello", "world", "hi"] == "hello world hi"`
 
 ---
 
 # `intercalate`
 
+What if we want to paste them together with something other than a single space?
+
+We can use the `intercalate` function:
+
+```haskell
+import Data.List; -- needed for intercalate. It works with any list.
+
+intercalate :: [a] -> [[a]] -> [a] -- get that?
+
+--example:
+intercalate ";;" ["hello", "world", "hi"] ==
+    "hello;;world;;hi"
+```
+
+Practice: write this function!
+
+---
+
+# `lines`
+
+Splits a string into lines instead of words:
+
+```haskell
+lines :: 
+lines "hello\nworld" == ["hello", "world"]
+```
+
+Practice: you know what to do!
+Bonus points: make it work with both "\n" and "\r\n" (Windows line endings) 
+
+---
+
+# `unlines`
+
+And of course there's an unlines:
+```haskell
+unlines :: [String] -> String
+unlines ["hello", "world"] == "hello\nworld\n"
+```
+
+Notice that extra "\n" at the end. `unlines` does that for some reason. 
+
+Practice: ...?
+
 ---
 
 # Questions?
 <!-- _class: questions invert -->
+
+---
+
+# Required reading
+
+[More on datatypes](https://en.wikibooks.org/wiki/Haskell/More_on_datatypes)
+
+[Other data structures](https://en.wikibooks.org/wiki/Haskell/Other_data_structures) (note: this is a tough one, but it's only reading. No exercises.)
