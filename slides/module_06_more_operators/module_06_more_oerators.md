@@ -1154,3 +1154,4 @@ Practice: ...?
 [More on datatypes](https://en.wikibooks.org/wiki/Haskell/More_on_datatypes)
 
 [Other data structures](https://en.wikibooks.org/wiki/Haskell/Other_data_structures) (note: this is a tough one, but it's only reading. No exercises.)
+
