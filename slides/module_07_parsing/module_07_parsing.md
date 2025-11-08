@@ -282,7 +282,7 @@ Therefore, we have to store the whole expression, we can't just reduce it down t
 
 Therefore, we are writing this function:
 ```haskell
-parseExpr :: String -> Expr
+parseExpr :: [Token] -> Expr
 ```
 
 That's it. We take a string and return an expression.
@@ -332,23 +332,260 @@ So if we have an expression, followed by a `+` and then a term, we can invoke th
 
 ---
 
+# Backus-Naur warnings
+
+We have to be careful when we write our grammar.
+
+This is not the right grammar:
+```
+expr ::= expr + expr
+expr ::= expr - expr
+expr ::= expr * expr
+expr ::= Variable
+expr ::= Value
+```
+
+[What's wrong with it?]
 
 ---
 
+# It's ambiguous
 
-Parts of expressions that we add together are called *terms*. We know this is a term.  We can't really do anything with it. It's not an operator, so we move on and also look at the first one of those, which is `Plus`.
+The first issue with that grammar is that it's ambiguous. 
 
-Now at this point we make the following observation:
-- We don't know (yet) what comes after it, but we know that we need exactly one term.
-- We're at the *lowest* level of precidence possible in our little expression language. Therefore, the only thing that should stop us is another term (i.e., a "+" or "-")
+We don't just care *whether* a string is an expression, but *how*.
+
+For example, which tree is correct for `1 + 2 * 3`:
+1. `1 + (2 * 3)` which results in `Add 1 (Mul 2 3)`
+2. `(1 + 2) * 3` which results in `Mul (Add 1 2) 3`
+
+We know that we want to follow normal order of operations, which means #1. But the grammar doesn't require that, it's possible to apply rules in either order...
 
 ---
 
-# Parsing a term
+# It's ambiguous (2)
 
-Therefore, in order to parse an expression, we need to parse a term.
+When we see `1 + 2 * 3`,
+
+We can apply the `expr ::= value` rule to get this: `Value 1 + Value 2 * 3`.
+Then we apply `expr ::= expr + expr`  to get this: `(Add (Value 1) (Value 2)) * 3`
+Then we apply the `expr :: value` rule again... `(Add (Value 1) (Value 2)) (Value 3)`
+Finally, `Mul (Add (Value 1) (Value 2)) (Value 3)`
+
+But, this is what we *want*:
+Apply `expr ::= value` to `2` and `3`: `1 + Value 2 * Value 3`
+Then `Value 2 + (Mul (Value 2) (Value 3))`
+Then `Add 2 (Mul (Value 2) (Value 3))`
+
+So we need to make sure there's only one way to parse it.
+
+---
+
+# Fixing it
+
+We need to create intermediate categories like *term* and *factor*:
+```
+expr ::= expr + term
+expr ::= term
+term ::= term * factor
+term ::= factor
+factor ::= variable
+factor :: value
+```
+
+Now we only have one way to parse: `1 + 2 * 3`. What rules can we apply?
+
+Previously we went bottom-up, replacing words as quickly as possible.
+
+Instead, let's start from `expr`...
+
+---
+
+# Top-down parsing
+
+`1 + 2 * 3`
+
+There are two ways to build an expression. Either from a `+` expression, or from a term.
+We see a `+`, so let's try that: `expr 1 + term (2 * 3)`
+
+We need to parse 1 as an expression and `2 * 3` as a term.
+
+The only way to parse 1 as an expression, is to treat it like a term, which means to treat it as a factor, and then to make it a value.
+
+To parse `2 * 3`, we invoke `term * factor`, and then parse `2` as a factor and then a value. `3` is already a factor, so we treat it as a value.
+
+So we end up with `Add (Value 1) (Mul (Value 2) (Value 3))`
+
+And importantly: we can't get anything else. Any other parse fails (end up with a non expression)
+
+---
+
+# Associativity is fixed, too
+
+Notice how we have this in our language:
+```
+expr ::= expr + term
+expr ::= expr - term 
+...
+```
+
+These are left-recursive rules. What would change if we did this?
+
+```
+expr ::= term + expr
+expr ::= term - expr
+...
+```
+
+[?]
+
+---
+
+# The associativity would change
+
+If we did that, we would end up parsing `1 + 2 + 3` as `1 + (2 + 3)` instead of `(1 + 2) + 3`. Is that a problem?
+
+Not for `+`, but it is for `-`: `1 - 2 - 3` should be 4, not `1 - (2 - 3) == 1 - (-1) == 2`
+
+So we can't do `expr ::= expr + expr` because we get ambiguous parses
+We can't do `expr ::= term + expr` because the parentheses go around the recursive parse, and we want `+` (and `-`) to be left recursive.
+
+Instead, we do `expr ::= expr + term` to get the right associativity, and to also ensure that multiplication happens before addition, even if it's on the right of a `+`.
+
+---
+
+# Knowledge check 2
+
+1. Parse 1 + 2 * x * 3 - 9 - 2 by hand. What Haskell `Expr` do you end up with?
+2. Extend the grammar by adding `^` to it (exponentiation). Make it be right associative.
+
+If you're wondering how we extend our intuition about how to do this to Haskell, don't worry. That's coming up.
+
+---
+
+# KC 2 answers
+
+1. I like to start by putting in parentheses:
+   `((1 + ((2 * x) * 3)) - 9) - 2`
+   Now start putting in constructors:
+   `((Add 1 ((2 * 4) * 3)) - 9) - 2`
+   `((Add 1 ((Mul 2 4) * 3)) - 9) - 2`
+   `((Add 1 (Mul (Mul 2 4) 3)) - 9) - 2`
+   `(Sub (Add 1 (Mul (Mul 2 4) 3)) 9) - 2`
+   `Sub (Sub (Add 1 (Mul (Mul 2 4) 3)) 9) 2`
+   Lastly, fill in the values and variables:
+   `Sub (Sub (Add (Value 1) (Mul (Mul (Value 2) (Var "x")) (Value 3))) (Value 9)) (Value 2)`
 
 
+This is what `parseExpr` would return. 
+
+---
+
+# KC 2 answers (2)
+
+```
+expr ::= expr + term
+expr ::= expr - term
+expr ::= term
+term ::= term * factor
+term ::= factor
+factor ::= factor ^ exp
+factor ::= exp
+exp ::= Variable
+exp ::= Value
+```
+
+---
+
+# Questions?
+
+<!-- _class: questions invert -->
+
+---
+
+# Putting this into Haskell
+
+Now that we have refreshed on how to use grammars, let's turn this into Haskell.
+
+Our goal is to write this function
+```haskell
+parseExpr :: [Token] -> Expr
+```
+
+However, that function is going to need to parse terms, and terms will need factors. So let's show the whole family:
+
+```haskell
+parseExpr :: [Token] -> Expr
+parseTerm :: [Token] -> ([Token], Expr) -- the tuple has the left-over string
+parseFactor :: [Token] -> ([Token], Expr)
+parseVariable :: [Token] -> ([Token], Expr)
+parseValue :: [Token] -> ([Token], Expr) 
+```
+
+---
+
+# Variables and values
+
+Let's start with the easiest ones, `parseVariable` and `parseValue`.
+
+We just take a Value token and wrap it in a `Val` `Expr`:
+```haskell
+parseVariable (Sym name) : remainder = (remainder, Variable name)
+parseVariable _ = error "expected a symbol"
+```
+
+This is why so many error messages say "expected 'blah'". It's because once we've decided we need a variable, if there isn't one there, that's an informative thing to say (it tells the user what state the parser was in).
+
+[do `parseValue`]
+
+---
+
+# Parsing factors
+
+Parsing factor is a little more complex, but not really.
+
+Remember the rules look like this:
+```
+factor ::= variable
+factor ::= value 
+```
+
+So the function just has two definitions, one for a symbol and one for a literal:
+```haskell
+parseFactor :: [Token] -> ([Token], Expr) 
+parseFactor (Sym s) : rem = parseVariable $ (Sym s) : rem
+parseFactor (IntLit i) : rem = parseValue $ (IntLit i) : rem
+parseFactor _ = error "parsing factor: expected symbol or literal."
+```
+
+---
+
+# What to notice so far
+
+So far, notice that for each rule, we have a function definition.
+
+`factor ::= Variable` becomes `parseFactor (Sym s) : rem = ...`
+`factor ::= Value` becomes `parseFactor (IntLit i) : rem = ...`
+
+We're effectively treating our grammar rules as functions.
+
+It's worked so far, let's keep going...
+
+---
+
+# Parsing terms
+
+The first tricky one is when parsing a term. We have two possibilities:
+1. The term is just a factor (i.e., there is no `*`)
+2. The term is an actual multiplication of two operands.
+
+Let's apply the grammar and see what happens:
+```haskell
+parseTerm :: [Token] -> ([Token], Expr)
+parseTerm tokens =
+    let (remaining, first) = parseTerm tokens
+        -- now expect a '*'
+```
 
 ---
 
