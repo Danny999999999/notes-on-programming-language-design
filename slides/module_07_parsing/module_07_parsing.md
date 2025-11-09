@@ -581,11 +581,116 @@ The first tricky one is when parsing a term. We have two possibilities:
 
 Let's apply the grammar and see what happens:
 ```haskell
-parseTerm :: [Token] -> ([Token], Expr)
 parseTerm tokens =
     let (remaining, first) = parseTerm tokens
-        -- now expect a '*'
+    in  if null remaining then ([], first) -- no operator
+        else let (remaining', second) = parseTerm' remaining
+             in Mul first second
+    where
+        parseTerm' (Times : remaining) = parseFactor remaining 
+        parseTerm' _ = error "expected '*'"  
 ```
+
+Let's understand this first, and then try to see a problem...
+
+---
+
+# Parsing terms
+
+We are attempting to apply the parsing rule `term ::= term * factor` directly
+
+That means, we first parse a term recursively. Then we check for a `*`. If we find one, we parse the remaining factor.
+
+The result is either a `Term` or a `Mul (Term ...) (Factor ...)`
+Either way, we return it and the rest of the tokens.
+
+But there's a problem here. This code won't work.
+
+[What's wrong?]
+
+---
+
+# Left-recursive grammar
+
+The problem is that the grammar is left-recursive. 
+
+So our first recursive call is unguarded. 
+
+It will therefore run forever.
+
+This part...
+```haskell
+parseTerm tokens =
+    let (remaining, first) = parseTerm tokens
+    in ... 
+```
+
+...is the issue. Specifically that parseTerm call.
+
+---
+
+# What's the problem?
+
+Suppose it were right-recursive: `term ::= factor * term`
+
+This would no longer have the associativity we want, and it would pose a problem if we added division to the language, but let's just pretend that was the rule. 
+
+Then, our function would look like this:
+```haskell
+parseTerm tokens =
+    let (remaining, first) = parseFactor tokens
+        h : remaining' = remaining
+    in if h == '*' then 
+            let (remaining'', second) = parseTerm tokens
+            in (remaining'', Mul first second)
+        else (remaining', first)
+```
+
+This version does not have the problem.
+
+---
+
+# How can we fix it?
+
+We have a few options:
+1. Change the grammar to eliminate the recursion
+2. Modify the behavior (the semantics) so that the math works out with right recursion.
+
+Let's consider both options.
+
+---
+
+# Changing the grammar
+
+If we remove the recursive term by expanding it in the grammar (meaning, replace it with equivalent things that aren't recursive), we can get around this.
+
+So instead of this:
+```
+term ::= term * factor
+term ::= factor
+```
+
+We replace the "some kind of term and a star" with this regular expression style term:
+
+```
+term ::= (factor '*')* factor
+```
+
+---
+
+# What's that?
+
+That first star '*' is just the star symbol for multiplication.
+
+That second star is a Kleene star. Just like a regular expression, it means "zero or more of the thing before me".
+
+This modification of Backus-Naur form is called [Extended Backus-Naur form](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form).
+
+Why is it better? Well, let's revisit what it looks like to parse a term...
+
+---
+
+# Parsing a term
 
 ---
 
