@@ -674,6 +674,8 @@ We replace the "some kind of term and a star" with this regular expression style
 
 ```
 term ::= (factor '*')* factor
+or 
+term ::= factor ('*' factor)*
 ```
 
 ---
@@ -691,6 +693,238 @@ Why is it better? Well, let's revisit what it looks like to parse a term...
 ---
 
 # Parsing a term
+
+```
+term ::= factor ('*' factor)*
+```
+
+Now we just parse a factor, and then, if there's a star, we parse it, and then keep parsing factors as long as there's more.
+
+One way of coding this is to make a recursive function that parses the rest of the term (the part starting with the first '*')...
+
+(consider this as psuedo code to illustrate the concept: the real parsing code you'll need to use is later in this module)
+
+---
+
+# Parsing a term (2)
+
+```haskell
+-- parse a (factor '*')* into a multiply expression
+parseTerm tokens =
+    let (rest', factor) = parseFactor token
+        (head : rest'') = rest'
+    in if not (null rest') && head == Times then
+        let (rest''', factors) = parseTerm rest''
+        in  (rest''', Mul factor factors)
+       else (rest', factor)
+```
+
+Here, we parse a factor (which we "know" needs to be there if we want to parse a term)
+
+Then we check to see if there's any tokens left. If see, if there's also a "\*" there, we keep parsing whatever comes after it. 
+
+Note: the reason it's safe to destructure the list with `(head : rest'') = rest` before we know if it's empty or not is because of lazy evaluation.
+
+---
+
+# The basic pattern
+
+The basic pattern here is that we call a function whenever we want to match a particular grammar rule.
+
+So there's a `parseFactor`, a `parseTerm`, and a `parseExpr`. I'll leave `parseExpr` up to you, or we can do it together if there's time.
+
+Do we understand how we can represent rules in a grammar as functions?
+
+This technique is called recursive descent.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Parsing lisp
+
+Now we get to the part that's relevant for our project.
+
+We want to parse a Lisp program (technically our little toy version of Lisp, called "slisp").
+
+What does the grammar look like?
+
+Let's look at the building blocks of our language and see if we can guess the rules...
+
+---
+
+# Lists
+
+The most important datatype in Lisp is the list. 
+
+But a list of what? It can't just be lists all the way down.
+(I mean, lambda calculus is functions all the way down but that's *weird*)
+
+Like, at some point it needs to be a list *of* something, right?
+
+We call the smallest something an *atom*.
+
+---
+
+# Atoms
+
+In a traditional lisp, there are many kinds of atoms. We will consider exactly two:
+1. Symbols: some word that can be a variable name or something
+2. Integers: literally an integer
+
+So `hello` and `123` are both atoms.
+
+What does `hello` mean? Well, it could be variable, or it could just be a random symbol. Symbols are like strings, but we don't consider them to have "characters". They are only equal to themselves.
+
+The purpose of symbols is to represent things.
+
+---
+
+# Values
+
+Therefore, in our simple version of list, there are actually two kinds of values
+1. Atoms
+3. Lists of some number (including zero) of values
+
+So there are basically 3 data-types in the whole language: symbols, integers, or lists of anything (including lists of lists of anything)
+
+A list is delimited by parentheses `()` and the values inside are whitespace separated if they are atoms.
+
+---
+
+# Representing values
+
+What is a value as a data type? Well, something like this makes sense:
+
+```haskell
+data Value = 
+        VSym String 
+    |   VInt Integer
+    |   VList [Value]
+    deriving Show
+```
+
+I'm adding 'V' before the constructors to distinguish them from token constructors.
+
+Notice the `deriving Show` which we learned about from our required reading. This makes it so that we can convert our values into strings, which is useful for debugging.
+
+---
+
+# List examples
+
+The following are all valid lists
+```
+()
+(a b c)
+(1 2 3)
+(a b c 1 2 3)
+(a 1 b 2 c 3)
+(a (b c) 1 2 (3))
+```
+
+The symbols will eventually be interpreted as variables.
+
+Given these examples, can we come up with a grammar that will recognize these lists?
+
+---
+
+# List grammar
+
+```
+value ::= atom | list
+list ::= '(' value* ')'
+atom ::= Symbol | IntLit
+```
+
+So a value is either a list or an atom.
+
+A list is some sequence of values within a pair of parentheses.
+
+An atom is either a symbol or an integer literal
+
+We handle symbols and integer literals with our lexer, so we stop there (no need to distinguish which is which; it's already done for us).
+
+Note, lisp expressions are entirely prefix, so there's no need to deal with precedence or associativity. It's quite nice to parse.
+
+---
+
+# Parsing that
+
+With that grammar, let's imagine how to complete our project:
+```haskell
+parseValue :: [Token] -> ([Token], Value)
+parseList :: [Token] -> ([Token], Value)
+parseAtom :: [Token] -> ([Token], Value)
+```
+
+Your job will be to implement these functions. 
+
+Think about how to do it:
+* Parsing a value means determining if there's a list there (how?).
+    * If there is, parse the list
+    * Otherwise, it's some kind of atom. Those are easy to parse.
+
+---
+
+# Practice
+
+What if strings were in our language? What would change about our grammar?
+
+A single program is just a list. What if we allowed multiple lists side by side. How would the grammar change? That is:
+```
+((a 1 2) (b 3 4)) ; permitted
+(a 1 2) (b 3 4) ; currently not permitted. What would need to change?
+```
+
+What would change if we wanted a program to be a single atom in addition to a list?
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# What is the point of parsing lists?
+
+You might be wondering what the point is. Why are we parsing lists? What's so special about them?
+
+We actually interpret the lists to be commands. The first element of the list is a function to call, the rest of the values are arguments.
+
+So a typical hello-world program could look something like this
+`(print "hello world")`
+
+Of course, that would require strings, which we don't have, but it's not hard to imagine.
+
+Why on earth would a programming language work like this, though?
+
+---
+
+# The program is an AST
+
+Our goal with parsing is to build an abstract syntax tree, or AST.
+
+---
+
+# Quesitons?
+
+---
+
+# Other parsing techniques
+
+
+---
+
+# Overloading operators
+
+---
+
+# Parser combinators
 
 ---
 
