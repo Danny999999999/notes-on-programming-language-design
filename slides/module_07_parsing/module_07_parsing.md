@@ -870,9 +870,48 @@ Think about how to do it:
 
 ---
 
+# Suggestions
+
+I recommend starting with `parseAtom`. You will need to either return a symbol or an integer. This can be done easily by looking at the token you've gotten and considering if it's an IntLit, a Sym, or something else.
+
+Then `parseList` is a good next choice. It can first expect a `(`, then keep calling `parseValue` until there is a `)` token.
+
+`parseValue` can just check if there is a `(`, and if so, call `parseList`, and if not, call `parseAtom`.
+
+But wait, we hadn't defined `parseValue` before calling it inside `parseList`. How is it okay for `parseList` to call `parseValue`?
+
+---
+
+# Mutual recursion
+
+This is an example of [mutual recursion](https://en.wikipedia.org/wiki/Mutual_recursion).
+
+You're used to regular recursion: make the function call itself.
+
+Mutual recursion is when function A calls function B, but function B calls function A.
+
+For example, consider a forest of trees, but the trees can have multiple children (so the children of a tree is a forest).
+
+---
+
+# Forests and trees
+
+```haskell
+data Tree a = Empty | InnerNode (Forest a)
+data Forest a = ForestOf [Tree a]
+```
+
+A tree is either empty, or it's an inner node which has a forest for its children.
+
+A forest is a list of trees.
+
+They both refer to each other. This is fine. This is mutual recursion.
+
+---
+
 # Practice
 
-What if strings were in our language? What would change about our grammar?
+Back to parsing lists and atoms, What if strings were in our language? What would change about our grammar?
 
 A single program is just a list. What if we allowed multiple lists side by side. How would the grammar change? That is:
 ```
@@ -881,6 +920,110 @@ A single program is just a list. What if we allowed multiple lists side by side.
 ```
 
 What would change if we wanted a program to be a single atom in addition to a list?
+
+---
+
+# More practice
+
+Write a function that counts the number of nodes in our tree above.
+
+What about forest?
+
+Should these functions be mutually recursive?
+
+---
+
+# Knowledge check on recursive descent
+
+Consider this language, call it "Florp":
+```
+program ::= (statement)*
+statement ::= printStatement | assignment
+printStatement ::= 'print' sum
+assignment ::= Name '=' sum
+sum ::= value ('+' sum)*
+value ::= Int | Name
+```
+
+First, what are some example programs in "florp"?
+
+---
+
+# RD Knowledge check answers (1)
+
+Here's one:
+```
+x = 2
+y = x + 2 + 2
+z = 1 + x + y + z
+print z
+print x + y
+```
+
+Uh...and here's another one. Its *syntax* (order of string) is correct, but its *semantics* (what it actually means) is wrong:
+```
+print x
+x = 2
+```
+
+Next, what should the data types be that stores the tree?
+
+---
+
+# RD Knowledge check answers (2)
+
+There are many ways to do this. One is to give each rule its own datatype. 
+
+We didn't do this for our lisp dialect because we didn't need to, but let's see what it looks like when we do:
+
+```haskell
+data FlorpProgram = FlorpProgram [FlorpStatement]
+data FlorpStatement = 
+    StatPrint FlorpPrint | StatAssign FlorpAssignment
+data FlorpPrint = FlorpPrint FlorpSum
+data FlorpAssignment = FlorpAssignment String FlorpSum
+data FlorpSum = FlorpSum [FlorpVal]
+data FlorpVal = FlorpInt Integer | FlorpName String
+```
+
+With this data type, we can compile an entire "florp" program into a FlorpProgram value. Then, later we can execute it. What should tokens look like?
+
+---
+
+# RD Knowledge check answers (3)
+
+Here are the important tokens:
+```haskell
+data FlorpToken =
+        Print
+    |   Eq
+    |   Plus
+    |   TInt Integer
+    |   Name String
+```
+
+Practice: how would you write the tokenization routine?
+
+What about the recursive descent functions? What would they look like?
+
+---
+
+# RD Knowledge check answers (4)
+
+Well, every florp program is a list of statements
+```haskell
+parseProg :: [Token] -> ([Tokens], [FlorpStatement])
+parseProg (Print : toks) = 
+    let (rest, printStatement) = parsePrint (Print : toks)
+        (rest', otherStatements) = parseProg rest
+    in  (rest', printStatement : otherStatements)
+parseProg (name : Eq : toks) = -- an assignment statement
+    let (rest, assignmentStatement) = parseAssign (name : Eq : toks)
+        (rest', otherStatements) = parseProg rest
+    in  (rest', assignmentStatement : otherStatements)
+```
+
+If you'd like some more practice, try the others. We have a program here, what does `parsePrint` or `parseProg` look like?
 
 ---
 
@@ -909,22 +1052,162 @@ Why on earth would a programming language work like this, though?
 
 Our goal with parsing is to build an abstract syntax tree, or AST.
 
+With lisp, that is very easy, becuase the program itself is an AST.
+
+Normally, we'd have to turn `print (1 + 2)` into `(print (+ 1 2))`, but with lisp, the programmer does that for us.
+
+Once we have the AST fully turned into a Haskell tree, we can *execute* it.
+
 ---
 
-# Quesitons?
+# Executing the AST
+
+How does execution work?
+
+This will be for a future lecture, but basically, our program will be a list.
+
+We will lookup the first element of the list. If it's a `+`, we'll sum the rest of the list.
+
+If there are any nested lists, we'll execute those.
+
+This is how we'll make a lisp interpretor. It's a strategy that works for almost any programming language.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
 
 ---
 
 # Other parsing techniques
 
+We've seen recursive descent parsing now. It's an elegant technique.
+
+However, it can be a pain to deal with many common situations:
+* Left-associative operators are annoying.
+* We need to be able to differentiate nodes. For example, for the *florp* language parser, we had to check if it was a print statement or an assignment statement by looking for the `Print` token. 
+
+The last point is important. It becomes challenging when our language has rules that look almost the same except for a token that appears much later.
 
 ---
 
-# Overloading operators
+# Other parsing techniques (2)
+
+C compilers typically use some variant of [LR parser](https://en.wikipedia.org/wiki/LR_parser).
+
+LR Parsers are *bottom-up* parsers instead of top-down ones like recursive decent.
+
+They *shift* tokens into a stack until the tokens match one of the rules. Then they *reduce* the tokens into a single node matching that rule.
+
+Consider
+```c
+int x = 2 + 2;
+```
+
+---
+
+# Other parsing techniques (3)
+
+Here, we could shift all the tokens on the stack:
+`[int, x, =, 2, +, 2]` until we see the `;`
+That's a sign that we have a complete statement.
+
+So now we reduce `2 + 2` into `(+ 2 2)`
+`[int, x, =, (+ 2 2)]`
+
+At this point, we have enough information to describe a definition.
+
+This technique is nice because it's fast. It can be "compiled" into a giant turning machine `goto` table based on a description of grammar rules. This is what tools like [Flex](https://ftp.gnu.org/old-gnu/Manuals/flex-2.5.4/html_mono/flex.html) and [Bison](https://www.gnu.org/software/bison/) do.
+
+---
+
+# Other parsing techniques (4)
+
+So what does Haskell use?
+
+Haskell uses a still-different technique, called an [operator-precedence parser](https://en.wikipedia.org/wiki/Operator-precedence_parser)
+
+The basic technique works like this:
+* Read tokens as long as each token is either an operand or an operator that has a lower precedence than the last operator.
+* At that point, you need to reduce (meaning, combine the tokens into a node).
+* Then continue.
+
+---
+
+# Operator precedence example
+
+Suppose we have an expression like this:
+`2 + 5 * 3^4 + 9`
+
+We first shift all the tokens until we get to the second `+`, because that's the first time there's an operation with a lower precedence than the previous operation:
+`2 + 5 * 3^4`, `+ 9`
+
+We then reduce the left expression from right to left:
+`(2 + (5 * (3^4)))`
+
+Then we continue:
+`(2 + (5 * (3^4))) + 9`
+
+Then we're done.
+
+---
+
+# Operator precedence
+
+This is an extremely simple algorithm, but it works quite well.
+
+It has problems, though. Syntax that doesn't follow the infix operator rule requires special handling.
+
+Haskell ends up mixing some other parsing techniques to deal with that. For example, recursive descent can be used to deal with keywords.
+
+It works great for infix operators, but struggles with mixing prefix and postfix. Haskell deals with this by making all prefix operations have the highest level of precedence and not using postfix operations.
+
+If you are willing to abide by these strict rules, it's a great system. It also has a side benefit...
+
+---
+
+# Adding operators
+
+Haskell's precedence parser allows you to add new operators to the language.
+
+You can literally just define a new operator any time:
+```haskell
+(<-=->) :: Integer -> Integer -> Integer
+a <-=-> b = a * b + a
+```
+
+Now:
+```haskell
+20 <-=-> 30 == 620
+```
+
+---
+
+# Adding operators (2)
+
+You can even change its precedence:
+```haskell
+infixl 6 <-=-> -- put this after the type declaration, before the definition
+```
+
+Now our goofy space-ship-looking operator has precedence level 6, the same as `+` and `++`. `*` is 7. `^` is 8. 
+
+The lowest precedence are `$`, `$!` and `seq`. This is why `$` is a useful substitute for parentheses (because we can guarantee everything to the right of it runs first).
+
+[Here's the list](https://hackage.haskell.org/package/base-prelude-1.6.1/docs/BasePrelude-Operators.html). The reason this is all possible is that operator precedence parsers only require a table that maps operators to their precedence. This table isn't static, unlike the way LR parsers usually work. 
 
 ---
 
 # Parser combinators
+
+One last technique. Haskell is a pretty flexible language, more flexible than we've seen.
+
+It's annoying to have to bind every parse in a `let` expression that pulls out the remaining tokens and the thing we just parsed.
+
+There are combinators for parsing, just like for lambda expressions. These combinators are functions that allow you to say "expect this token followed by any number of these other rules". 
+
+[Here are some examples](https://github.com/lettier/parsing-with-haskell-parser-combinators). Don't expect to understand the ideas until we get to monads later, but it's nice to know that parsing can be as clean as basically putting the grammar into a Haskell program.
 
 ---
 
@@ -933,3 +1216,9 @@ Our goal with parsing is to build an abstract syntax tree, or AST.
 [Classes and Types](https://en.wikibooks.org/wiki/Haskell/Classes_and_types) (Very important!)
 
 [The Functor Class](https://en.wikibooks.org/wiki/Haskell/The_Functor_class) (Also very important!)
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
