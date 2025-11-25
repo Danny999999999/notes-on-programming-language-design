@@ -22,14 +22,11 @@ Feel free to submit fixes, improvements, and new material [here](https://github.
 
 # Last module
 
-We learned about parsing. Specifically:
-* BNF and EBNF
-* How recursive descent works
-* Info on bottom-up parsing
-* Info on how Haskell does it (precedence parsing)
+We learned about records.
 
-The grammar is a critical part of a programming language's design.
+Finally, something that looks like a struct.
 
+There were some weird wrinkles about field names though [can anyone recall?].
 
 ---
 
