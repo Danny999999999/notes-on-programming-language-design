@@ -580,6 +580,8 @@ Typeclasses are interfaces, not classes
 
 Haskell does not have classes. It doesn't need them. It *does* need interfaces, and they are confusingly called *typeclasses*.
 
+Typeclasses are how Haskell implements *subtype polymorphism*. Think of it as letting you implement an interface to allow types to be used in new ways, just like in Java.
+
 ---
 
 # Making one
@@ -604,16 +606,70 @@ And just like an `interface`, a typeclass is not very useful unless it has some 
 Instead, we just have ordinary data types implement type classes:
 
 ```haskell
-data Labrador = Labrador()
-data Chihuahua = Chihuahua ()
+data Labrador = Labrador
+data Chihuahua = Chihuahua
 
 instance Barkable Labrador where
     bark _ = "woof!"
 
-instance 
+instance Barkable Chihuahua where
+    bark _ = "yarp!"
 ```
 
+So now, if we call the function bark, the string depends on what we pass into it:
+```haskell
+bark Labrador == "woof!"
+bark Chihuahua == "yarp!"
+```
+
+But that raises an immediate question...
+
 ---
+
+# How is that different from pattern matching?
+
+Couldn't we just do this?
+
+```haskell
+data Dog = Labrador | Chihuahua
+
+bark :: Dog -> String
+bark Labrador = "woof!"
+bark Chihuahua = "yarp!"
+```
+
+Yes...we could do that.
+
+But there's one thing we can't do if we do things this way. 
+
+What does subtype polymorphism let us do that basic pattern-matching/case-statements don't let us do? [Anyone?]
+
+---
+
+# We can't add more
+
+Pattern matching requires us to know, in advance, all the possible cases.
+
+We have to have a data type with exactly two constructors:
+```haskell
+data Dog = Labrador | Chihuahua
+```
+
+If we add a new constructor later, we have to modify every case statement to handle that case.
+
+This is honestly not that big a deal, especially for software maintained by one team.
+
+However, typeclasses allow us to add new data types to the family later, without breaking any code we've already written. This is just like interfaces.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Typeclasses in type expressions
 
 If we inspect the type of `bark` in GHCI, we can finally see that wide arrow notation that we've probably been seeing a lot in error messages:
 
@@ -621,6 +677,296 @@ If we inspect the type of `bark` in GHCI, we can finally see that wide arrow not
 ghci> :t bark
 bark :: Barkable a => a -> String
 ```
+
+This notation says *"given a `Barkable` type we'll call `a`, this function will take an instance of that type and turn it into a string"*
+
+This is very similar to `a -> String`, but that type would accept any type for `a`. The wide arrow specifies that `a` must be a type instance (what we call an "implementor") of `Barkable`.
+
+---
+
+# Let's see real examples: Show and Read
+
+In your reading, you've already seen the functions `show` and `read`.
+
+`show` converts things to string. For example `show 7 == "7"`
+
+`read` does the opposite. It converts strings into other things. `read "7" :: Int == 7`
+(we needed the type so it would know what to convert it to)
+
+But what is the type of `show` and `read`?
+
+---
+
+# Their type
+
+```haskell
+ghci> :t show
+show :: Show a => a -> String
+ghci> :t read
+read :: Read a => String -> a
+```
+
+These types imply that there are typeclasses named `Show` and `Read` that `a` must be an instance of in order for us to call these functions on it.
+
+Typeclasses are open sets. We can create new types and add them to the typeclass. Then, we'll be able to call `show` and `read` on our new type.
+
+Let's see an example from an older lecture...
+
+---
+
+# Remember this type
+
+```haskell
+data Character =
+    Hero { name :: String, health :: Int, mana :: Int } | 
+    Monster { health :: Int, mana :: Int }
+```
+
+Suppose this is a game. It would be nice to be able to convert a character to a string to save, and read it in from one to load.
+
+You *could* make functions for that:
+```haskell
+serializeCharacter :: Character -> String
+desearializeCharacter :: String -> Character 
+```
+
+However, how should `ghci` know that we want to run `serializeCharacter` when it's time to print a character? And what if someone else already wrote a function that can write things to files as long as they can be converted to strings?
+
+---
+
+# Instancing `Show`
+
+Instead, let's use the already existing typeclass `Show`, which represents things that can be turned into strings.
+
+By using the already existing typeclass, we make our type instantly compatible with all other functions that work on instances of `Show`. 
+
+So if someone wrote a function `saveToFile :: Show a => a -> IO ()`, we could use it even though the person who made that function had never heard of our `Character` data type.
+
+(don't worry about `IO ()` yet. That's a monad; we'll talk about those)
+
+---
+
+# Show's definition
+
+The `Show` typeclass is defined like this:
+
+```haskell
+class Show a where
+    show :: a -> String
+```
+
+So, to make our type an instance of it, we give an instance definition like this...
+
+---
+
+# An instance of Show 
+
+```haskell
+instance Show Character where
+    show (Hero {name=n, health=hp, mana=mp}) =
+        "Hero {name=" ++ show n ++ ", health=" ++ 
+            show hp ++ ", mana=" ++ show mp ++ "}"
+    -- as an exercise, do show (Monster ...)
+```
+
+This makes it so that if we call `show bob` on our friend `bob` from the last lecture, we get this kind of string:
+`"Hero {name = \"Bob\", health = 100, mana = 20}"`
+
+Notice, because we used `show` on all the values inside `bob`, they got converted to strings for us. Using `show` on a string escapes it for us, too, so even that works.
+
+---
+
+# What about `Read`?
+
+So if `Show` is the typeclass for things that can be converted into strings, `Read` is the typeclass for things that can be constructed from strings.
+
+See if you can implement `Read` for a simpler type. Like this one:
+
+```haskell
+data IntPair = Pair Int Int
+
+Instance Show IntPair where
+    show (IntPair x y) == show x ++ ", " ++ show y
+```
+
+Here, I've implemented `Show` so that you can see how it gets turned into a string.
+
+Try implementing `Read` so you can turn that string back into an `IntPair`.
+
+---
+
+# What about parametric types?
+
+That's cool, but it only works for pairs of integers.
+
+Are we supposed to implement `Show` for every kind of pair?
+
+No. Let's make a parametric `Pair` that works for any type:
+```haskell
+data Pair a = Pair a a
+```
+
+That is, `Pair 10 20` is a `Pair Int`. We've seen this a bunch of times now, but it bears repreating that Haskell lets us name a constructor with the same name as a type, and it figures out whether an expression is a value or a type from context (i.e., whether it comes after a `::`) 
+
+---
+
+# What about parametric types? (2)
+
+For `Pair 10 20`, we'd like the result to be `"10, 20"`. Ideally, we'd like it to work for any "showable" type. 
+
+So `Pair 10.0 20.0` would also work: `"10.0, 20.0"`
+
+For this, we need "inheritance":
+```haskell
+instance Show a => Show (Pair a) where
+    show (Pair x y) = show x ++ ", " ++ show y
+```
+
+Here, we're saying "given some type `a` which is "showable", a pair of that `a` will also be "showable". First, show the first element of it, then insert a comma and space, and then show the second element of it.
+
+The only requirement is that we be able to call `show` on the things inside the pair.
+
+---
+
+# This isn't the same as OO inheritance
+
+You might think "oh, inheritance, I remember that."
+
+This is different. In OO inheritance, we pull all the data fields in from the parent class, and all its methods, too. We can then override the methods we want to override.
+
+In Haskell, typeclasses have *no data*. They are only a list of functions. This is by design. By having only functions and no data, you avoid the so-called "deadly diamond" [we can remind ourselves of what this is if there's time].
+
+Instead, typeclass inheritance is more like a constraint. We're saying "`Pair` is only a `Show` if the type inside of it is also a `Show`.
+
+Because we know that `a` is a `Show`, we know that it's safe to call `show x` and `show y`, and Haskell allows the code to compile.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Having this done automatically
+
+Converting things into strings is such a common thing to need to do, Haskell has a standard way to do it that doesn't require you to think about what the string will look like.
+
+Just do this:
+```haskell
+data Character =
+    Hero { name :: String, health :: Int, mana :: Int } | 
+    Monster { health :: Int, mana :: Int }
+    deriving Show
+```
+
+The key is the *deriving clause* at the end. That says "go ahead and generate a show instance for me, automatically"
+
+---
+
+# Testing it out
+
+Let's see if it works:
+```haskell
+-- (remember that records are just ordered pairs behind the scenes)
+ghci> show (Hero "Bob" 100 20)
+"Hero {name = \"Bob\", health = 100, mana = 20}"
+ghci> show (Monster {health = 20, mana = 20})
+"Monster {health = 20, mana = 20}"
+ghci> show (Pair 10 20)
+"Pair 10 20"
+```
+
+Haskell was automatically able to generate a `Show` implementation for us by using simple rules.
+
+What are the rules? For ordinary data types, print the name of the constructor, then call show on each of the fields. For records, do that same thing, but include the braces and field names.
+
+---
+
+# "deriving" 
+
+This convenient feature can be used on more than just `Show`.
+
+For example, we can also do deriving read:
+```haskell
+class Pair a = Pair a a deriving (Show, Read)
+-- we can put it on one line. Useful in GHCI.
+```
+
+```haskell
+ghci> show $ Pair 10 20
+"Pair 10 20"
+ghci> read "Pair 10 20" :: Pair Int -- need to say what it's going to become
+Pair 10 20
+```
+
+---
+
+# `Show` and `Read` rules
+
+It should be clear that `Show` and `Read` are inverses of one another.
+
+That is, we expect `read . show == id`. That is, calling `show` on some showable data, and then calling `read` on the result should be the same as doing nothing (the identity function `id`)
+
+Haskell doesn't check this anywhere. There are some programming languages where making something an instance of a typeclass also requires you to provide a proof that it follows the rule (e.g., Coq, Lean, Idris), but Haskell isn't quite that sophisticated.
+
+Therefore, it's on you to make sure your typeclass instances make sense.
+
+---
+
+# Other useful typeclasses we can "derive"
+
+`Eq` is the typeclass for things that support equality.
+
+If you implement this typeclass for a type, it supports `==`.
+
+We could do it ourselves:
+```haskell
+instance Eq a => Eq (Pair a) where
+    (Pair a b) == (Pair x y) = a == x && b == y
+```
+
+Here we're saying "A `Pair` of two values `a` and `b` is equal to a another `Pair` of `x` and `y` if `a` equals `x` and `b` equals `y`.
+
+---
+
+# Deriving `Eq`
+
+This situation (where we want equality to mean "all the fields are equal") is so common, Haskell lets us just derive it:
+```haskell
+data Pair a = Pair a a
+    deriving Show, Read, Eq
+```
+
+Now we can compare pairs:
+```haskell
+let a = Pair 10 20
+    b = Pair 10 20
+in  print $ a == b -- prints "True"
+```
+
+---
+
+# Deriving `Ord`
+
+What about inequalities? `Ord` is the typeclass for things that can be ordered (with `>`, `>=`, `<`, and `<=`)
+
+---
+
+# More useful typeclasses to be familiar with
+
+- `Num`, the class of types that support numeric operations. This is the default assumption for any arithmetic without types. `f x = x + 2 :: Num a => a -> a` 
+- `Integral`, the class of types that are "integer-like" and can be converted to `Integer`
+- `Floating`, the class of types that are "float-like". You can use this to write code that works with both `Float` and `Double` without needing to assume one or the other.
+
+These are all useful, but they don't have `derive` recipes. You can't magically interpret a random data type as a floating point number with `deriving Floating`.
+
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
 
 ---
 
