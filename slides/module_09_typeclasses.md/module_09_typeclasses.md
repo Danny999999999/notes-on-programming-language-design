@@ -1494,7 +1494,7 @@ We call this AOS vs. SOA. Sometimes one is more performant or convenient than th
 
 Classes are built around an SOA assumption, which is a good assumption most of the time, but not always.
 
-On the other hand, what if you were never using classes to begin with? Your module may have used handles for game objects. 
+On the other hand, what if you were never using classes to begin with? Your module may have used handles for game objects with totally independent data structures. 
 
 If so, congratulations, you probably didn't break any external code when you refactored.
 
