@@ -6,7 +6,7 @@ paginate: true
 
 # Programming Language Design
 
-## Module 8 (short): Typeclasses 
+## Module 9: Typeclasses 
 
 <br>
 <br>
@@ -552,6 +552,18 @@ This is called *dynamic dispatch*. It means *dynamically* (meaning, at runtime) 
 
 ---
 
+# Dynamic dispatch
+
+Dynamic dispatch is required, because Java allows things like mutation.
+
+If a `Barkable` can be changed from a `Chihuahua` to a `Labrador`, we need the ability for the method to get routed to the right implementation.
+
+But if things are guaranteed not to change (or be generated randomly), then most of the time, the compiler can figure out what's going to happen, and resolve to a static method.
+
+This is the case in Haskell. The language doesn't need dynamic dispatch because nothing is dynamic. As a result, polymorphism is much simpler.
+
+---
+
 # Questions?
 
 <!-- _class: questions invert -->
@@ -951,6 +963,56 @@ in  print $ a == b -- prints "True"
 
 What about inequalities? `Ord` is the typeclass for things that can be ordered (with `>`, `>=`, `<`, and `<=`)
 
+When we `derive` it, Haskell assumes we want to first compare by the first field, and if they're equal, to then compare by the second field as a tiebreaker, and so on.
+
+So if we `deriving (Eq, Ord)` on `Pair`, we get
+```haskell
+ghci> (Pair 10 20) < (Pair 11 20)
+True
+ghci> (Pair 10 19) < (Pair 10 20)
+True
+```
+
+Important note: `Ord` inherits from `Eq`. That is, a type cannot be `Ord` without also being `Eq`. You will get an error when `deriving Ord` without also listing `Eq`.
+
+---
+
+# Deriving `Ord` (2)
+
+What if your type doesn't have numbers? It still works:
+
+```haskell
+data Rgb = Red | Green | Blue
+    deriving (Show, Read, Eq, Ord)
+```
+
+The order goes based on the order of constructors.
+
+Examples:
+```haskell
+print $ Red < Green -- True
+print $ Red < Blue  -- True
+print $ Green < Blue  -- True
+print $ Green < Red  -- False
+print $ Blue < Red  -- False
+```
+
+---
+
+# Deriving `Enum`
+
+Lastly, it's useful to have classes that can be converted to and from integers.
+
+This typeclass has the `toEnum` and `fromEnum` functions, which provide conversions to, and from, an `Int`.
+
+`Bool` is an instance of this typeclass: we can convert `0` and `1` into `False` and `True`
+
+The `Enum` typeclass also requires 2 more functions: `succ` and `pred` for the successor and predecessor. This is equivalent to incrementing or decrementing the value.
+
+Normally `succ` crashes if you call it on the last constructor and `pred` likewise on the first (i.e., don't write `succ Blue` or `pred Red`). However, you could implement your own to make it wrap instead, for modular arithmetic.
+
+Practice: Implement `Enum` for `Rgb` without `deriving` but make `succ` and `pred` wrap.
+
 ---
 
 # More useful typeclasses to be familiar with
@@ -970,14 +1032,484 @@ These are all useful, but they don't have `derive` recipes. You can't magically 
 
 ---
 
+# Let's make a custom number
+
+We're used to arithmetic on fix-sized integers. We know, e.g., that if we increment an integer too many times, it wraps around to the most negative integer (overflow).
+
+We also know that if we subtract too much, most integers will wrap around to a big number. This is called negative overflow.
+
+(this is not underflow--underflow is something that happens to floating point numbers that round toward zero. people get this term wrong so frequently that its meaning might actually change)
+
+(in C, signed overflow is technically undefined, but this is often what ends up happening)
+
+---
+
+# Let's make a custom number (2)
+
+However, sometimes we don't want the number to wrap around.
+
+This situation is very frequent when doing digital signal processing.
+
+For example, if I add two sound waves together to mix them, I don't want the wavefunctions to wrap around. That would make it sound unintelligible. 
+
+Also, if I'm doing additive blending of light values (common in 3D graphics), I don't want adding two bright lights together to somehow result in a dim light.
+
+Let's use our knowledge of typeclasses to create a new kind of saturating integer.
+
+---
+
+# The `Num` typeclass
+
+First, what is required for something to be a `Num`?
+
+Here is the typeclass definition ([source](https://hackage.haskell.org/package/base-4.21.0.0/docs/GHC-Num.html)):
+```haskell
+class Num a where
+    (+) :: a -> a -> a
+    (-) :: a -> a -> a  -- not required: default is a - b = a + negate b
+    (*) :: a -> a -> a
+    negate :: a -> a    -- not required: default is negate x = 0 - x
+    abs :: a -> a       -- absolute value
+    signum :: a -> a    -- get the sign: signum -7 == -1
+    fromInteger :: Integer -> a -- might overflow
+```
+
+Notice, `-` and `negate` are both marked as not required. In fact *one* of them is required, but then the other can be defined in terms of the one we provided.
+
+Math enjoyers: why do you think division is not defined in the type class?
+
+---
+
+# Default implementations
+
+Normally, typeclasses list functions that need to be defined later. Like `+` here is for the person who implements the typeclass to figure out. 
+
+Adding integers is easy, but adding ratios requires making their denominators the same before doing the addition. 
+
+We are supposed to fill in a different implementation for `+` for ratios (and this has been done for us for the `Ratio` data type)
+
+However, typeclasses can also come with *default implementations*. Which are functions that are already provided and that get copied over every time you define a new instance.
+
+---
+
+# Default implementations (2)
+
+In this case, `-` and `negate` have default implementations that are defined in terms of each other. 
+
+This means we only need to define one, and we get the other for free.
+
+To define a default implementation, just add some function definitions after the types. [Here's an example from `Num`](https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Num.html#Num) for `-` and `negate`.
+
+Of course, nothing stops us from providing *both* functions. We might have optimized code for both of them, which could be faster than defining one in terms of the other.
+
+---
+
+# The gameplan
+
+Our ultimate goal is to make a new type that is an instance of the `Num` typeclass
+
+This will make it so that we can use standard operators like `+` with our type, instead of having to define new operators that only work with saturating integers.
+
+The plan is as follows:
+1. Define a new datatype to store our integer
+2. Make it an instance of the `Num` datatype by providing the minimum required set of functions.
+
+---
+
+# Making a new datatype
+
+Here is a simple one:
+```haskell
+newtype SatInt = SatInt Int
+    deriving (Show, Eq, Ord)
+```
+
+We're using `newtype` because we only need one constructor and one data field, and using `data` would introduce overhead for the "tag" field that would be unecessary. 
+
+We're deriving `Show` so we can easily print our new type, and `Eq` and `Ord` for comparisons.
+
+"Saturated" ints are just like regular `Int`s, but they won't wrap around their bounds. So, what are those bounds?
+
+---
+
+# Getting the bounds
+
+Here is how we get the maximum and minimum values for the int inside the `SatInt`:
+
+```haskell
+intMax :: Int
+intMax = maxBound
+
+intMin :: Int 
+intMin = minBound
+```
+
+What's going on here? Let's look at those functions:
+```haskell
+minBound :: Bounded a => a
+maxBound :: Bounded a => a
+```
+
+`Bounded` is a typeclass. Any data type that is bounded must implement these two constant functions: `minBound` and `maxBound`.
+
+---
+
+# They aren't constants
+
+Those are functions, not constants. 
+
+They dispatch based on the *return type*, not based on their input (which they lack)
+
+That is, if I do something like this:
+```haskell
+import Data.Int
+x :: Int8
+x = minBound
+```
+
+x will be `-128`. Haskell looks at the type of the scope that we call `minBound` from, sees that it's an `Int8`, and calls the `minBound` function from the `Int8` instance of `Bounded`.
+
+---
+
+# With me so far?
+
+<!-- _class: invert questions -->
+
+---
+
+# Saturating
+
+In order to make our arithmetic functions saturate, let's define a helper function
+
+```haskell
+boundInteger :: Integer -> Int
+boundInteger x
+    | x < toInteger intMin = intMin  -- too small, replace with intMin
+    | x > toInteger intMax = intMax  -- too big, replace with intMax
+    | otherwise = fromInteger x      -- just right: pass it through
+```
+
+This function takes an unboundedly-sized `Integer` and binds it to the range of a regular `Int`, using our `intMin` and `intMax` constants.
+
+This is not very efficient: it would probably be faster to anticipate when we will saturate ahead of time, but it makes the code simple for our purposes.
+
+---
+
+# Implementing `Num`
+
+Now it's time to make `SatInt` an instance of `Num`.
+```haskell
+instance Num SatInt where
+    (SatInt x) + (SatInt y) = 
+        SatInt $ boundInteger $ toInteger x + toInteger y
+    (SatInt x) * (SatInt y) =
+        SatInt $ boundInteger $ toInteger x * toInteger y
+
+    abs (SatInt x) = 
+            SatInt $ boundInteger $ abs $ toInteger x
+    signum (SatInt x) = SatInt $ signum x
+
+    negate (SatInt x) = SatInt $ boundInteger $ negate $ toInteger x 
+
+    fromInteger = SatInt . boundInteger
+```
+
+---
+
+# Implementing `Num` (2)
+
+The most interesting lines are for `+` and `*`. We use pattern matching to pull the `Int` out of the `SatInt`. Then we convert the `x` and `y` values into unbounded `Integers`. We perform the operation.
+
+After the operation, if the result is out of bounds, we replace it with either the max or min value as appropriate.
+
+For signum, we just project the signum function inside the SatInt structure.
+
+---
+
+# Implementing `Num` (3)
+
+You might think we could do that for `abs`, too, but we can't. Suppose we're working with 8 bit integers. The range is `[-128, 127]`. If we take `abs -128`, we would expect `128`, but that's too big! We need to bound it, therefore.
+
+Same deal with `negate`. We want `negate intMin` to give `intMax`, not wrap around to `intMin` again.
+
+Lastly, we use point-free notation for `fromInteger`. We apply the `SatInt` constructor of the result of calling `fromInteger` on the input value.
+
+---
+
+# Showing it off
+```
+main :: IO ()
+main = do
+    let x = SatInt 7
+    let y = SatInt 9
+    let z = SatInt 99
+    
+    print $ x + y -- Prints SatInt 16
+    print $ x - y -- SatInt (-2)
+    print $ x * y -- SatInt 63
+    print $ abs $ x * negate y -- SatInt 63
+    print (-100000000000000000000 :: SatInt) -- SatInt (-9223372036854775807)
+    print (100000000000000000000 :: SatInt) -- SatInt 9223372036854775807
+    print $ abs (-100000000000000000000 :: SatInt) -- SatInt 9223372036854775807
+    print $ z*z*z*z*z*z*z*z*z*z*z*z*z*z*z*z*z*z  -- SatInt 9223372036854775807
+```
+
+Notice the saturation being demonstrated on all the last values. Haskell has a weird length of `Int` on my platform, but it's clearly limited.
+
+---
+
+# Practice
+
+Create a custom integer type, `Int4` that ranges from -8 to +7. 
+
+Implement `Bounded` for it.
+
+Then, implement `Num` for it, too.
+
+Don't make it saturate, it should wrap. You can use the modulus to make it do that. 
+
+Demonstrate that your integer type works by doing some arithmetic on it.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Other typeclasses
+
+Now that you understand `Num`, you have a good grounding for how typeclasses work and why they're useful.
+
+We can add any new numeric type and have it work with the operators we're used to.
+
+We can even support higher operators like `^` if we also want to implement `Integral` (which requires `Real` and `Enum`).
+
+---
+
+# Other typeclasses
+
+Next module, we'll look at some extremely important typeclasses with have weird names: `Functor`, `Applicative`, and `Monoid`.
+
+This will set us up to discuss one of the most important typeclasses of all: `Monad`!
+
+---
+
+# One last thing: dynamic dispatch on which arg?
+
+One random thing I wanted to point out but couldn't find a good place to do it.
+
+In Java (and most OO languages), when we write `instance.method(1, 2, 3)`, if the type of instance is abstract (i.e., an interface or abstract class), then we're doing dynamic dispatch.
+
+That is, assume `method` is the 3rd method in the interface. We'll looking up the 3rd value in `instance`'s VTable and calling it with `1, 2, 3`. This happens at run time.
+
+But that means that only the thing before the `.` can be used in the look up.
+
+---
+
+# What if?
+
+What if we want to have the dynamic dispatch happen to another value. For example, a non-object-oriented function like this product between a scalar and a vector:
+`scale 5 (Vec3 2 3 4)`
+
+I might want to dispatch this function depending on whether I'm scaling a `Vec3`, a `Vec4`, a matrix, etc.
+
+In most OO languages, we can't do this: `5.scale(Vec3(2, 3, 4))` would dispatch based on the 5. That would mean that all integers would have the same `scale` function. We couldn't have it change at runtime depending on what kind of thing we're scaling except manually (i.e., an if-statement or some kind of table of function pointers).
+
+The value before the `.` is *special*. It is the only one allowed to cause dispatch to occur.
+
+---
+
+# In Haskell, we can
+
+```haskell
+class Scalable a where
+    scale :: Num b => b -> a -> a 
+```
+
+Notice the difference, the `Scalable` thing (`a`) is the *second* argument to `scale`. The first argument is just a `Num`.
+
+This means that we're doing dispatch-based on the second argument rather than the first. We can scale a different way for `<1, 2, 3>` and `<<1, 2,>, <3, 4>>` (pretend that's a 2x2 matrix) 
+
+---
+
+# Return type dispatch
+
+We can even dispatch based on the return type.
+
+That's how `minBound` and `maxBound` work.
+
+In Java, you cannot overload based on return type. 
+
+This ends up being very useful in Haskell when dealing with monads, which use this feature along with `do` notation to let you extend the language in cool ways.
+
+---
+
+# What about multiple dispatch
+
+What if we want to dispatch based on *more than one* argument?
+
+We've been assuming that we only ever want to use one argument to dispatch based on.
+
+But what if we want different combinations of types to go to different methods?
+
+When on earth could we ever need that?
+
+---
+
+# Multiple dispatch example:
+
+Collision detection is a good example.
+
+There are custom math formula for detecting a rectangle-rectangle, rectangle-circle, circle-triangle, etc. collision.
+
+So we need to consider combinations.
+
+Haskell lets us do this with multi-parameter typeclasses:
+
+```haskell
+class Collider a b where
+    collides :: a -> b -> Bool
+```
+
+Here, we can define a `Collider` instance for every pair we support. Like:
+```haskell
+instance Collider Circle Square where
+    collides circle square = ...
+```
+
+---
+
+# Why have I never heard of this?
+
+If a language requires dynamic-dispatch, multiple dispatch is pretty rare.
+
+The [Dylan](https://opendylan.org/intro-dylan/multiple-dispatch.html) language supports it...
+...as does [Julia](https://docs.julialang.org/en/v1/manual/methods/).
+
+However, C++ doesn't have it. It has ad-hoc polymorphism, so you can define it on a case-by-case basis, but you have to have your definitions up-front. You can't let someone add new collisions later for example.
+
+Java doesn't have it either. Neither does C#.
+
+---
+
+# Blub strikes again
+
+Now that you've seen it, it probably seems like the easiest way to define collisions.
+
+But if you had never heard of multiple dispatch, it might have never even occurred to you to ask for that feature.
+
+This is the curse of Blub, and why it's so useful to learn new languages.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
 # Class's being overly overloaded
 
 I promised earlier that I had an example of how the design of classes needing to enable 3 different language features could cause them to not fulfill each one as well as a purpose-built solution.
 
-Here are some examples...
+Here is an example
 
 ---
 
-# Soa versus Aos
+# Class layout
 
-Classes are used for encapsulation. They act as boundaries 
+Classes are used for encapsulation. They act as boundaries for modifying data.
+
+However, in most OO languages, all the data in an instance is co-located.
+
+That is, in this Java class, when we instantiate it, `x`, `y`, and `z` will be next to each other in memory:
+
+```java
+class Foo {
+    int x;
+    int y;
+    int z;
+}
+```
+
+---
+
+# What's wrong with that?
+
+Nothing is wrong with that. It's what we want most of the time.
+
+However, sometimes some subsets of fields are never used at the same time. 
+
+Consider this example:
+
+```c++
+class GameObject {
+private:
+    Position pos;
+    Sprite sprite;
+    SoundEffect collisionSound;
+public: ...
+};
+```
+
+The graphics drawing routine is probably completely unrelated to the sound processing, and yet those two pieces of data are right next to each other.
+
+---
+
+# What's wrong with that? (2)
+
+The problem with that is that it's cache-inefficient.
+
+Having sound data in our cache when we're doing sprite drawing just reduces the amount of data that can fit in Cache.
+
+We're probably doing a for-loop over all the sprites to draw them, then maybe a for-loop over all the sounds later to play them if a collision happened.
+
+Therefore, we should probably store them in two separate places:
+```c++
+SoundEffect* effects;
+Sprite* sprites;
+```
+
+If each game object has a unique id, we can maybe treat it as an index into these arrays.
+
+---
+
+# What's wrong with that? (3)
+
+The issue is: this is a radical re-orginization of data. We aren't using the class anymore.
+
+We could have a class with pointers to its data, but that defeats the purpose. We really only need the class to be an id.
+
+At this point, most game programmers switch to using an entity component system, which is based on this principle.
+
+---
+
+# Fundamentally...
+
+This is a distinction between an array of structures (or classes) and a structure of arrays.
+
+We call this AOS vs. SOA. Sometimes one is more performant or convenient than the other.
+
+Classes are built around an SOA assumption, which is a good assumption most of the time, but not always.
+
+On the other hand, what if you were never using classes to begin with? Your module may have used handles for game objects. 
+
+If so, congratulations, you probably didn't break any external code when you refactored.
+
+---
+
+# The point
+
+The reason I'm mentioning this is that when we use the same feature for data-hiding as we do for controlled mutation, we may run into problems where it's not great at either.
+
+Here, because in Haskell we don't need a feature for controlled mutation, we can just use our data-hiding tool, which is a module.
+
+And modules are very simple. We end up with easier software design.
+
+--- 
+
+# Questions?
+
+<!-- _class: invert questions -->
