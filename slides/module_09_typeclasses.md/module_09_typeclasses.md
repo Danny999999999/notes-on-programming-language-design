@@ -1020,9 +1020,8 @@ Practice: Implement `Enum` for `Rgb` without `deriving` but make `succ` and `pre
 - `Num`, the class of types that support numeric operations. This is the default assumption for any arithmetic without types. `f x = x + 2 :: Num a => a -> a` 
 - `Integral`, the class of types that are "integer-like" and can be converted to `Integer`
 - `Floating`, the class of types that are "float-like". You can use this to write code that works with both `Float` and `Double` without needing to assume one or the other.
-
+- `Foldable`, the class of data structures that can be folded with `foldl` and `foldr`.
 These are all useful, but they don't have `derive` recipes. You can't magically interpret a random data type as a floating point number with `deriving Floating`.
-
 
 ---
 
