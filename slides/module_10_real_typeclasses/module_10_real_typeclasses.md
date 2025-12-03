@@ -192,6 +192,12 @@ So instead of `Semigroup`, think "naturally foldable without extra info"
 
 ---
 
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
 # What is `NonEmpty`?
 
 Which brings us to `NonEmpty`. What is the point?
@@ -261,22 +267,95 @@ First, this illustrates a cool thing about typeclasses in Haskell.
 
 Notice that `mempty` is a constant. The typeclass can say "there needs to be a value named `mempty` somewhere". 
 
-This is a rare and powerful feature. In Java, we can't use inheritance to require the existence of a value (only of a function that produces a value). 
+This is a rare and powerful feature. In Java, we can't use inheritance to require the existence of a value (only of a method, called on an object, that produces a value). 
 
-Also, now that we have an `mempty`, we don't need the list to be nonem
-
----
-
-# What about times?
+Also, now that we have an `mempty`, we don't need the list to be `NonEmpty`. Now if the list is empty we just return `mempty`.
 
 ---
 
-# Monoid laws
+# What is `mempty` for some common values?
+
+```haskell
+ghci> mempty :: Sum Int
+Sum {getSum = 0}
+ghci> mempty :: Product Int
+Product {getProduct = 1}
+ghci> mempty :: String
+""
+```
+
+That last one is why it's called `mempty`: the empty string is a prime example.
+
+It's an identity element of strings under concatination, because if you concatinate an empty string, it doesn't do anything.
+
+---
+
+# What about `stimes`?
+
+There was another `Semigroup` function: `stimes :: Integral b => b -> a -> a`
+
+This function calls `<>` on the same value the given number of times.
+
+So `stimes 3 monoid` is equivalent to `monoid <> monoid <> monoid`
+
+So for the `Sum` monoid, it's the equivalent of mulitplication (hence the name). For `Product`, it's exponentiation. 
+
+For strings, it's particularly interesting: `stimes 5 "hi" == "hihihihihi"`
+or more naturally: ``5 `stimes` "hi" == "hihihihihi"``
+
+Wrinkle: for `stimes 0 ...` to make sense, the `Semigroup` must be a `Monoid`. [why?]
+
+---
+
+# Get that?
+
+Because of the `Semigroup` typeclass, we automatically get the ability to repeat strings. 
+
+We didn't need a special operator for it that only works on strings. It actually works on them because they form a semigroup.
+
+Notice the Haskell mindset: find a way to encode a mathematical structure. They often elegantly describe coding patterns.
+
+Very cool: soon we will learn about monads, which are one way that Haskell represents commands to do IO. Many monads are also monoids (called `MonadPlus`es), which allows us to use `stimes` on them. So ``5 `stimes` putStrLn "hi"`` actually prints "hi" 5 times like you would expect.
+
+---
+
+
+# Summary of Semigroups
+
+* `Semigroup` is a typeclass
+* To make something a semigroup, it needs a closed binary operation (called `<>`)
+* Once you make something a semigroup, you can call `sconcat` and `stimes` on it.
+* `sconcat` requires a non-empty list, and `stimes` isn't guaranteed to work on `0`, because a `Semigroup` is not required to have an identity element.
+
+---
+
+# Summary of Monoids
+
+* `Monoid` is a typeclass which *inherits* from `Semigroup` (which means it must be a `Semigroup` first to be a `Monoid`).
+* A `Monoid` must have an identity element, which is called `mempty`.
+* The operation `<>` is also called `mappend` (this is because `Semigroup` came later)
+* `mconcat` is like `sconcat`, but now the list can be empty.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# Semigroup laws
+
+Just because we can provide an operator `<>`
 
 
 ---
 
-# Monoid practice
+# Making a monoid
+
+---
+
+# What about Min?
 
 
 
