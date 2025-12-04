@@ -335,6 +335,7 @@ Very cool: soon we will learn about monads, which are one way that Haskell repre
 * A `Monoid` must have an identity element, which is called `mempty`.
 * The operation `<>` is also called `mappend` (this is because `Semigroup` came later)
 * `mconcat` is like `sconcat`, but now the list can be empty.
+* `Semigroups` represents operations that are *collapsable* and repeatable. They represent operations that can be squashed down into a single value, or that can be done over and over.
 
 ---
 
@@ -344,14 +345,49 @@ Very cool: soon we will learn about monads, which are one way that Haskell repre
 
 ---
 
-# Semigroup laws
+# Semigroup laws (technically law)
 
-Just because we can provide an operator `<>`
+Just because we can provide an operator `<>` doesn't mean it's valid.
 
+`Semigroup` instances also are supposed to follow certain laws (there's only one, technically, but most of these mathematical typeclasses have more than one)
+
+These laws are not checked by Haskell. Instead, you must check your own code and make sure it follows these rules.
+
+If it doesn't, weird, non-deterministic things can happen depending on which Haskell implementation you use.
+
+Note: the type checker can make sure that, e.g., the operator is a binary operator with type `a -> a -> a`. But some laws are not visible to it.
+
+You will also upset any Mathematicians nearby, which is risky.
+
+---
+
+# Semigroup laws (technically law) (2)
+
+The one law that every semigroup must follow: the operation `<>` is associative.
+
+That means: `(a <> b) <> c == a <> (b <> c)` for *any* instances of your semigroup.
+
+Addition, multiplication, and string concatenation all follow this rule.
+
+But, e.g., if `<>` meant "midpoint", it wouldn't work. `(1 <> 2) <> 3 == 1.5 <> 3 == 2.25`, but `1 <> (2 <> 3) == 1 <> 2.5 == 1.75`. So the real numbers under the midpoint operation is not a semigroup.
+
+Why do we care, though? Because unlike `fold`, `sconcat` does not specify whether it goes right to left or left to right. In fact, it might even be interleaved on special hardware (e.g., SIMD). This additional flexibility is nice, but it means some operations don't work. 
 
 ---
 
 # Making a monoid
+
+To make sure we understand this concept, let's make a monoid of our own.
+
+Consider the `max` function on unsigned integers. Haskell calls an unsigned `Int` a `Word`. Let's define a `newtype` to make into a `Monoid`.
+
+```haskell
+newtype Min = Min Word
+```
+
+`Min` is a type, but also a constructor. It stores a single word.
+
+Now, let's turn it into a monoid. Our goal is to make it so that 
 
 ---
 
