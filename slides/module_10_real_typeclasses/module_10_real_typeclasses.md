@@ -355,9 +355,10 @@ These laws are not checked by Haskell. Instead, you must check your own code and
 
 If it doesn't, weird, non-deterministic things can happen depending on which Haskell implementation you use.
 
+You will also upset any Mathematicians nearby, which is risky.
+
 Note: the type checker can make sure that, e.g., the operator is a binary operator with type `a -> a -> a`. But some laws are not visible to it.
 
-You will also upset any Mathematicians nearby, which is risky.
 
 ---
 
@@ -371,7 +372,50 @@ Addition, multiplication, and string concatenation all follow this rule.
 
 But, e.g., if `<>` meant "midpoint", it wouldn't work. `(1 <> 2) <> 3 == 1.5 <> 3 == 2.25`, but `1 <> (2 <> 3) == 1 <> 2.5 == 1.75`. So the real numbers under the midpoint operation is not a semigroup.
 
-Why do we care, though? Because unlike `fold`, `sconcat` does not specify whether it goes right to left or left to right. In fact, it might even be interleaved on special hardware (e.g., SIMD). This additional flexibility is nice, but it means some operations don't work. 
+Why do we care, though? Because, fundamentally, `Semigroups` are things that are naturally "timesable". That is, they have an operation that behaves like addition, and that can be extended into multiplication by repeatedly doing them an integral number of times.
+
+---
+
+# Semigroup law(s) (3)
+
+Also unlike `fold`, `sconcat` does not specify whether it goes right to left or left to right. 
+
+In fact, it might even be interleaved on special hardware (e.g., SIMD). 
+
+This additional flexibility is nice, but it means some operations just aren't semigroups. 
+
+---
+
+# Monoid laws
+
+Monoids have laws too.
+
+First, all monoids are semigroups, so they follow the semigroup law (`<>` is associative).
+
+In addition, recall that monoids have an indentity element `mempty :: a`. Note: nothing about the type requires it to actually *be* an identity element, but if it's not, get ready for weird bugs. 
+
+To make it an identity, this must follow:
+`x <> mempty == mempty <> x == x` for any instance `x` of the monoid. 
+
+---
+
+# Laws in general
+
+Many of these mathematically-based typeclasses have laws to follow.
+
+You are responsible for following them. 
+
+In languages like [Idris](https://www.idris-lang.org/), the language actually treats proofs as a first-class value. In order to make something a Monoid, [you can actually have the typeclass require proofs be supplied that it obeys associativity, left identity, and right identity](https://github.com/anotherArka/idris-algebra/blob/master/Monoid.idr).
+
+The type system is *dependently typed*. Dependently typed type systems can actually encode logical predicates, and values of those types are proofs. 
+
+Haskell has some community members who [want to add this feature](https://ghc.serokell.io/dh), but it's not there yet, so until then, you need to take note when a typeclass has *laws*. The type system won't protect you, here.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
 
 ---
 
@@ -382,18 +426,118 @@ To make sure we understand this concept, let's make a monoid of our own.
 Consider the `max` function on unsigned integers. Haskell calls an unsigned `Int` a `Word`. Let's define a `newtype` to make into a `Monoid`.
 
 ```haskell
-newtype Min = Min Word
+newtype Max = Max Word deriving Show -- deriving Show for convenience
 ```
 
-`Min` is a type, but also a constructor. It stores a single word.
+Now, we need a new type because `Word` can't be a monoid by itself. There are more than one useful operation (addition, multiplication, etc.) that we could define on a `Word`. Therefore, we are creating a new data type which will only work with one operation.
 
-Now, let's turn it into a monoid. Our goal is to make it so that 
+`Max` is a type, but also a constructor. It stores a single word.
 
 ---
 
-# What about Min?
+# Making a semigroup
+
+Not so fast. In order for something to be a monoid, it needs to be a Semigroup, first.
+
+Let's make taking the maximum between two `Word`s our `<>` operation:
+
+```haskell
+instance Semigroup Max where
+    (Max x) <> (Max y) = Max $ max x y 
+```
+
+So now, if I write `Max 20 <> Max 30` I get `Max 30`, which makes sense.
+
+---
+
+# What about the laws
+
+Just because we created a typeclass instance doesn't mean it's valid. It needs to follow the law for `Semigroup` too, which requires that `max` over `Word` be associative.
+
+Here's a simple proof by case analysis over permutations of `x`, `y`, and `z`.
+```
+forall natural numbers x, y, z, (x `max` y) `max` z == x `max` (y `max` z)
+case x <= y <= z: both sides simplify to z
+case x <= z <= y: both sides simplify to y
+case y <= x <= z: both sides simplify to z
+case z <= x <= y: both sides simplify to y
+case y <= z <= x: both sides simplify to x
+case z <= y <= x: both sides simplify to x
+```
+
+So we can make `Max` into a semigroup safely.
+
+---
+
+# Making it a monoid
+
+Of course, a `Semigroup` is fine, but a `Monoid` is much easier to work with.
+
+Luckily, once a type is a `Semigroup`, we only need an instance of `mempty` to make it a `Monoid`.
+
+What would be a good choice of `mempty`? That is, what is a value, where, if we take `max mempty x` we get `x` for all `x`?
+
+---
+
+# Try 0
+
+0 is a logical choice. `max 0 x` is always `x`, and `max x 0` is also always `x`, so 0 is both a left and right identity.
+
+```haskell
+instance Monoid Max where
+    mempty = Max 0
+```
+
+Now that `Max` is a monoid, we can take the maximum of a list of numbers instead of only applying it between pairs:
+`print $ mconcat $ map Max [1, 0, 50, 2, 30, 4, 9, 0]` prints `Max 50`
+
+---
+
+# Knowledge check: what about Min?
+
+Could we make `newtype Min = Min Word` a `Semigroup`? What about a `Monoid`?
+
+---
+
+# Answer: sort of
+
+We can make it a `Semigroup`. We just replace `max` with `min`.
+
+Making it a `Monoid` is harder. We can't use 0 as our identity element. Instead, we would need to use maxBound. The biggest number is the only one that will never be the minimum with a less-big number.
+
+If we used an indefinitely large datatype, like `Integer`, then there is no identity element. Therefore, in that case, we couldn't make it a `Monoid`, and every list of elements to take the min over would have to be non-empty for a meaningful result. 
 
 
+---
+
+# I have no idea what's going on
+
+While you will need to go back, come to office hours, and/or do some studying, I will provide this super-short summary of what we've discussed so far to help guide your own homework. These bullet points are roughly in order of when we learned them, so you can stop as soon as you hit a confusing one and know what to review.
+- A data type is basically a combination of a struct and/or an enum. They can have multiple constructors (like an enum has variants), but they can also have multiple fields like a struct. The `newtype` keyword is preferred if there is exactly one constructor with one field, the `data` keyword is used otherwise.
+- A typeclass is basically a collection of datatypes and the functions that they all support. For example, because `Int`, `Word`, and `Integer` all are instances of the `Num` typeclass, we can call `+` on all of them.
+
+---
+
+# I have no idea what's going on (2)
+
+- An instance is when we say what the functions in the typeclass mean when they are applied to one or more specific types.
+- `Semigroup` is a typeclass for any type that has a closed, associative, binary operation which we call `<>`.
+- Sometimes we need to define a `newtype` or `data` to create a new semigroup, because there are more than one useful operation. 
+- `Semigroup` is useful becuase of the `sconcat` method, which magically flattens any non-empty list. What does flatten mean? It means applying `<>` repeatedly.
+- `sconcat` requires a 
+
+---
+
+# I have no idea what's going on (3)
+
+- For example, `sconcat` on `Sum 10 :| [Sum 10, Sum 10]` yields `Sum 30`
+  `sconcat` on `"hey" :| ["there", "hi", "there"]` yields `"heytherehithere"`
+  `sconcat` on `Max 0 :| [Max 10, Max 20]` yields `Max 20`.
+
+---
+
+
+- 
 
 ---
 
