@@ -524,7 +524,7 @@ While you will need to go back, come to office hours, and/or do some studying, I
 - `Semigroup` is a typeclass for any type that has a closed, associative, binary operation which we call `<>`.
 - Sometimes we need to define a `newtype` or `data` to create a new semigroup, because there are more than one useful operation. 
 - `Semigroup` is useful becuase of the `sconcat` method, which magically flattens any non-empty list. What does flatten mean? It means applying `<>` repeatedly.
-- `sconcat` requires a 
+- `sconcat` requires a non-empty list, constructed with `value :| regularList`. It has to be non-empty because there isn't necessarily an identity element.
 
 ---
 
