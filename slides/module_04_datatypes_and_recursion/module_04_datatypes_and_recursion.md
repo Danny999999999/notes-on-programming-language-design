@@ -999,11 +999,55 @@ Here, we just used pattern matching directly on the list to get the head rather 
 
 ---
 
+# Either
+
+There's one more basic datatype that we should cover: `Either`:
+
+```haskell
+data Either a b = Left a | Right b
+```
+
+Notice, this data type has two type parameters.
+
+Either represents things that can be "either" an `a`, *or* a `b`.
+
+For example `Either String Int` can store a `String` or an `Int`. If we want it to store a `String`, we use the `Left` constructor, and if we want it to store an `Int` we use the `Right` constructor.
+
+```haskell
+aString :: Either String Int; aString = Left "Hello"
+anInt :: Either String Int; anInt = Right 44
+```
+
+---
+
+# Either (2)
+
+But why? Why not make a custom type?
+```haskell
+data StringOrInt = SoiString String | SoiInt Int
+```
+
+We can, but by using an `Either`, our type gains some magical abilities. Haskell allows you to extend data types. We'll talk about how later, but `Either` has been heavily extended to make it useful for error handling.
+
+Basically, the `Right` type is the "good" type (because it's "right") and the `Left` type is the "error" type. (note: for those of you who program in Rust, it's just `Result<E, T>`
+
+So if have a function return `Either`, you are saying "this function can return a `b`, or it can error-out with an `a`. You need to check if the result was a `Left` or a `Right` to know which one happened.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
 # Knowledge check 5
 
 1. Write `sum'`, which computes the sum of a list. Include the type.
 2. Write `tail'` which returns a maybe, but it returns the rest of the list excluding the head. Include the type.
 3. Write `headOfTail` which returns the head of the tail if there is one, or `Nothing` otherwise. Include the type.
+4. Rewrite `tail'` from `3` to make it return an `Either` instead of a `Maybe`. The left type should be `String`, and it should return `"the list was empty"` if the list is empty.
+5. Rewrite `headOfTail` which returns the head of the tail if there is one, or `"the list was empty"` if the list was empty, or `"the tail was empty"` if there was a tail, but it had no head.
 
 ---
 
@@ -1024,8 +1068,25 @@ tail' (x : xs) = Just xs
 ```haskell
 headOfTail :: [a] -> Maybe [a]
 headOfTail [] = Nothing
-headOfTail [x] = Nothing -- or headOfTail (x : []) = Nothing
+headOfTail [_] = Nothing -- or headOfTail (x : []) = Nothing
 headOfTail list = Just (head (tail list))
+```
+
+---
+
+# knowledge check 5 answers (2)
+
+```haskell
+tail'' :: [a] -> Either String [a]
+tail'' [] = Left "the list was empty"
+tail'' (x : xs) = Right xs
+```
+
+```haskell
+headOfTail' :: [a] -> Either String [a]
+headOfTail' [] = Left "the list was empty"
+headOfTail' [_] = Left "the tail was empty"
+headOfTail' list = Right (head (tail list))
 ```
 
 ---
@@ -1057,7 +1118,7 @@ How does it work?
 
 One thing we've glossed over but will cover later: operators in Haskell are just functions.
 
-You can actually add more operators if you want. You just tell it the associativity, the precedence, and what function you want it to call when the operator is used.
+You can actually add more operators if you want. You just tell it the associativity, the precedence, and what you want it to do.
 
 They have types, and behind the scenes, Haskell just maps them to a function. 
 
