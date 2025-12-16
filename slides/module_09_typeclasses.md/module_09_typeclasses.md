@@ -1447,7 +1447,40 @@ You get an error stating that `a` is a *rigid type variable*. There are two ways
 
 # Dispatch in Haskell is static (3)
 
+So is Java just better than Haskell? At least for GUIs?
 
+No, there are easy ways to fix this:
+1. There's a language extension called `existentialQuantification` that lets you define the type of the list as "a list of *some* widget" instead of "a list of *any* widget".
+2. There's a better way to design this software.
+
+Let's focus on number 2: [can anyone think of a way to redesign our system to not rely on fancy hidden dispatch mechanisms?]
+
+---
+
+# Different designs
+
+If the main difference between widgets is what they do when you click them, why not just bake that directly into the data type as a function?
+
+```haskell
+data Widget = Widget (Widget -> IO ())
+```
+
+Now, a `Widget` is anything that does `IO` when you click it. We can easily have a list of `Widget`s now.
+
+We could even do this instead:
+```haskell
+data Widget = Button | Scrollbar | Window | ...
+```
+
+We can use sum-types to list every kind of widget.
+
+---
+
+# Different designs (2)
+
+The second design is not very OO, but it avoids requiring a dispatch mechanism. The first design is almost exactly equivalent to the OO, but avoids the extra level of indirection.
+
+Either way, we get a nice, simple design that doesn't require the language to secretly build lookup-tables for us.
 
 ---
 
