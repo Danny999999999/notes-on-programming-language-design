@@ -1403,6 +1403,54 @@ This is the curse of Blub, and why it's so useful to learn new languages.
 
 ---
 
+# Dispatch in Haskell is static
+
+Can Haskell be blub? Yes. Here's an example.
+
+In Haskell, dispatch is always static. We never dynamically dispatch based on the type. The compiler can always figure out which function to call at compilation, so there are no lookup tables.
+
+However, that means we can do a particular thing in Java and not as easily in Haskell:
+```java
+interface GuiWidget { 
+    void onClick();
+}
+
+class GuiInterface {
+    static GuiWidget[] widgets = new GuiWidget[100];
+}
+```
+
+---
+
+# Dispatch in Haskell is static
+
+In Haskell, the equivalent code would be this:
+```haskell
+class GuiWidget a where
+    onClick :: a -> IO () -- IO () is for "actions", we'll cover it later
+
+widgets :: Widget a => [a] -- this seems to work
+widgets = [Button "load", Button "quit"] -- but this fails
+```
+
+You get an error stating that `a` is a *rigid type variable*. There are two ways to explain why this fails...
+
+---
+
+# Dispatch in Haskell is static (2)
+
+1. Because the type `widget :: Widget a => [a]` really means `widget :: forall a. Widget a => [a]`. That is, it's a nonsense type that claims to be a list of every kind of Widget, not a specific kind. It is impossible to fulfill, because there is no bound on the kinds of Widget (we can define more at any time, even in external modules).
+
+2. Because it requires dynamic dispatch. If each element of the list can be a different type, we have to, at run time, descide what to do. Therefore we need a lookup table.
+
+---
+
+# Dispatch in Haskell is static (3)
+
+
+
+---
+
 # Questions?
 
 <!-- _class: invert questions -->
