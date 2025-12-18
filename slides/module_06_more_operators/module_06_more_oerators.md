@@ -1144,6 +1144,62 @@ Practice: ...?
 
 ---
 
+# Take and drop
+
+`take :: Int -> [a] -> [a]` takes n values from the list. 
+`drop :: Int -> [a] -> [a]` skips over the next n values from the list.
+
+This is useful for working with infinite lists:
+```haskell
+ghci> squares = map (^2) [1..]
+ghci> take 10 squares
+[1,4,9,16,25,36,49,64,81,100]
+```
+
+Suppose I want the first 10 squares after 100:
+```haskell
+ghci> take 10 $ drop 10 squares
+[121, 144, 169, 196, 225, 256, 289, 324, 361, 400]
+```
+
+Practice: I think we already wrote these, but do it again!
+
+---
+
+# (take|drop)While
+
+Recall that, in programming, a predicate is a function that returns a Bool.
+`takeWhile` takes a predicate and a list, and grabs values from it as long as the predicate is true.
+
+```haskell
+ghci> takeWhile (isEven) [2,4,6,1,2,3]
+[2,4,6]
+```
+
+But it stops as *soon* as the predicate fails:
+```haskell
+ghci> takeWhile (isEven) [1,2,3,4,5,6]
+[]
+```
+
+Here, it failed on the very first value, so it returned the empty list. That's how `takeWhile` is different from `filter`. This is a great one to write yourself as practice.
+
+---
+
+# (take|drop)While (2)
+
+There is also `dropWhile`, which drops as long as a predicate is true:
+```haskell
+ghci> dropWhile (isEven) [2,4,6,1,2,3]
+[1,2,3]
+```
+
+Now, as practice, try writing `takeUntil`, which takes as long as the predicate is *false*. 
+
+You can write this using function composition. Remember that `not` is a function.
+
+---
+
 # Questions?
 <!-- _class: questions invert -->
 
@@ -1155,3 +1211,160 @@ Practice: ...?
 
 [Other data structures](https://en.wikibooks.org/wiki/Haskell/Other_data_structures) (note: this is a tough one, but it's only reading. No exercises.)
 
+---
+
+# Quiz format
+
+You know the drill! 15 minutes, and 4 questions, each worth 25%. These questions will focus on functional operators:
+1. `map` or `fmap`
+2. `filter`
+3. `zip`
+4. `fold` and friends
+5. Point-free style with the above
+6. Currying and uncurrying
+7. The odds-and-ends functions
+
+---
+
+# Practice quiz 1
+
+**Include types for all of these functions.** You can define intermediate functions that are not point-free, but your solution functions must be point free.
+1. Define a function *point free* named *uppify* which converts a string to upper case, using the `toUpper` function. So `uppify "heLLo" == "HELLO"`. Your solution must be point free to receive credit.
+2. Define a function `replacify` which uses `isLower` and replaces all the lowercase letters with a question mark. So `replacify "heLLo" == ??LL?`
+3. Use `filter` define a point free function `countUppers`, which uses `isUpper` and `length` to count the number of upper case characters in a string. `countUppers "heLLo" == 2`. Your solution must be point free to receive credit.
+4. Do the same thing as 3 using `foldl` and `map` and not using `filter`. 
+
+---
+
+# Practice quiz 1 answers
+
+```haskell
+-- 1.
+uppify :: String -> String
+uppify = map toUpper
+-- 2.
+replacify :: String -> String
+replacify = map (\x -> if isLower x then '?' else x)
+-- 3.
+countUppers :: String -> Int
+countUppers = length . filter isUpper
+-- 4.
+countUppers' :: String -> Int
+countUppers' = foldl (+) 0 . map oneIfUpper
+    where
+        oneIfUpper x = if isUpper x then 1 else 0
+```
+
+---
+
+# Practice quiz 2 
+
+**Include types for all of these functions. 1 and 4 must be point free for any credit.** 
+1. Write a function **point-free** which returns the first letter of every word in a given string (assume non-empty). For example: `firstLetters "hello world!" == "hw"`.
+2. Write a function (not point free) that takes a pair of strings, converts them to a list of words, and then counts the number of those word pairs that are identical. So `sameWordCount "hello world how is it?" "hello world is it good?" == 2` because "hello" and "world" are the same word in the same position in both. (note: the "it" is the 5th word in the first string and the 4th in the second: doesn't count)
+3. Write a function that determines if two strings have the same length 
+4. Write a function **point free** that determines the longest line in a string with newlines in it. Function must be point free to receive credit. You can use `maximum :: [Int] -> Int` which returns the largest value of a list.
+
+---
+
+# Practice quiz 2 answers
+
+```haskell
+-- 1.
+firstLetters :: String -> String
+firstLetters = map head . words
+-- 2.
+sameWordCount :: String -> String -> Int 
+sameWordCount s t = length $ filter (== True) $ zipWith (==) (words s) (words t)
+-- 3.
+sameLength :: String -> String -> Bool
+sameLength s t = length s == length t
+-- 4.
+longestLineLength :: String -> Int
+longestLineLength = maximum . map length . lines
+
+```
+
+---
+
+# Practice quiz 3
+
+**Include types for all these functions. If it says define a point-free function, it must be point-free for credit.**
+
+1. Suppose we had a function `isPrime :: Int -> Bool` that took an `Int` and returned whether or not it was prime. Define an infinite list of the prime numbers.
+2. Define a function `sumOfFirstPrimes` that takes `n` and returns the sum of the first `n` primes (the number of primes is the argument). For example `sumOfFirstPrimes 3 == 10`, becuase the first 3 primes are 2, 3, and 5, and the sum 2 + 3 + 5 is 10.
+3. Define a function `whichPrime` which, given a positive `Int` `n`, returns which prime number it is, starting from 1 (assume `n` is prime) So `whichPrime 5 == 3` (hint: try using `takeWhile` on the list of primes by those less than the given number)
+4. Define a **point-free** function that returns whether or not an `Int` is even.
+
+---
+
+# Practice quiz 3 answers
+
+```haskell
+-- 1.
+primes :: [Int]
+primes = filter isPrime [1..]
+-- 2.
+sumOfFirstPrimes :: Int -> Int
+sumOfFirstPrimes n = sum $ take n primes
+-- 3.
+whichPrime :: Int -> Int 
+whichPrime n = length $ takeWhile (<=n) primes
+-- 4.
+isEven :: Int -> Int
+isEven = (== 0) . (`mod` 2)
+```
+
+---
+
+# Practice quiz 4
+
+**Include types for all these functions. If it says define a point-free function, it must be point-free for credit.**
+
+1. Write a function `last` which returns the last element of any type of list if it exists, or `Nothing` if the list is empty. Do not return a list.
+2. Use this function to define **point-free** a function named `endsWithQuestion`. You must handle `Maybe`s correctly.
+3. Now define a function **point-free** named `any'` which returns true if *any* element of a list of bools is true, and false otherwise (this function already exists, which is why there's a `'`)
+3. Now define a function **point-free** called anyLineEndsWithQuestion, using `any'`, `endsWithQuestion`, and any other useful functions you know or define.
+
+---
+
+# Practice quiz 4 answers
+
+```haskell
+import Data.Maybe -- <- you wouldn't need to write this on a real quiz
+-- 1.
+last :: [a] -> Maybe a
+last l = case drop (length l - 1) of 
+        (h : _) -> Just h
+        _ -> Nothing
+-- 2.
+endsWithQuestion :: String -> Bool
+endsWithQuestion = (== '?') . fromMaybe '_' . last
+-- 3.
+any' :: [Bool] -> Bool
+any' = not . null . filter (== True)
+-- I made a small mistake on this one originally, using '$' instead of '.'.
+-- That would require the right argument of not $ ... to be a boolean
+-- -5 points from me!
+-- 4.
+anyLineEndsWithQuestion :: String -> Bool
+anyLineEndsWithQuestion = any' . map endsWithQuestion . lines
+```
+
+---
+
+# Ask an AI
+
+Ask an AI to generate a practice quiz for you like the above! Give it the slides starting with "# Quiz Format" and up to and including this slide. Or give it the whole markdown.
+
+Then, ask it to grade you. I like to use this scale:
+1. 0 points off for extremely minor things. Misspellings or missing grouping operators that are clearly intended.
+2. 5 points for mistakes that cause the code to fail but are more than just minor mistakes. For example a small type error where it's clear you get the big idea but, e.g., applied the applicative to too many arguments or something.
+3. 10 points for bigger mistakes, like type errors that can't work, but there's still "more than half" of the understanding demonstrated.
+4. Zero points total if there are several major mistakes or it looks like you're guessing.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
