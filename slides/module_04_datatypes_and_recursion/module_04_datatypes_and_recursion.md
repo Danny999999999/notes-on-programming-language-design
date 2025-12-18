@@ -1406,7 +1406,7 @@ convert x = x
 
 # Ask an AI
 
-Ask an AI to generate a practice quiz for you like the above! Give it the slides starting with "# Quiz Format" and up to and including this slide.
+Ask an AI to generate a practice quiz for you like the above! Give it the slides starting with "# Quiz Format" and up to and including this slide. Or just the whole markdown!
 
 Then, ask it to grade you. I like to use this scale:
 1. 0 points off for extremely minor things. Misspellings or missing grouping operators that are clearly intended.
