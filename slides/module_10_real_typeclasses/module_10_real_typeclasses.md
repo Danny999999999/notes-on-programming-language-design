@@ -1243,16 +1243,6 @@ These simple "container" types pretty much always do the same thing. They apply 
 
 ---
 
-# This is a short one
-
-We didn't have a long module this time. This material is hard enough that I didn't feel like it was a good idea to go too long.
-
-This will give us more time to focus on what quiz quesitons will be asked of you.
-
-Let's do some practice
-
----
-
 # Quiz format
 
 The quiz will consist of 4 questions, each of equal weight.
