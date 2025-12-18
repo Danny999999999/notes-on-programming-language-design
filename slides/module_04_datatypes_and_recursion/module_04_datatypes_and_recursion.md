@@ -1292,8 +1292,127 @@ There might be a prize for doing lots of codewars later in the semester. I stron
 
 ---
 
-# Insert practice quizzes
+# The quiz format
 
+Quizzes will have 4 questions, each worth 25% of the total credit.
+
+Typical kinds of questions:
+- What is the type of an expression
+- Provide an expression or function definition with the given type
+- Write a function that satisfies some requirement
+- Write a data type that satisfies some requirement
+
+---
+
+# Practice quiz 1
+
+1. (25%) Suppose we want a function that takes two lists of `Integer` and adds them piecewise. So `addPiece [1,2,3] [4,5,6] == [5,7,9]`. What is the type of this function?
+2. (25%) Define that function. Also make it so that the result length is the same as the smaller input length so `addPiece [1,2,3] [4,5] == [5,7]`
+3. (25%) Suppose we wanted to *require* that the two lists have the same length, and if they didn't, to return `Nothing`. Now what should the new type be?
+4. (25%) Define that function. Make it so that `addPiece [1,2,3] [4,5,6] == Just [5,7,9]` but `addPiece [1,2,3] [4,5] == Nothing`
+
+---
+
+# Practice quiz 1 answers
+
+```haskell
+1. addPiece :: [Integer] -> [Integer] -> [Integer]
+2. addPiece [] _ = []
+   addPiece _ [] = []
+   addPiece (x : xs) (y: ys) = (x + y) : (addPiece xs ys)
+3. addPiece' :: [Integer] -> [Integer] -> Maybe [Integer]
+4. addPiece' [] [] = Just []
+   addPiece' x [] = Nothing
+   addPiece' [] y = Nothing 
+   addPiece' (x : xs) (y : ys) = 
+    case addPiece' xs ys of 
+        Nothing -> Nothing 
+        Just t -> Just $ (x + y) : t
+```
+
+---
+
+# Practice quiz 2
+
+1. (25%) Define a version of `$` named `ap2` that takes a binary function and *two* arguments instead of 1. It should call the function its given on both arguments.
+2. (25%) What is its type?
+3. (25%) What is the type of `ap2 (+) (2 :: Int)`?
+4. (25%) What does that function do?
+
+---
+
+# Practice quiz 2 answers
+
+```haskell
+2. ap2 :: (a -> b -> c) -> a -> b -> c
+1. ap2 f x y = f x y
+```
+3. `Int -> Int`
+4. It adds 2 to things. It is equivalent to `(2+)`.
+
+
+---
+
+# Practice quiz 3
+
+1. (25%) Suppose we want a function that, given an `Int` x and a list of anything, returns the first x elements of the list. What should its type be?
+2. (25%) Define that function. If the given list is too short, just take its remainder.
+3. (25%) Define a function *point free* named `floop` that reverses a string and takes its last `3` elements in order. So `floop "hello" == "oll"`. You will only get credit for point free answers. You can assume that `reverse` is already defined.
+4. (25%) What is the type of `floop`?
+
+---
+
+# Practice quiz 3 answers
+
+```haskell
+-- 1.
+take' :: Int -> [a] -> [a]
+-- 2.
+take' 0 _ = [] 
+take' _ [] = []
+take' n (x : xs) = x : take (n - 1) xs
+-- 4.
+floop :: String -> String 
+-- 3.
+floop = take' 3 . reverse -- first reverse, then take 3
+```
+
+---
+
+# Practice quiz 4
+
+1. (25%) Define a data type that can either hold an integer or a string.
+2. (25%) Define a function myStrLen which returns the length of the string of that type, but returns `Nothing` if it has an int.
+3. (25%) Define a function "convert", that takes your data type. If it has an integer, return the same data type but with the empty string. If it is a string, leave it alone.
+4. (25%) Give types to the functions from 2. and 3.
+
+---
+
+# Practice quiz 4 answers
+
+```haskell
+data IntOrString = ItsAnInt Int | ItsAString String 
+
+myStrLn :: IntOrString -> Maybe Int
+myStrLn (ItsAnInt _) = Nothing 
+myStrLn (ItsAString s) = Just $ length s
+
+convert :: IntOrString -> IntOrString
+convert (ItsAnInt _) = ItsAString ""
+convert x = x
+```
+
+---
+
+# Ask an AI
+
+Ask an AI to generate a practice quiz for you like the above! Give it the slides starting with "# Quiz Format" and up to and including this slide.
+
+Then, ask it to grade you. I like to use this scale:
+1. 0 points off for extremely minor things. Misspellings or missing grouping operators that are clearly intended.
+2. 5 points for mistakes that cause the code to fail but are more than just minor mistakes. For example a small type error where it's clear you get the big idea but, e.g., applied the applicative to too many arguments or something.
+3. 10 points for bigger mistakes, like type errors that can't work, but there's still "more than half" of the understanding demonstrated.
+4. Zero points total if there are several major mistakes or it looks like you're guessing.
 
 ---
 
