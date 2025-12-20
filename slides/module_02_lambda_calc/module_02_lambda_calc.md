@@ -486,6 +486,8 @@ print(f(7)(8)(9)) # also prints 24
 
 Really, you can do this in any language that supports anonymous closures. A closure is just a function that is allowed to use variables from its containing scope (environment).
 
+(Note: I like to ask this kind of question on quizzes, so make sure you can do this in at least one real world programming language)
+
 ---
 
 # Why haven't I seen that before?
@@ -1011,7 +1013,7 @@ We will have our first practice quiz on [insert date here].
 
 (I will put the actual date on Canvas).
 
-This quiz will be 10 minutes if you take it in class.
+This quiz will be 15 minutes if you take it in class.
 
 You can bring any written or printed material into the exam, but no electronic devices (except to submit at the very end--when you've put away your pens or pencils).
 
@@ -1081,21 +1083,21 @@ xor $a \; b = \mathrm{or} \; (\mathrm{and} \; a \; (\mathrm{not} \; b)) \; (\mat
 
 1. (10%) Reduce $(\lambda x. x \; x) \; (\lambda y. y)$ to normal form.
 2. (20%) Reduce $(\lambda x. \lambda y. x \; y) \; (\lambda z. z + 1) \; 5$ to normal form. (you can treat numbers and `+` as built in arithmetic)
-3. (20%) Define a curried function that computes $a + 2 * b$
+3. (20%) Define a curried function in a real language that computes $a + 2 * b$
 4. (30%) Using Church booleans, define an if-elseif-else function that takes one condition for the if, a value if that condition is true, a condition for the else if, a value for when that condition is true, and then a value for when neither condition is true.
 5. (20%) Let true = $\lambda a \; b. a$ and false = $\lambda a \; b. b$. Define the function *implies*, where implies true true = true, implies true false = false, implies false true = true, and implies false false = true.
 
 ---
 
-# Practice quiz 4?
+# Ask an AI
 
-Now make your own quiz.
+Ask an AI to generate a practice quiz for you like the above! Give it the slides starting with "# Quiz Format" and up to and including this slide.
 
-Alternatively, copy and paste the markdown version of this entire lecture into your favorite LLM and ask it to generate a quiz. Most LLMs know how to read markdown and mathjax.
-
-They can grade the quiz too.
-
-I recommend a reasoning model for both tasks. Otherwise there's a high chance it hallucinates.
+Then, ask it to grade you. I like to use this scale:
+1. 0 points off for extremely minor things. Misspellings or missing grouping operators that are clearly intended.
+2. 5 points for mistakes that cause the code to fail but are more than just minor mistakes. For example a small type error where it's clear you get the big idea but, e.g., applied the applicative to too many arguments or something.
+3. 10 points for bigger mistakes, like type errors that can't work, but there's still "more than half" of the understanding demonstrated.
+4. Zero points total if there are several major mistakes or it looks like you're guessing.
 
 ---
 

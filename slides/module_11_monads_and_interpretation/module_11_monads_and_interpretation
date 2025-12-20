@@ -1,0 +1,475 @@
+---
+marp: true
+theme: slides
+paginate: true
+---
+
+# Programming Language Design
+
+## Module 11: Language Interpretation 
+
+<br>
+<br>
+
+Slides © Grant Williams, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).  
+
+<br>
+
+This is an open educational resource.
+Feel free to submit fixes, improvements, and new material [here](https://github.com/grantwill74/notes-on-programming-language-design).
+
+---
+
+# Last Time
+
+We talked about some real examples of important typeclasses.
+
+First: [what's a typeclass]?
+
+Second: [what typeclasses did we talk about and what are their important abilities]?
+
+---
+
+# This time
+
+It's time. Time to have the talk.
+
+---
+
+# Monads...
+
+There comes a time in every aspiring functional programmer's life in which they have to finally have to learn about monads.
+
+Why? Because we want to actually execute our lisp code, and we can't do it without them.
+
+But monads are a meme. People joke about no one being able to understand them. They are like pointers in C for non-C-programmers: a challenge to understand that must be overcome to master the language.
+
+Why are pointers hard? Because they come with an algebra. You have to understand that the `&` and `*` operators are inverses of one another. This is not trivial: it's like learning a branch of mathematics that only applies to that one formal language.
+
+---
+
+# Monads... (2)
+
+This is different though. Monads aren't just a Haskell feature, they are a feature in tons of languages.
+
+They are extremely important, and once you understand them, the pattern will appear in many many more places:
+* Error handling in Rust is monadic
+* Exception handling in Java is a (poorly implemented) monad.
+* Async promises in Javascript (and many languages) are monads.
+* Optional types in C# (and many languages) are monads.
+
+Monads are a core design pattern in computing. You can encode pretty much any kind of computation in them. Once you understand them, you have a powerful tool.
+
+---
+
+# What's a monad?
+
+I hope you're excited to learn monads now! Monad is a term from category theory. Let's search the internet to find out what they are:
+
+> All told, a monad in X is just a monoid in the category of endofunctors of X
+> - Saunders Mac Lane, *Categories for the Working Mathematician*
+
+
+Oh...
+
+---
+
+# We know some of those words
+
+We know what a monoid is.
+We also know what a functor is (from a Haskell perspective).
+There actually is a clue here that explains what a monad is.
+
+But I think it's a mistake to get too abstract too quick.
+
+Instead of deriving monads from endofunctors or whatever, let's motivate their existence. We're going to learn why Haskell came up with this idea.
+
+---
+
+# Doing IO
+
+Remember that Haskell is a pure functional language. 
+
+It is also a language with lazy evaluation, which forces it to be pure.
+
+So now it's finally time to address the question: how do you actually **do** things?
+
+- How do you draw the triangles?
+- How do you access the internet?
+- How do you play the sound?
+- How do you roll the dice?
+
+Is Haskell really incapable of *doing* things?
+
+No, actually. You can make video games, servers, media players, and whatever else in Haskell. We just have to have a bit of a paradigm shift.
+
+---
+
+# Don't *do* IO, *describe* it!
+
+In a Haskell program, everything must be pure. No mutation.
+
+However, *outside* a Haskell program, anything goes!
+
+Haskell programs are run by a *runtime*. A runtime is basically a bunch of code that is needed to run a program in a high-level language. Pretty much every high level language has a runtime (but systems languages make it optional). 
+
+Haskell's runtime is called [rts](https://gitlab.haskell.org/ghc/ghc/-/wikis/commentary/rts), and it is written in C.
+
+The runtime is what connects Haskell code to the wider world. It's what actually *does* things.
+
+---
+
+# Don't *do* IO (2)
+
+So how do we do IO in Haskell?
+
+We don't. We build a program that will do IO in the future, and we give that program to the runtime to actually execute.
+
+So a Haskell program is really a meta-program. It's a program that builds a program.
+
+In modern Haskell, the type of that program is `IO`. An `IO` is a program that will do input output when the runtime system executes it.
+
+This explains a shocking fact: `main` in Haskell is not a function. Isn't that weird? In a functional language, `main` is not a function? It's a value. A value of type `IO ()`:
+`main :: IO ()`. It's a value representing a program that will later be executed.
+
+---
+
+# What is an IO?
+
+`IO` is a datatype, but we can't look inside it. It's what we call an *opaque* type.
+
+Normally, we can use pattern matching to break a data type into its constructors, but the constructors for an IO are not exported from their module.
+
+Therefore, the data inside it that stores the program is like a private variable.
+
+Instead, we construct `IO`s using publicly visible functions. These functions are wide-ranging enough to do basically anything you could want to do, [including calling C functions](https://downloads.haskell.org/~ghc/4.06/docs/users_guide/glasgow-ccalls.html).
+
+You already know one such function...
+
+---
+
+# `putStrLn`
+
+Here's the classic Haskell hello world:
+```haskell
+main :: IO ()
+main = putStrLn "Hello, World!"
+```
+
+Now we can finally clear up some things you may have wondered...
+
+- As stated before, `main` is not a function. It is an `IO ()`.
+- An `IO a` is a program that will do something and then return an `a`. In this case it is returning `()`, which is pronounced "unit". It's kind of like `void`.
+- `putStrLn :: String -> IO ()`. That is, it's a function that takes a string, and return a program that will print that string and then not return anything.
+- The reason we use `=` for `main` is that `main` *really is* that IO program.
+
+---
+
+# What about more complex programs?
+
+Okay, but presumably we don't just want to print "Hello" and then leave.
+
+What if we want to print more than one thing?
+
+Then you do this:
+```haskell
+main = putStrLn "hello" *> putStrLn "world"
+```
+
+Remember `*>`? It was to combine applicative functors and "execute" both of them, keeping the result of the second one. In this case, they both don't return anything interesting.
+
+So `IO` is an applicative functor, and because of that, we can take two programs and run them one after the other!
+
+---
+
+# This new paradigm
+
+The ability to "concatenate" programs is interesting. We haven't seen it before.
+
+Suppose I have two programs:
+```haskell
+printHello :: IO ()
+printHello = putStrLn "hello"
+printWorld :: IO ()
+printWorld = putStrLn "world"
+main = printHello *> printWorld
+```
+
+It's like being able to concatenate functions in c without creating a new function. 
+```c
+void printHello() { puts("hello"); }
+void printWorld() { puts("world"); }
+int main = printHello + printWorld + return 0; // won't work
+```
+
+---
+
+# But hang on...
+
+I can hear the protest. 
+
+"Surely I can just do this!"
+```c
+void printBoth() {
+    printHello();
+    printWorld();
+}
+```
+
+Yes, you can. That function will do both other functions in sequence.
+
+But it is not an expression: it is a statement block. So you have to define a new function any time you want to sequence two other functions. 
+
+You also can't change what the semicolon means. We *can* change what `*>` means. E.g., we could define a new kind of function that automatically logged every statement.
+
+---
+
+# Nicer notation
+
+It is here that we can explain the `do` block you've seen in my handouts.
+
+The `do` block enables Haskell to pretend to be a normal language.
+
+These two `main`s are equivalent:
+```haskell
+main = putStrLn "hello" *> putStrLn "world!"
+main = do 
+    putStrLn "hello"
+    putStrLn "world"!
+```
+
+You can put the little `*>` in there at the end of each line like a little semicolon if you want to, but `do` does it for you instead.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+---
+
+# But what about input
+
+We can take input, too: `getLine :: IO String`
+
+`getLine` has type `IO String`. That is, it's a program that will eventually give a string.
+
+But...how do we get the result *out*?
+
+This is the first stumbling block many people face when they try to do IO in Haskell:
+```haskell
+main = do
+    putStrLn "Enter your name: "
+    let name = getLine
+    putStrLn $ "Hello, " ++ name -- type error 
+```
+
+The problem is that `name` is not a string. It's a program that will eventually return a string when it runs...and we can't run it!
+
+---
+
+# How do I get the string out?
+
+Okay, if `name` is an `IO String`, how do I pull the `String` out of the `IO`?
+
+That's the neat thing: you don't:
+*It actually doesn't exist*.
+**The program hasn't been run yet!** 
+
+And `Applicative` functors, while cool, can't fix this problem. The `*>` operator isn't powerful enough to do anything but run two programs one after the other.
+
+So...uh...are we sunk? No, but now we actually *have* to learn monads.
+
+---
+
+# Typeclass Monad
+
+```haskell
+class Applicative m => Monad m where
+    (>>) = (*>) 
+    return = pure
+    (>>=) :: m a -> (a -> m b) -> m b
+```
+
+First, the small things:
+- There's an operator `>>` that is identical to `*>`. `>>` uses the monad like an applicative functor, but since monads *are* applicative functors, it's the same as `*>`. Applicative functors are newer than monads, so this is a historical relic that is still used in most monad tutorials. `putStrLn "hello" >> putStrLn "world"` is just another way of writing `putStrLn "hello" *> putStrLn "world"`
+- Every monad has a constructor named `return`. Again, so does every `Applicative`, and since all monads are also applicatives, you could just use `pure`. Historical. 
+
+---
+
+# The big thing: the "bind" operator `>>=`
+
+The big thing that makes monads special is this operator, pronounced "bind":
+```haskell
+    (>>=) :: m a -> (a -> m b) -> m b
+```
+
+Let's look at its type. It takes a program that returns an `a`, a function that takes `a`s and uses them to construct a program that returns a `b`, and then applies that function to produce a program that returns a `b`.
+
+This allows us to stitch two programs together where one of them produces output that the other consumes. We can use it to fix our input problem from before:
+
+---
+
+# A basic monadic program
+
+```haskell
+main :: IO ()
+main =
+    putStrLn "Please enter your name: " >>= 
+        (\name -> putStrLn "Hello, " ++ name)
+```
+
+
+
+---
+
+# Understanding this historically
+
+As I said before, Haskell is older than monads applied to computer science. It was Haskell that introduced this concept to CS, but it wasn't there in the earliest versions.
+
+
+
+---
+
+---
+
+# What do we need?
+
+Remember that Slisp, the language we're going to make for this class, is Simple Lisp. A Lisp program broadly looks like this:
+
+```lisp
+(print "hi")
+(print (+ 2 2))
+(print "bye")
+```
+
+Those parentheses denote lists:
+- `()` is the empty list (not shown)
+- ("hi") is the list containing "hi"
+- (print "hi") is the list containing a symbol `print` and a string `"hi"`
+
+(an actual Common Lisp programm often uses `format` command to print. It's kind of like the lisp equivalent of `printf`, if you're looking at lisp programs online.) 
+
+---
+
+# The program is a list
+
+Lisp is unique in that it is the first *homoiconic* programming language.
+
+[Homoiconicity](https://en.wikipedia.org/wiki/Homoiconicity) is the property that the code of the program is, itself, available in a data structure inside the language. That is, **code is data**.
+
+The basic data structure of Lisp is the list. And the lisp program itself is a lisp list.
+
+Specifically, it is a list of lists. Each inner list is a command, where the first symbol is a function or macro (I will explain this term in a second) to be called, and the remaining list elements are the arguments. 
+
+Why is this helpful?
+
+---
+
+# It lets you have *real* macros
+
+"Oh macros, I know what those are from C. Like `#define` and stuff"
+
+Yes, those are macros. *Text* macros. The worst kind. 
+
+They work by copying and pasting text together. This is very simple and powerful, but also very unweildy. You can't just say "here is a list of code lines: print the code first, then execute it", because that would require parsing the lines, and the macro happens *before* parsing. 
+
+But what if the code wasn't just a string, what if you could access the parse tree?
+
+In lisp, the program *is* the parse tree. So you can modify parts of the program as if they were any old list.
+
+---
+
+# Macros let you add new features
+
+The main benefit of macros is that they let you add new features to the language.
+
+A macro in Lisp is a function that runs *at compile time*, that takes and returns a list.
+
+That means, we can take raw, unevaluated code and modify it to add new features. 
+
+Lisp dialects like Common lisp are famous for basically having every feature. Want object oriented programming? They have classes. Want currying? They can do that. Want monads? They can have those too.
+
+You can use macros to basically add new features to the language after it came out.
+
+We will talk about macros later. For now, I just want to motivate why we're writing an interpreter for this weird language. It isn't just a raw learning exercise: we are learning a powerful language that can do pretty much everything, even ergonomically. 
+
+---
+
+# Back to slisp
+
+Let's consider a very basic program in our dialect:
+```lisp
+(print 2)
+(print (+ 2 2))
+```
+
+We intend for this to first print 2, then print 4 (because `(+ 2 2)` means `2 + 2`)
+
+But how do we *run* that code?
+
+Well first, we need to parse it.
+
+We already wrote a parser for project 3. What would it return on that code?
+
+---
+
+# The result of parsing
+
+Something like this:
+```
+VList [ VList [ VSym "print", VInt 2 ],
+           VList [ VSym "print", VList [VSym "+", VInt 2, VInt 2 ]]]
+```
+
+In fact, let's adopt lisp-style lists. Lists in this syntax are called *S-expression*s:
+```
+((print 2) (print (+ 2 2)))
+```
+
+Notice: that's literally just the program with an extra pair of parentheses around it.
+
+The program itself is just a list. And we want to *execute* that list.
+
+---
+
+# How do we execute it?
+
+Now we come to the key point: the lists that we have encountered in other classes don't do anything. They are data structures. They sit around, holding data.
+
+So we need some kind of strategy that tells us how to interpret that data as code to be executed.
+
+The lisp execution strategy is simple:
+- The program is a list of lists
+- For each sub-list, if it starts with a symbol...
+    - call the corresponding function with the remaining elements of the list as args.
+    - otherwise crash.
+
+---
+
+# Let's start with `+`
+
+Okay, how do we run `(+ 2 2)`?
+
+Any time we execute some code, we pull the first element of the list to determine what to do:
+
+```haskell
+expectInt :: Value -> Int
+expectInt (VInt val) = val
+expectInt other = error "expected an Int but got " ++ show other
+
+eval :: Value -> Value
+eval (VList ("+" : args)) = 
+    VInt $ sum $ expectInt <$> (eval <$> args)
+eval _ = error "unknown command or invalid s-expression"
+```
+
+---
+
+# Let's start with `+` (2)
+
+First, we map `eval` to each argument. We have to evaluate each argument in case there are nested additions. For example `(+ (+ 2 2) 5)`.
+
+Then, `expectInt` just makes sure that a value is an integer.
+
+This is a very simple and not very helpful form of error checking. We will learn better techniques when we discuss monads. 
