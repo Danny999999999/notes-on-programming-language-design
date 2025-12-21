@@ -315,11 +315,296 @@ This allows us to stitch two programs together where one of them produces output
 ```haskell
 main :: IO ()
 main =
-    putStrLn "Please enter your name: " >>= 
+    putStrLn "Please enter your name: " >>
+    getLine >>= 
         (\name -> putStrLn "Hello, " ++ name)
 ```
 
+Here, there is a `>>` after `putStrLn` to stitch it together with `getLine`. But we use `>>=` after `getLine` because we need more complicated functionality. We stitch it with a function that will eventually receive a string when `getLine` is run, and it will use that string to produce a new program, which prints `Hello` along with that string.
 
+So we stitched a program to a program, and a program to a function which produces programs.
+
+This program will have the desired effect. Try it!
+
+---
+
+# No, it really is hard
+
+This isn't expected to be easy. There's a lot going on and you haven't had a good chance to learn it yet.
+
+I will make a promise, though: this is a learnable skill. It becomes effortless to work with monads.
+
+Let's start by comparing them to functors and applicative functors...
+
+---
+
+# Comparison between functor types
+```haskell
+(<$>) :: Functor f =>       (a -> b)   -> f a -> f b
+(<*>) :: Applicative f => f (a -> b)   -> f a -> f b
+(=<<) :: Monad m =>         (a -> m b) -> m a -> m b
+```
+
+(note: `function =<< monad` is equivalent to `monad >>= function`)
+
+- A functor has the ability to take a function to change what's inside it.
+- An applicative has the ability to take a function that's already inside it and apply it to a value that's already inside it
+- A monad has the ability to take a function and use it to create a new monad based on what's inside.
+
+Monads are the most powerful of these, because the function can build a new monad from scratch, instead of modifying what's already in the monad.
+
+---
+
+# "bind" is key
+
+The `>>=` operator is key to understanding monads in CS. Let's write its type again:
+```haskell
+(>>=) :: Monad m => m a -> (a -> m b) -> m b
+```
+
+"Take a monad that will produce an `a`. Pass that `a` to a function that will produce a new monad that produces a `b`. Return this new monad."
+
+This operator is overloadable. Every monad does something different when you bind them. It's like if you could make the semicolon do something different in C depending on whatever behavior you wanted to inject into your program.
+
+However, it's a little awkward to use...
+
+---
+
+# The bind operator is awkward
+
+Let's get a name and password together...
+
+```haskell
+main = 
+    putStrLn "enter your character's name: " >>
+    getStrLn >>= (\name ->
+        putStrLn "enter this character's password: " >>
+        getStrLn >>= (\pass ->
+            putStrLn $ "registering character " ++ name ++ " with password " ++ pass
+        )
+    )
+```
+
+It works but...every time we want to get input, we have to create a lambda function to receive that input.
+
+This is awkward. Luckily, `do` notation has a solution.
+
+---
+
+# Using do
+
+Here is how we write that same program using `do`:
+
+```haskell
+main = do
+    putStrLn "enter your character's name"
+    name <- getLine -- this is the >>= equivalent
+    putStrLn "enter your character's password"
+    pass <- getLine
+    putStrLn $ "registering " ++ name ++ " with password " ++ pass
+```
+
+Isn't that nice? We can pretend Haskell is a normal language! 
+
+We can even use braces and semicolons: `do { print "hi." ; print "bye!" }`
+
+Monads (and applicatives) really are programmable semicolons!
+
+`do` looks like some complicated syntax feature, but it follows simple rules.
+
+---
+
+# Do's rules
+
+```haskell
+do 
+    action1
+    action2
+```
+
+is equivalent to 
+```haskell
+do { 
+    action1; 
+    action2;
+}
+```
+
+which is equivalent to
+` do { action1 ; action 2 } `
+
+The last semicolon is optional 
+
+---
+
+# Do's rules (2)
+
+```haskell
+do 
+    name <- resultReturningAction
+    action -- we can use "name" now, but we don't have to
+```
+
+Is equivalent to
+```haskell
+resultReturningAction >>= (\name -> action)
+```
+
+```haskell
+do -- consider this:
+    a <- blip
+    b <- blop
+    something a b
+-- same as
+blip >>= (\a -> blop >>= (\b -> something a b))
+```
+
+---
+
+# Do's rules (3)
+
+We can still use `let` inside of a `do` block. You can use `in` if you want, but if you don't, the name you create is visible to the rest of the `do` block, as if the whole thing was in the `in`
+
+```haskell
+do 
+    let x = 7
+    let y = 8
+    print (x + y)
+```
+or 
+```haskell
+do 
+    let x in
+        let y in print (x + y)
+```
+
+---
+
+# Do's rules (4)
+
+But `<-` is different from let.
+
+`let x = y` means "x is a new name for y until the end"
+`x <- y` means "create a new program that will take the result from `y` and feed it to a function in which the result is named `x`. The rest of the `do` block is this function.
+
+```haskell
+do
+    x <- y
+    ...
+```
+Means
+```haskell
+y >>= (\x -> ...)
+```
+
+---
+
+# Do's rules (5)
+
+This is why `<-` is necessary when getting user input.
+
+If we do this:
+```haskell
+do { let name = getLine ; putStrLn $ "hello, " ++ name }
+```
+
+Then `name` is not a string. It's a program that will return a string. And we cannot concatenate programs to strings.
+
+---
+
+# Do's rules (6)
+
+Instead, if we do this:
+```haskell
+do { name <- getLine ; putStrLn $ "hello, " ++ name }
+```
+
+Then the part after the `;` is a function body: 
+`(\name -> putStrLn $ "hello, " ++ name)`, and in this function, *name* is a `String`.
+
+Let me repeat that: when you use `>>=` or `<-`, the type of the variable will be the type *inside* the monad, because the value inside is the one being fed to the function.
+
+```haskell
+getLine >>= (\name -> ... )
+```
+
+In the above function, `name` is a string, because `getLine` is an `IO String`.
+
+---
+
+# Finally, more intuition
+
+These are some more intuitive notes that may or may not trigger an "aha".
+
+`>>` or `*>` stitches two programs together to create a new program. 
+
+`a >> b` is a new program that will do the same thing as `a`, then discard the result, then will do the same thing as `b`.
+
+`>>=` stitches a program to a function that will generate a new program. The program and the function become a new program. 
+
+`>>=` allows later actions to depend on the results of previous ones.
+
+---
+
+# Monad knowledge check 1
+
+So let's see some concrete examples of how to apply this.
+
+Knowledge check 1: ask the user to enter a number. Then, print out whether or not the number is prime.
+
+Most of the code we need *does not* need to be monadic. But the input/output part does.
+
+[How do we go about this?]
+
+---
+
+# Monad KC 1 answer
+
+Don't immediately jump into monads. Good old functions are still very useful.
+
+We can use functions to determine if a number is prime:
+```haskell
+divides :: Int -> Int -> Bool
+divides a b = a `mod` b == 0
+
+-- integer square root
+isqrt :: Int -> Int 
+isqrt i = floor $ sqrt $ int2Double i
+
+isPrime :: Int -> Bool 
+isPrime i = i > 1 && 
+    not (any (divides i) [2 .. (isqrt i)])
+```
+
+An integer is prime if it is bigger than 1 and if none of the numbers from `2` up to its square root can divide it. That logic is handled by `isPrime`.
+
+---
+
+# Monad KC 1 answer (2)
+
+Okay, but how do we interact with the user?
+
+```haskell
+main :: IO ()
+main = do
+    putStrLn "please enter a number: "
+    line <- getLine
+    let num = read line :: Int
+    putStrLn (line ++ 
+        if isPrime num
+            then " is prime."
+            else " is not prime.")
+```
+
+Note that `let` inside a `do` block has an invisible `in` that extends to the end of the block. It's another way to avoid having unbounded indentation.
+
+This illustrates the difference between `let` and `<-`. 
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
 
 ---
 
