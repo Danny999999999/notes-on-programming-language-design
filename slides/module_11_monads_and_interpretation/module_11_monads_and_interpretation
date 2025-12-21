@@ -596,9 +596,283 @@ main = do
             else " is not prime.")
 ```
 
-Note that `let` inside a `do` block has an invisible `in` that extends to the end of the block. It's another way to avoid having unbounded indentation.
 
-This illustrates the difference between `let` and `<-`. 
+You can think of a `do` block as a "monad builder". Here, we first ask for a number, then we `bind` a program that will get a line and feed the results forward. We convert it to an integer, and then we print it and whether it's prime. [Why `<-` versus `let`?]
+
+---
+
+# Monad KC question 2
+
+I was going to use this one on a quiz, but it's so important I decided to make it part of the lecture material so that every year of students could see it.
+
+There's a classic programming question that is commonly used as a warmup question in technical interviews.
+
+It's called *FizzBuzz*. It's also a verb: *FizzBuzzing* someone means testing them on a basic task.
+
+So, let's see that basic task...
+
+---
+
+# Monad KC question 2 (2)
+
+For every integer from 1 to 100 (inclusive), print "Fizz" if it is divisible by 3, "Buzz" if it is divisible by 5, "FizzBuzz" if it is divisible by both, and if none of the above apply, just print the number. Correct output sample:
+```
+1
+2
+Fizz
+4
+Buzz
+...
+13
+14
+FizzBuzz
+...
+```
+
+[Ideas?]
+
+---
+
+# Monad KC question 2 answer
+
+Some thoughts:
+- Whether a number is printed as itself, or one of the strings, is dependent entirely on that number and no other state.
+- Therefore, we can write a function that converts a number to the correct string.
+- And then, we can map that function to every element of a list of integers.
+- Finally, we need to somehow print those
+
+Let's work on the easy part first. [Shall we solve it together?]
+
+---
+
+# Monad KC question 2 answer (2)
+
+```haskell
+fizzbuzzify :: Int -> String
+fizzbuzzify i
+    | i `mod` 15 == 0 = "FizzBuzz"
+    | i `mod` 3 == 0 = "Fizz"
+    | i `mod` 5 == 0 = "Buzz"
+    | otherwise = show i
+```
+
+Here, we use a little number theory trick to test whether the number is divisible by 3 and 5. If it is divisible by both, it will be divisible by 15.
+
+You don't have to use this trick, of course. ``i `mod` 3 == 0 && i `mod` 5 == 0`` works.
+
+If we get past the checks, we just use `show` to convert the number to a string of itself. Remember that `show` is Haskell's equivalent of `.toString()`. 
+
+---
+
+# Monad KC question 2 answer (3)
+
+Then we can map all the numbers like this:
+```haskell
+fizzbuzzify <$> [1 .. 100]
+```
+
+This creates a big list of strings, `["1", "2", "Fizz", etc.]`
+
+But how do we print all of them?
+
+[thoughts?]
+
+---
+
+# One way to do it
+
+Suppose we did this:
+```haskell
+putStrLn <$> ["1", "2", "Fizz", ...]
+```
+
+Remember, `putStrLn` is a function, so we can map it. The result is a list of actions:
+```haskell
+[putStrLn "1", putStrLn "2", putStrLn "Fizz", ...]
+```
+
+But we don't want 100 independent programs that print stuff. We want one program that we can return from main.
+
+How can we collapse those 100 programs into 1?
+
+---
+
+# Two options
+
+First, we can use one of the folds. It doesn't matter which one, since `>>` is associative.
+
+```haskell
+main = do
+    let strings = fizzbuzzify <$> [1 .. 100]
+    let prints = putStrLn <$> strings
+    foldl (>>) (return ()) prints
+```
+
+Wait, what's that `return ()`?
+
+`return` is the universal constructor for monads. It creates an empty monad that does nothing except "return" the given value. So `return 7` can be an `IO Int` that, when run, will `return` 7 and do nothing else.
+
+`foldl` requires a starting value, so we use `return ()` to create an empty program to `>>` with the first `putStrLn`. 
+
+---
+
+# A nicer option
+
+It turns out that `IO` is a monoid, so we have a nicer option.
+
+Instead of using `foldl`, which makes us provide a default value, we can use `mconcat`.
+
+`mconcat prints`
+
+That's it. That will squash the whole list of prints into a single program that we can return.
+
+---
+
+# More familiar option
+
+If those are too weird, we can even use a for loop!
+
+Wait? Really? Haskell has for-loops?
+
+Not as syntax elements. But monads are so flexible, there is a `for` function that does everything a for loop does. In most languages, this would need to be built-in, but Haskell has it as a function.
+
+It's called `forM_`. The `M` is for monad, and the `_` means "discard the output of the last value". There is also `forM` if we want to keep it:
+
+```haskell
+forM_ strings (\string ->
+    putStrLn string
+) -- or just forM_ strings putStrLn
+```
+
+Look how much it looks like a for loop!
+
+---
+
+# More familiar option
+
+There's a more "Haskelly" version, `mapM_` which does the same thing as `forM_` but the argument order is reversed:
+
+```haskell
+main = do 
+    let strings = fizzbuzzify <$> [1 .. 100]
+    mapM_ putStrLn strings
+```
+
+It's taken a long time, but hopefully the pieces are starting to fall into place as to how you can do normal programming language things in Haskell.
+
+However, behind the scenes, even statements are algebraic objects that you can manipulate, giving you enormous flexibility in extending the language.
+
+Almost no other language gives you this much flexibility...
+Almost...except one...
+
+---
+
+# Not so fast
+
+But before we talk about Lisp, let's do some `IO` monad drills.
+
+Remember, `IO` is just one monad of many, but it's the main one we need to use to make Haskell do anything outside the program, so it's kind of important.
+
+Make sure none of these programs are too hard. There will be a quiz!
+
+---
+
+# Monad Problems
+
+1. Calculate and print the first 100 fibonacci numbers.
+2. Ask the user to enter their name, then print how many characters are in it.
+3. Ask the user to enter their name, then convert it to Spongebob case (so Grant becomes gRaNt)
+4. Ask the user to enter a first name and a last name. Paste them together and print the result. [unworked]
+5. Ask the user to enter the two leg lengths of a right triangle. Print the length of the hypotenuse. [unworked]
+6. Ask the user to enter some digits, and print whether it could maybe be a PIN (4 digits), a Zip code (5 digits), or a phone number (7 or 10 digits). [unworked]
+
+---
+
+# Monad fibos
+
+```haskell
+fibos :: [Int]
+fibos = 0 : 1 : zipWith (+) fibos (tail fibos)
+
+main :: IO ()
+main = forM_ (take 100 fibos) print
+```
+
+The `fibos` list uses lazy evaluation. The remainder of the list is created by zipping the list itself with its own tail. This is more efficient than applying the definition.
+
+We use `forM_` to loop over the first 100 fibonacci numbers and call `print` on them.
+
+---
+
+# Monad name chars
+
+```haskell
+main :: IO ()
+main = do
+    putStrLn "please enter your name: "
+    name <- getLine
+    putStrLn $ "your name has " ++ show (length name) ++ " characters."
+
+```
+
+This one is a bit easier. We just read the name in and construct the message.
+
+We can take advantage of the fact that monads are a kind of functor though:
+
+```haskell
+main :: IO ()
+main = do
+    putStrLn "please enter your name: "
+    nameLen <- show . length <$> getLine
+    putStrLn $ "your name has " ++ nameLen ++ " characters."
+```
+
+---
+
+# Monad name chars (2)
+
+Applying fmap (`<$>`) to a monad creates a new monad in which its return value has been transformed by the given function.
+
+`getLine` is an `IO String`
+`length <$> getLine` is an `IO Int` that returns the length instead of the line.
+`show <$> length <$> getLine` will convert the length `Int` into a `String`.
+`show . length <$> getLine` is equivalent because of functor laws.
+
+---
+
+# Spongebob case
+
+One last one for us to do together. Spongebob case.
+
+To do this one, I zip the string with a list of ints that each correspond to the index of each character in the string.
+
+If it is an even index, we want to make it lowercase. If odd, uppercase.
+
+```haskell
+spongebobCase :: Int -> Char -> Char 
+spongebobCase index char 
+    | even index = toLower char
+    | otherwise = toUpper char 
+```
+
+---
+
+# Spongebob case (2)
+
+Now we just map that function to the string and provide all the indices
+
+```haskell
+toSpongebob :: String -> String 
+toSpongebob = zipWith spongebobCase [0..]
+        
+main :: IO ()
+main = do
+    putStrLn "please enter your name: "
+    name <- toSpongebob <$> getLine
+    putStrLn $ "nIcE To mEeT YoU " ++ name
+```
+
+Its fine if we provide an infinite list of ints. `zip` and `zipWith` stop as soon as the end of the shorter list is reached, so if the name is finite, the `zipWith` result will be finite.
 
 ---
 
@@ -608,13 +882,15 @@ This illustrates the difference between `let` and `<-`.
 
 ---
 
-# Understanding this historically
+# What about lisp?
 
-As I said before, Haskell is older than monads applied to computer science. It was Haskell that introduced this concept to CS, but it wasn't there in the earliest versions.
+Lisp actually has this much flexibility.
 
+It has a feature that is analogous to monads, but works completely differently.
 
+In the same way that general grammars are turing complete, but they work in a completely different way, Lisp *macros* can fulfill the same requirements as Haskell *monads*. In fact, they are perhaps a little more powerful.
 
----
+But we have a long way to go. Let's learn how to comple and run our lisp programs.
 
 ---
 
