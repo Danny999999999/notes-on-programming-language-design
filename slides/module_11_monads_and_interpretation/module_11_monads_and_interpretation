@@ -994,7 +994,111 @@ The program itself is just a list. And we want to *execute* that list.
 
 ---
 
-# How do we execute it?
+# Let's make that look nicer
+
+Now that we're using s-expressions, let's write a function that turns our `Values` into the corresponding s-expression. 
+
+We could make a custom instance of the `Show` typeclass, but I prefer to have the default `Show` available for debugging.
+
+Instead, here's a function to "pretty print" a value...
+
+---
+
+# Pretty printing
+
+```haskell
+prettyPrint :: Value -> String
+prettyPrint (VList list) = "(" ++ unwords (prettyPrint <$> list) ++ ")"
+prettyPrint (VInt i) = show i
+prettyPrint (VSym s) = s
+```
+
+The base cases are when a value is an int or a symbol. We "show" the int to convert it into a string, or just return the symbol.
+
+When the value is a list, we recursively pretty print all its values, and use "unwords" to paste the values together with a space in between.
+
+Lastly, we cap it off with a '(' and ')' on either end.
+
+---
+
+# Now what?
+
+Okay, we have parsed a list, and we can print it out to inspect it. How do we run it?
+
+We can't. Remember that Haskell is a functionally pure language. Running the code would mean printing stuff out and changing variables and all sorts of unsafe nonsense.
+
+But we can compile a program to run later.
+
+That is, we can take the program we parsed and compile it into an `IO`. Then, return that `IO` back to the runtime to execute it.
+
+---
+
+# Compilation?
+
+Wait, compiling? I thought we were making an interpreter?
+
+The distinction is less clear than you might think.
+
+A *pure* interpreter, like an old school, Commodore BASIC-style interpreter, would parse and execute each line separately.
+
+If a line contained a `GOTO` to send you to another line, it would then re-parse the tokens and execute that line.
+
+This is obviously not very fast, modern languages that we consider "interpreted" don't actually do that. 
+
+---
+
+# Compilation? (2)
+
+Python, for example, does have a compiler.
+
+You write some python, it tokenizes, then parses it, but then it compiles what it parsed into an intermediate language.
+
+The difference between an "interpreted" language and a compiled language isn't that the modern interpreted language never compiles. It's that its compiler does not compile all the way down to machine language, and it typically runs immediately after compilation.
+
+That's what we're going to build. Our "compiler" will build an `IO` that, when executed, will run the program that the user submitted.
+
+---
+
+# Compiling into an `IO`
+
+This is our compile function's type:
+```haskell
+compile :: Value -> IO Value
+```
+
+It will take a value, and then produce a program that will generate it.
+
+Remember, an `IO` is just a program. 
+
+We want the lisp function:
+```lisp
+(+ 2 2)
+```
+
+To compile into a program that, when it is run, produces `VInt 4`.
+
+---
+
+# Compiling into an `IO` (2)
+
+
+For integers and symbols, it is very simple:
+```haskell
+compile (VInt i) = return (VInt i)
+compile (VSym s) = return (VSym s)
+```
+
+Remember, `return` is a function that produces a monad that doesn't actually do anything except return the given value. 
+
+So `return (VInt i)` produces an `IO Value` when it is executed.
+
+The correct way to "evaluate" an int or a symbol is to just return it.
+
+But what about lists? We have to *execute* those. So we have to produce a function that will run the function in the list, and then 
+
+---
+
+# What does it mean to execute it?
 
 Now we come to the key point: the lists that we have encountered in other classes don't do anything. They are data structures. They sit around, holding data.
 
@@ -1012,25 +1116,304 @@ The lisp execution strategy is simple:
 
 Okay, how do we run `(+ 2 2)`?
 
-Any time we execute some code, we pull the first element of the list to determine what to do:
+Any time we execute a list, we pull the first element to determine what to do:
 
 ```haskell
-expectInt :: Value -> Int
-expectInt (VInt val) = val
-expectInt other = error "expected an Int but got " ++ show other
-
-eval :: Value -> Value
-eval (VList ("+" : args)) = 
-    VInt $ sum $ expectInt <$> (eval <$> args)
-eval _ = error "unknown command or invalid s-expression"
+commandArgs :: [Value] -> (String, [Value])
+commandArgs (VSym name : args) = (name, args)
+commandArgs c = 
+    error ("invalid command list: command" ++ 
+        prettyPrint (VList c) ++ "does not start with a symbol.")
 ```
+
+This function takes a list like `(+ 2 2)` and breaks it into a command `+`, and a list of arguments. The result of running `commandArgs` on `(+ 2 2)` is:
+
+`("+", [VInt 2, VInt 2])`
 
 ---
 
 # Let's start with `+` (2)
 
-First, we map `eval` to each argument. We have to evaluate each argument in case there are nested additions. For example `(+ (+ 2 2) 5)`.
+Then, we check the function. Is it a built-in function? If so, we make an `IO` that will execute it. If it's not built-in (maybe it's a function the user made), we look it up. We'll handle that case in project 5.
 
-Then, `expectInt` just makes sure that a value is an integer.
+So, let's check for built-in functions:
+```haskell
+compileBuiltin :: String -> [Value] -> IO Value
+compileBuiltin "+" args = ...
+compileBuiltin "print" args = ...
+compileBuiltin command _ = error $ "unrecognized command: " ++ command
+```
 
-This is a very simple and not very helpful form of error checking. We will learn better techniques when we discuss monads. 
+This function takes a string that tells us the name of the built-in we want, and then it outputs the compiled program that will execute that function on the given arguments.
+
+What should "+" do?
+
+---
+
+# Let's start with `+` (3)
+
+```haskell
+compileFunction "+" args = compileAdd $ expectInt <$> args
+```
+
+We have a helper function called `compileAdd`, but it expects a list of integers. Lisp is dynamically typed, so the values we pass to it could be anything. We don't want to accept lists or symbols, we just want to add ints. So we use `expectInt` to force it.
+
+```haskell
+expectInt :: Value -> Integer 
+expectInt (VInt i) = i 
+expectInt v = error $ "expected int but got " ++ prettyPrint v  
+
+compileAdd :: [Integer] -> IO Value
+compileAdd args = return $ VInt $ sum args
+```
+
+`compileAdd` takes a list of arguments, computes their sum, and returns a program that will produce that sum.
+
+---
+
+# What about `print`?
+
+At this point, we can add numbers. If you run `compileFunction` on `"+"` and `[2, 2]`, you can get an `IO Value` that will return `4`. So programs like this can be compiled
+```lisp
+(+ 2 2)
+```
+
+But that program doesn't *do* anything. We need some way to print the results.
+
+If all we needed was to compute values, we wouldn't really need a compiler. We could just evaluate a list directly, with a function like this `eval :: Value -> Value`. That's how the first version of this course worked when we used the *Forth* programming language.
+
+However, I want to be able to print now, so it's time to get more familiar with monads!
+
+---
+
+# Understanding print
+
+This is why our compile function returns an `IO Value`. `IO a` means "program that will do a bunch of things and then finally return an `a`.
+
+So an `IO Value` is a program that will potentially print or read input and then return a lisp value when it's done.
+
+So, our print function can return an `IO Value` which prints, and then returns whatever it wants (we don't really care about the return value here).
+
+---
+
+# Understanding print (2)
+
+Let's extend our `compileBuiltin` function:
+```haskell
+compileBuiltin "print" args = compilePrint args
+```
+
+And then define `compilePrint`:
+```haskell
+compilePrint :: [Value] -> IO Value 
+compilePrint args = do 
+    let pretty = prettyPrint <$> args -- pretty is a string list
+    let str = unwords pretty -- unwords joins a list together with spaces
+    putStrLn str -- actually do the printing
+    -- if there is one argument to print, then that is its value
+    -- otherwise its value is a list of all its args
+    return $ if length args == 1 then head args else VList args 
+```
+
+[Let's spend a moment understanding it...]
+
+---
+
+# Finally, a compile function
+
+Now that we have our two built-in functions, let's have a function that compiles values.
+
+```haskell
+compile :: Value -> IO Value 
+compile (VList list) = do 
+    let (command, args) = commandArgs list 
+    compiledArgs <- mapM compile args 
+    compileBuiltin command compiledArgs
+compile other = return other 
+```
+
+If we pass it a list, it will break it into its command and its arguments.
+
+Then, it wlil run `compile` on all its arguments. `mapM` stands for "map monad". Here, it takes itself, and runs it on every value. `mapM` then takes the list of `[IO Value]` and stitches them together into an `IO [value]`. That is, it takes a list of actions, and returns one action that returns each of the produced values.
+
+---
+
+# `mapM`
+
+What does `mapM` really do? Imagine we had a list like this: `["1", "hi", "bye"]`
+
+Suppose we wanted to print all those things. 
+
+We could do this:
+```haskell
+map print ["1", "hi", "bye"] == [print "1", print "hi", print "bye"]
+```
+
+But that's just a list of actions. How can we produce one action that does all of them?
+```haskell
+foldl (>>) (return ()) [print "1", print "hi", print "bye"] == -- this works 
+return () >> print "1" >> print "hi" >> print "bye"
+```
+
+The end result is a single program that prints 3 things. (The initial `return ()` is a program that does nothing. We just need it to be there as a starting value for `foldl`)
+
+---
+
+# `mapM` (2)
+
+Folding a bunch of monads into one monad is so common, there are functions for it:
+```haskell
+sequence :: Monad m => [m a] -> m [a] -- for when we want the intermediate values
+sequence_ :: Monad m => [m a] -> m () -- for when we don't
+```
+
+`sequence_` is just `foldl (>>) (return ())`
+That is, `sequence_ [print 1, print 2] == print 1 >> print 2`
+
+[The version without the underscore](https://hackage-content.haskell.org/package/base-4.22.0.0/docs/Prelude.html#v:sequence) returns a list of intermediate values at the end. The results of running each program in the list of programs. Since `print` does not produce a value, this is not helpful. But if we have programs that *do* produce values (like `compile`), it's helpful. Here's an example of what it does:
+
+```haskell
+sequence [return 1, return 2, return 3] == IO that returns [1, 2, 3]
+```
+
+---
+
+# `mapM` (3)
+
+So what if we compile a list of arguments? Now we have a list of programs:
+```haskell
+compile <$> [VInt 2, VInt 2] == 
+    [compile (VInt 2), compile (VInt 2)] ==
+    [return (VInt 2), return (VInt 2)]
+```
+
+So we can sequence them together so that we now have a single program that produces all that data:
+
+```haskell
+sequence . compile <$> [VInt 2, VInt 2] == return [2, 2]
+```
+
+And that's what `mapM` does. It just maps a monadic function to a collection, and then sequences it into a single action that returns the collection:
+
+```haskell
+mapM f c == sequence . f <$> c
+```
+
+---
+
+# `mapM` for compiling the args
+
+So, let's return to our compile function:
+```haskell
+compile :: Value -> IO Value 
+compile (VList list) = do 
+    let (command, args) = commandArgs list 
+    compiledArgs <- mapM compile args 
+    compileBuiltin command compiledArgs
+compile other = return other 
+```
+
+Here, `mapM compile args` just says "build me an `IO` that will first run `compile` on all the arguments, and then return the results of doing that.`
+
+We use `<-` to use those results in the program we're building. We then compile the built-in function with the compiled args.
+
+---
+
+# Questions?
+## Especially about `mapM`?
+
+<!-- _class: questions invert -->
+
+---
+
+# It seems to work
+
+At this point, we can patch up our main `IO` to compile and run our lisp code:
+
+```haskell
+main :: IO ()
+main = do
+    program <- getContents 
+    let tokens = tokenize program
+    let parsed = parseProgram tokens
+    let compiled = mapM_ compile parsed
+    compiled 
+```
+
+Here, we use `mapM_` which, instead of returning an `IO [Value]`, returns an `IO ()`.
+
+We don't actually want those values anymore. The type of `main` is `IO()`, so we have to throw them away.
+
+However, all of the actions (like printing) will be executed, which is what we want.
+
+---
+
+# It seems to work (2)
+
+And in fact, we can pass this code:
+```lisp
+(print 2)
+(print (+ 2 2))
+(print (+ 2 2 2))
+(print (+ (+ 2 2) (+ 2 2)))
+```
+
+And I get this result:
+```
+2
+4
+6
+8
+```
+
+Which is correct.
+
+---
+
+# A program is more than a sequence of operations
+
+But there's a basic thing that real programs need to do that we can't do yet: branch.
+
+Branching is key to computer science. If our program cannot branch, it can't be Turing complete, and Turing completeness is kind of a bare-minimum bar to shoot for here.
+
+So, let's add `if` expressions to the language.
+
+Important point: Lisp does not distinguish between expressions and statements. A statement is just an expression that has a side effect. Even `print` returns something.
+
+---
+
+# Conditions
+
+First, every `if` has a condition, right?
+
+Like, in C, `if (x == 0) { ... }`
+
+How can we add `==` testing to our language?
+
+
+
+
+---
+
+# Introducing `cond`
+
+So this should be possible:
+```lisp
+(cond 
+    (== x 0) (print 0)
+    (== x 1) (print 17)
+    (print 1111))
+```
+
+`cond` (short for "condition") is the Lisp equivalent of if-else. 
+
+In the code above, it first tests whether `x` is `0`, and if so, the result is `(print 0)`
+
+---
+
+# Memory management
+
+---
+
+# Practice with `mapM`
+
