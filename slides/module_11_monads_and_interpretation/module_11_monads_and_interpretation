@@ -1063,12 +1063,12 @@ That's what we're going to build. Our "compiler" will build an `IO` that, when e
 
 This is our compile function's type:
 ```haskell
-compile :: Value -> IO Value
+eval :: Value -> IO Value
 ```
 
-It will take a value, and then produce a program that will generate it.
+We're calling it "eval" because it produces an `IO` that will evaluate to a value.
 
-Remember, an `IO` is just a program. 
+Evaluating a number, like `7`, just produces `7`. But evaluating a list runs it.
 
 We want the lisp function:
 ```lisp
@@ -1084,8 +1084,8 @@ To compile into a program that, when it is run, produces `VInt 4`.
 
 For integers and symbols, it is very simple:
 ```haskell
-compile (VInt i) = return (VInt i)
-compile (VSym s) = return (VSym s)
+eval (VInt i) = return (VInt i)
+eval (VSym s) = return (VSym s)
 ```
 
 Remember, `return` is a function that produces a monad that doesn't actually do anything except return the given value. 
@@ -1138,13 +1138,13 @@ Then, we check the function. Is it a built-in function? If so, we make an `IO` t
 
 So, let's check for built-in functions:
 ```haskell
-compileBuiltin :: String -> [Value] -> IO Value
-compileBuiltin "+" args = ...
-compileBuiltin "print" args = ...
-compileBuiltin command _ = error $ "unrecognized command: " ++ command
+evalBuiltin :: String -> [Value] -> IO Value
+evalBuiltin "+" args = ...
+evalBuiltin "print" args = ...
+evalBuiltin command _ = error $ "unrecognized command: " ++ command
 ```
 
-This function takes a string that tells us the name of the built-in we want, and then it outputs the compiled program that will execute that function on the given arguments.
+This function takes a string that tells us the name of the built-in we want, and then it outputs a program that will execute that function on the given arguments.
 
 What should "+" do?
 
@@ -1153,7 +1153,7 @@ What should "+" do?
 # Let's start with `+` (3)
 
 ```haskell
-compileFunction "+" args = compileAdd $ expectInt <$> args
+evalBuiltin "+" args = compileAdd $ expectInt <$> args
 ```
 
 We have a helper function called `compileAdd`, but it expects a list of integers. Lisp is dynamically typed, so the values we pass to it could be anything. We don't want to accept lists or symbols, we just want to add ints. So we use `expectInt` to force it.
@@ -1163,24 +1163,24 @@ expectInt :: Value -> Integer
 expectInt (VInt i) = i 
 expectInt v = error $ "expected int but got " ++ prettyPrint v  
 
-compileAdd :: [Integer] -> IO Value
-compileAdd args = return $ VInt $ sum args
+evalAdd :: [Integer] -> IO Value
+evalAdd args = return $ VInt $ sum args
 ```
 
-`compileAdd` takes a list of arguments, computes their sum, and returns a program that will produce that sum.
+`evalAdd` takes a list of arguments, computes their sum, and returns a program that will produce that sum.
 
 ---
 
 # What about `print`?
 
-At this point, we can add numbers. If you run `compileFunction` on `"+"` and `[2, 2]`, you can get an `IO Value` that will return `4`. So programs like this can be compiled
+At this point, we can add numbers. If you run `evalFunction` on `"+"` and `[2, 2]`, you can get an `IO Value` that will return `4`. So programs like this can be compiled
 ```lisp
 (+ 2 2)
 ```
 
 But that program doesn't *do* anything. We need some way to print the results.
 
-If all we needed was to compute values, we wouldn't really need a compiler. We could just evaluate a list directly, with a function like this `eval :: Value -> Value`. That's how the first version of this course worked when we used the *Forth* programming language.
+If all we needed was to compute values, we wouldn't really need a compiler that returned `IO Value`. We could just evaluate a list directly, with a function like this `eval :: Value -> Value`. That's how the first version of this course worked when we used the *Forth* programming language.
 
 However, I want to be able to print now, so it's time to get more familiar with monads!
 
@@ -1200,13 +1200,13 @@ So, our print function can return an `IO Value` which prints, and then returns w
 
 Let's extend our `compileBuiltin` function:
 ```haskell
-compileBuiltin "print" args = compilePrint args
+evalBuiltin "print" args = evalPrint args
 ```
 
-And then define `compilePrint`:
+And then define `evalPrint`:
 ```haskell
-compilePrint :: [Value] -> IO Value 
-compilePrint args = do 
+evalPrint :: [Value] -> IO Value 
+evalPrint args = do 
     let pretty = prettyPrint <$> args -- pretty is a string list
     let str = unwords pretty -- unwords joins a list together with spaces
     putStrLn str -- actually do the printing
@@ -1224,17 +1224,17 @@ compilePrint args = do
 Now that we have our two built-in functions, let's have a function that compiles values.
 
 ```haskell
-compile :: Value -> IO Value 
-compile (VList list) = do 
+eval :: Value -> IO Value 
+eval (VList list) = do 
     let (command, args) = commandArgs list 
-    compiledArgs <- mapM compile args 
+    compiledArgs <- mapM eval args 
     compileBuiltin command compiledArgs
-compile other = return other 
+eval other = return other 
 ```
 
 If we pass it a list, it will break it into its command and its arguments.
 
-Then, it wlil run `compile` on all its arguments. `mapM` stands for "map monad". Here, it takes itself, and runs it on every value. `mapM` then takes the list of `[IO Value]` and stitches them together into an `IO [value]`. That is, it takes a list of actions, and returns one action that returns each of the produced values.
+Then, it wlil run `eval` on all its arguments. `mapM` stands for "map monad". Here, it takes itself, and runs it on every value. `mapM` then takes the list of `[IO Value]` and stitches them together into an `IO [value]`. That is, it takes a list of actions, and returns one action that returns each of the produced values.
 
 ---
 
@@ -1270,7 +1270,7 @@ sequence_ :: Monad m => [m a] -> m () -- for when we don't
 `sequence_` is just `foldl (>>) (return ())`
 That is, `sequence_ [print 1, print 2] == print 1 >> print 2`
 
-[The version without the underscore](https://hackage-content.haskell.org/package/base-4.22.0.0/docs/Prelude.html#v:sequence) returns a list of intermediate values at the end. The results of running each program in the list of programs. Since `print` does not produce a value, this is not helpful. But if we have programs that *do* produce values (like `compile`), it's helpful. Here's an example of what it does:
+[The version without the underscore](https://hackage-content.haskell.org/package/base-4.22.0.0/docs/Prelude.html#v:sequence) returns a list of intermediate values at the end. The results of running each program in the list of programs. Since `print` does not produce a value, this is not helpful. But if we have programs that *do* produce values (like `eval`), it's helpful. Here's an example of what it does:
 
 ```haskell
 sequence [return 1, return 2, return 3] == IO that returns [1, 2, 3]
@@ -1282,15 +1282,15 @@ sequence [return 1, return 2, return 3] == IO that returns [1, 2, 3]
 
 So what if we compile a list of arguments? Now we have a list of programs:
 ```haskell
-compile <$> [VInt 2, VInt 2] == 
-    [compile (VInt 2), compile (VInt 2)] ==
-    [return (VInt 2), return (VInt 2)]
+eval <$> [VInt 2, VInt 2] == 
+    [eval (VInt 2), eval (VInt 2)] ==
+    [eval (VInt 2), eval (VInt 2)]
 ```
 
 So we can sequence them together so that we now have a single program that produces all that data:
 
 ```haskell
-sequence . compile <$> [VInt 2, VInt 2] == return [2, 2]
+sequence . eval <$> [VInt 2, VInt 2] == return [2, 2]
 ```
 
 And that's what `mapM` does. It just maps a monadic function to a collection, and then sequences it into a single action that returns the collection:
@@ -1303,19 +1303,19 @@ mapM f c == sequence . f <$> c
 
 # `mapM` for compiling the args
 
-So, let's return to our compile function:
+So, let's return to our function that gives evaluators:
 ```haskell
-compile :: Value -> IO Value 
-compile (VList list) = do 
+eval :: Value -> IO Value 
+eval (VList list) = do 
     let (command, args) = commandArgs list 
-    compiledArgs <- mapM compile args 
-    compileBuiltin command compiledArgs
-compile other = return other 
+    evaledArgs <- mapM eval args 
+    evalBuiltin command evaledArgs
+eval other = return other 
 ```
 
-Here, `mapM compile args` just says "build me an `IO` that will first run `compile` on all the arguments, and then return the results of doing that.`
+Here, `mapM eval args` just says "build me an `IO` that will first run `eval` on all the arguments, and then return the results of doing that.`
 
-We use `<-` to use those results in the program we're building. We then compile the built-in function with the compiled args.
+We use `<-` to use those results in the program we're building. We then compile the built-in function with the fully evaluated args.
 
 ---
 
@@ -1336,8 +1336,8 @@ main = do
     program <- getContents 
     let tokens = tokenize program
     let parsed = parseProgram tokens
-    let compiled = mapM_ compile parsed
-    compiled 
+    let compiled = mapM_ eval parsed
+    compiled -- actually evaluate by returning the compiled evaluator
 ```
 
 Here, we use `mapM_` which, instead of returning an `IO [Value]`, returns an `IO ()`.
@@ -1390,30 +1390,405 @@ Like, in C, `if (x == 0) { ... }`
 
 How can we add `==` testing to our language?
 
+---
+
+# Deriving `Eq`
+
+The easiest way is to derive `Eq` for our values:
+
+```haskell
+data Value = 
+        VSym String 
+    |   VInt Integer
+    |   VList [Value]
+        deriving (Show, Eq)
+```
+
+Now this works: `(VInt 7 == VInt 7) == True` and `(VInt 7 == VInt 8) == False`
+
+We can even allow inequalities with `deriving (Show, Eq, Ord)`
+
+This will make it so that when we use inequalities, they apply to the values inside the constructors: `VInt 7 <= VInt 8 == True`.
+
+---
+
+# Total ordering
+
+This is a total ordering, which means that *all* values participate in the relation.
+
+That is, symbols can also be compared to integers. 
+
+When we use `deriving Ord`, Haskell will make it so that all instances of the first constructor are less than the second, all instances of the second are less than the third, and so on.
+
+So all symbols are considered less than all integers: `VSym x <= VInt y == True` always.
+
+Lists are also always greater than symbols and ints, but what about other lists?
+
+Lists are compared lexically, in dictionary order. So list a is less than list b if its first element is strictly less, or if its first element is equal and its second element is strictly less, etc.
+
+---
+
+# Adding `==`
+
+So now, we want to add a new command, `==` (and then soon its friends)
+
+First, let's have the ability to require exactly 2 arguments:
+```haskell
+expectPair :: [Value] -> (Value, Value)
+expectPair [arg1, arg2] = (arg1, arg2)
+expectPair _ =
+    error "wrong number of arguments. expected 2."
+```
+
+And now we can add it:
+```haskell
+evalEq :: [Value] -> IO Value 
+evalEq args = 
+    let (a, b) = expectPair args 
+    in return $ if a == b then VInt 1 else VInt 0--uses 1 and 0 for true and false
+```
+
+---
+
+# Bools
+
+For the purpose of this simple language, I'm going to consider 0 and the empty list to be false, and anything else to be true, but 1 by default.
+
+This is not how classic lisp works. Lisp clasically used the symbol `t` for true, and "nil" (which was the empty list) for false.
+
+We could even add a boolean kind of value if we wanted, to distinguish it from integers and symbols.
 
 
+[Are there any language design implications to one choice or another?]
+
+---
+
+# Adding more relations
+
+For your project, you'll need to add `<=`, `/=` etc.,
+
+To do this, I like to define an intermediate function that I can compile any binary relation between `Value`s with:
+```haskell
+compileRelation :: (Value -> Value -> Bool) -> (Value, Value) -> IO Value 
+compileRelation rel (a, b) = return $
+    if a `rel` b then VInt 1 else VInt 0
+```
+
+This injects any function between two values (like `==`) and converts its result to `1` for true and `0` for false
+
+But using it requires a small refactoring. Can you see how to use it?
+
+---
+
+# Questions?
+
+<!-- _class: questions invert -->
+
+---
+
+# Turing completeness
+
+The requirements for a language to be turing complete are:
+1. Sequence (running a list of statements in order)
+2. Branching (conditional jumps or ifs)
+3. Repetition (loops, backwards jumps, general recursion)
+
+We have a primitive form of sequencing: the program is a list of commands.
+
+Let's work on branching. How do conditionals work in lisp?
 
 ---
 
 # Introducing `cond`
 
-So this should be possible:
+Classic lisp uses this kind of conditional 
 ```lisp
 (cond 
-    (== x 0) (print 0)
-    (== x 1) (print 17)
-    (print 1111))
+    ((== x 0) (print 0))
+    ((== x 1) (print 17))
+    ((print 1111)))
 ```
 
-`cond` (short for "condition") is the Lisp equivalent of if-else. 
+`cond` (short for "condition") is equivalent to an if-else. 
 
 In the code above, it first tests whether `x` is `0`, and if so, the result is `(print 0)`
+Then it tests if `x` is `1`, and if so, the result is `(print 17)`. 
+
+If all the conditions fail, it evaluates the last expression. It doesn't have a condition.
+
+You will need to implement `cond`, but in this lecture, we'll implement a simpler version, called `when`.
 
 ---
 
-# Memory management
+# Introducing `when`
+
+When is like a simple if-statement with no else-branch.
+```lisp
+(when (== (+ 2 2) 4) (print 1))
+```
+
+Here, we will only print 1 if the condition is true. If it's false, we don't do anything.
+
+We can also have multiple 
+
+At this point, I like to return the value inside the condition regardless so we can use when as a conditional trace:
+`(print (when 0 (print 1)))` ends up return zero from the `when`, which gets printed.
+
+Can we make this be a built in function? Let's try and see what happens.
 
 ---
 
-# Practice with `mapM`
+# How could we make `when`?
 
+Can we make this be a built-in function?
+
+Like, suppose we added a `cond` function the same way we added `==` and `print`. Would that work?
+
+Let's just try it and see what happens. Here's an `evalWhen`:
+
+```haskell
+evalWhen :: Value -> [Value] -> IO Value
+evalWhen (VInt 0) tail = return $ VInt 0
+evalWhen (VList []) tail = return $ VList []
+evalWhen _trueCondition tail = evalBlock tail
+```
+
+What about `evalBlock`?
+
+---
+
+# `evalBlock`
+
+This program will run every command in a block:
+
+```haskell
+evalBlock :: [Value] -> IO Value
+evalBlock commands = do 
+    evald <- mapM eval commands
+    -- if empty, return the empty list, otherwise the last value
+    if null evald 
+        then return $ VList []
+        else return $ last evald
+```
+
+It uses `mapM` to evaluate all the commands in the block, then run them all in sequence.
+
+If there are no given commands, it just returns the empty list.
+
+If there are commands, it returns the value of the last one executed.
+
+---
+
+# Last steps?
+
+Now we can add our `when` function:
+```haskell
+evalBuiltin "when" [] = error "when without condition"
+evalBuiltin "when" (condition : prog) = evalWhen condition prog 
+```
+
+`evalWhen` will check the given condition. If it evaluated as true, it will run the given program. Otherwise, it shouldn't run it (`evalWhen` should just return the false condition in that case)
+
+Does it work?
+
+---
+
+# Sort of...
+
+This code works:
+```haskell
+(when (== (+ 2 2) 4) (print 4))
+```
+
+This does, in fact, print 4.
+
+The problem is, this code also prints 5, even though it shouldn't.
+
+```haskell
+(when (== (+ 2 2) 5) (print 5))
+```
+
+Any idea why?
+
+---
+
+# Functions won't work here
+
+The problem is, `when` cannot be a function!
+
+Consider this C program:
+```c
+int fake_if(int condition, int trueval, int falseval) {
+    return condition ? trueval : falseval;
+}
+```
+
+If we try to run it where the true and false values have side effects, it won't work:
+```c
+int x = 0
+fake_if(2 + 2 == 4, x = x + 1, x = x - 1);
+```
+
+Here, `x = x + 1` and `x = x - 1` always run, no matter whether the condition was true or false. Because *functions always fully evaluate their arguments*. 
+
+---
+
+# We need something else
+
+What we need here is not a function: it's a macro. 
+
+Macros are like functions, but they see their arguments *before* they get evaluated. 
+
+In C, using `#define` for our `fake_if` example would work. But how can we do this in our language?
+
+---
+
+# Adding macros
+
+We need to update our `eval` function for commands. 
+
+Previously, it would fully evaluate all of the arguments by running itself recursively on every argument to the command.
+
+We need this behavior to only happen for functions. Let's define a function that tells us whether something is a macro or not:
+
+```haskell
+isBuiltInMacro :: String -> Bool 
+isBuiltInMacro "cond" = True 
+isBuiltInMacro "when" = True 
+isBuiltInMacro _ = False 
+```
+
+Now, we can update eval to, when it's being called on a macro command, *not* evaluate all its arguments.
+
+---
+
+# Evaluating macros
+
+```haskell
+-- compile a value into an IO that returns it
+eval :: Value -> IO Value
+eval (VList list) = do 
+    let (command, args) = commandArgs list 
+    if isBuiltInMacro command 
+        then evalBuiltinMacro command args  
+        else do 
+            args' <- mapM eval args 
+            evalBuiltin command args' 
+eval other = return other 
+```
+
+If the command is a macro, we simply run `evalBuiltinMacro` directly, without evaluating the arguments. 
+
+If it's not a macro, we still evaluate the args.
+
+---
+
+# Evaluating `when`
+
+```haskell
+evalBuiltinMacro "when" [] = error "when without condition"
+evalBuiltinMacro "when" (condition : prog) = do 
+    condition' <- eval condition
+    evalWhen condition' prog 
+
+evalWhen :: Value -> [Value] -> IO Value
+evalWhen (VInt 0) tail = return $ VInt 0
+evalWhen (VList []) tail = return $ VList []
+evalWhen _trueCondition tail = evalBlock tail
+```
+
+Now, we *only* evaluate the first argument, the condition. We use the `<-` to get the result of running the condition. Then we use the result to determine if we should evaluate the tail or not.
+
+With this change, it works.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
+
+
+---
+
+# The quiz (not what you think)
+
+There is enough here to keep you busy. You'll need to implement `cond` among other things for project 4.
+
+I know that monads are hard, so I want to give you time to study. Therefore, I will give an easier quiz that anyone who has been paying attention will do well on.
+
+It's going to quiz you on hypothetical programming languages and ask you to evaluate and classify them and their features.
+
+This will be very easy for anyone who has been paying attention.
+
+---
+
+# Quiz format
+
+The quiz will be a mix of multiple choice, short answer, and true-false questions. 
+
+Each one will be worth 20%
+
+That's it.
+
+---
+
+# Sample quiz 1
+Each question is worth 20%
+
+1. Which of these paradigms best describes Haskell?
+    a. Imperative
+    b. Functional
+    c. Object-oriented
+    d. Query-based
+
+2. What is the basic unit of an imperative program (i.e., a line like `x = 10;`)
+
+3. What is the basic unit of a functional program (i.e., a string like `x + y`)
+
+4. What is another major difference between imperative vs. functional programming?
+
+5. List a feature that, if a language had it, would make it more imperative.
+
+---
+
+# Sample quiz 1 answers
+
+1. Functional
+2. The statement
+3. The expression
+4. Functional languages prefer avoiding mutation, and sometimes make it impossible.
+5. Mutating assignment, while loops, print statements that execute right away, lots of choices.
+
+---
+
+# Sample quiz 2
+
+Each question is worth 20%
+
+1. List an imperative programming language
+2. List a feature that this language has that Haskell does not have
+3. Why do you think Haskell doesn't have this feature? 
+4. List a feature that Haskell has that the other language doesn't have.
+5. Why do you think the other language does not have this feature?
+
+---
+
+# Sample quiz 2 answers
+
+1. C++
+2. Classes
+3. Haskell doesn't need to control mutation, because it's already impossible.
+4. Monads
+5. Implementing it would require higher-kinded types, and managing the memory usage of combining a lot of values with `>>` would probably make the interface a decent bit more complex.
+
+---
+
+# You know the drill
+
+Ask an AI to generate more of these. You can feed it the markdown files of the other lectures to give it more ammunition.
+
+---
+
+# Questions?
+
+<!-- _class: invert questions -->
