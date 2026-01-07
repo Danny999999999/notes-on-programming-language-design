@@ -108,7 +108,7 @@ I will take the maximum score of all of these to determine what you make on the 
 
 Each mastery element will have one quiz focused on that element.
 
-There will be six quizzes in total, and each will be roughly 10 minutes long.
+There will be six quizzes in total, and each will be 15 minutes long.
 
 If you get a 100% on all the quizzes, congratulations, you don't need to show up at the midterms or the final.
 
@@ -160,8 +160,8 @@ The latter is a bad idea: if you miss everything, I can't give you an incomplete
 # Mastery areas: before second term
 
 4. Demonstrate an understanding of type-classes, especially Functor and Applicative.
-5. Demonstrate an understanding of the dreaded monad, especially the bind operation (either implementing, using, or both).
-6. Evaluate and classify a programming language according to the design paradigm and features provided.
+5. Evaluate and classify a programming language according to the design paradigm and features provided.
+6. Demonstrate an understanding of the dreaded monad, especially the bind operation (either implementing, using, or both).
 
 ---
 
@@ -1083,7 +1083,6 @@ Which is good, because it's actually common for programming lanugages to borrow 
 
 Make sure you understand these concepts:
 - High-level vs. low-level langauges
-- Blub, and how we are all vulnerable to the Blub Paradox
 - What structured programming is
 - What a programming paradigm is
 
