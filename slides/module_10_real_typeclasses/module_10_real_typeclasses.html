@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>module_10_real_typeclasses</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="programming-language-design">Programming Language Design</h1>
+<h2 id="module-10-typeclasses">Module 10: Typeclasses</h2>
+<p><br> <br></p>
+<p>Slides © Grant Williams, <a
+href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+4.0</a>.</p>
+<p><br></p>
+<p>This is an open educational resource. Feel free to submit fixes,
+improvements, and new material <a
+href="https://github.com/grantwill74/notes-on-programming-language-design">here</a>.</p>
+<hr />
+<h1 id="last-module">Last module</h1>
+<p>We learned about typeclasses.</p>
+<p>We saw some examples, espeially <code>Num</code>.</p>
+<p>[What defines a typeclass? That is, what things separate one
+typeclass from another?]</p>
+<hr />
+<h1 id="this-module">This module</h1>
+<p>We’re going to learn some <em>very important typeclasses</em></p>
+<p>Specifically: 1. <code>Monoid</code> 2. <code>Functor</code> 3.
+<code>Applicative</code></p>
+<p>At first, these will seem like very abstract things.</p>
+<p>It turns out, you already know the first two pretty well, but you
+don’t realize it yet.</p>
+<p>The third one will take some understanding.</p>
+<hr />
+<h1 id="when-haskell-gets-weird">When Haskell gets weird</h1>
+<p>Haskell has a reputation. You’re probably starting to understand that
+now.</p>
+<p>What we’re going to cover is precisely the point where Haskell gets
+<em>weird</em>. That is, where it starts using weird terms from category
+theory for everything.</p>
+<p>Rest assured: the weird names like <code>Monoid</code> refer to
+perfectly ordinary things that occur naturally in math and in other
+programming languages.</p>
+<p>You don’t need to be a category theorist to understand Haskell.
+(which is good or I wouldn’t be qualified to teach this class)</p>
+<hr />
+<h1 id="now-for-some-math">Now for some math</h1>
+<p>Okay, it’s time for some abstract math.</p>
+<p>You see, mathematicians came up with this idea of typeclasses long
+before programmers ever did.</p>
+<p>Consider the idea of a <a
+href="https://en.wikipedia.org/wiki/Semigroup">Semigroup</a>.</p>
+<p>This is a concept from mathematics. A semigroup is a set (i.e., a
+datatype) that also has an associative binary operation that it is
+closed under.</p>
+<p>For example, integers are a semigroup “under” addition, because the
+sum of two integers is another integer. (we use the preposition “under”
+to describe what the unifying operation is because sometimes there’s
+more than one: like multiplication)</p>
+<hr />
+<h1 id="can-you-come-up-with-more">Can you come up with more?</h1>
+<p>What about integers under multiplication? Yes, that is also a
+semigroup!</p>
+<p>To have a semigroup, you just need a set (or a datatype) and a binary
+function with type
+<code>ElementOfThatSet -&gt; ElementOfThatSet -&gt; ElementOfThatSet</code></p>
+<p>[Can you come up with some more examples?]</p>
+<hr />
+<h1 id="why-abstract-structures">Why abstract structures?</h1>
+<p>Mathematicians invented abstract structures like this because they
+can prove things about entire families of sets and operations.</p>
+<p>For example, <a
+href="https://en.wikipedia.org/wiki/Field_(mathematics)">Fields</a> are
+kind of like semigroups, but they have two operations instead of just 1,
+and they have two identities (1 for each op.). Also both operations are
+invertable.</p>
+<p>Did you know that if a Field’s set is finite, <a
+href="https://en.wikipedia.org/wiki/Finite_field">then its size has to
+be a power of a prime number</a>?</p>
+<p>Why? Because it turns out if that weren’t the case, the second
+operation would not always be invertible. This fact comes from number
+theory. It’s not an axiom that the size has to be a power of a prime, it
+just naturally falls out of the rules.</p>
+<hr />
+<h1 id="semigroups-are-in-haskell">Semigroups are in Haskell</h1>
+<p>It might seem strange, but Semigroups are in Haskell too.</p>
+<p>They’re actually very useful.</p>
+<p>So far we’ve learned a lot of Haskell and we’ve tried to make
+analogies to other programming languages. However, that had to end at
+some point. This is something most languages do not have (but maybe
+should).</p>
+<p>So what is a Semigroup? Let’s look at its typeclass and see if we can
+figure it out…</p>
+<hr />
+<h1 id="the-semigroup-class">The <code>Semigroup</code> class</h1>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Semigroup</span> a <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    (&lt;&gt;) ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    sconcat ::</span> <span class="dt">NonEmpty</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">    stimes ::</span> <span class="dt">Integral</span> b <span class="ot">=&gt;</span> b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p>A semigroup is any mathematical structure (read: datatype) that has a
+closed binary operation. That’s the point of <code>&lt;&gt;</code>
+above.</p>
+<p>This isn’t a standard mathematical operator with a well-known
+meaning. It’s a placeholder. You can define it however you want, and
+different semigroups define it completely differently. Sometimes it’s
+<code>+</code>, sometimes it’s <code>++</code>, etc.</p>
+<p>The other two functions (<code>sconcat</code> and
+<code>stimes</code>) are actually optional. There is a <em>default
+definition</em> in terms of <code>&lt;&gt;</code>, so you actually only
+need to define <code>&lt;&gt;</code>. Let’s see some examples of
+<code>&lt;&gt;</code> first, and then talk about the other two
+functions.</p>
+<hr />
+<h1 id="a-really-basic-semigroup">A really basic semigroup</h1>
+<p>Remember when I said that integers form a semigroup <em>under</em>
+sum?</p>
+<p>That is, if I add two integers together, I get another integer.
+That’s a binary operation.</p>
+<p>Therefore, integers and addition are a semigroup.</p>
+<p>Unfortunately, integers and multiplication are also a semigroup.
+There is more than one option for a reasonable semigroup with
+integers.</p>
+<p>So, how do we distinguish them?</p>
+<hr />
+<h1 id="special-data-types">Special data types</h1>
+<p>There is a <code>Sum a</code> data type. So <code>Sum Integer</code>,
+<code>Sum Float</code>, etc.</p>
+<p>The only requirement is that <code>a</code> be a number.</p>
+<p>This data type implements <code>Monoid</code>.</p>
+<p>So, now, we can, uh, add numbers together…</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Semigroup</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Sum</span> <span class="dv">10</span> <span class="op">&lt;&gt;</span> <span class="dt">Sum</span> <span class="dv">20</span> <span class="op">==</span> <span class="dt">Sum</span> {getSum <span class="ot">=</span> <span class="dv">30</span>}</span></code></pre></div>
+<p>(the <code>Sum</code> data type stores the actual integer inside of a
+field named <code>getSum</code>, I’m guessing because it means they
+didn’t need to add a pattern matcher)</p>
+<p>Isn’t that handy? We can add numbers everyone! That’s super useful
+right!</p>
+<hr />
+<h1 id="i-know-what-youre-thinking">I know what you’re thinking</h1>
+<p>Okay! Give me a second! I know what you’re thinking. “We could
+already do that! And it was easier! And we didn’t need to import
+<code>Data.Semigroup</code> or use <code>getSum</code> to get the result
+back out!”</p>
+<p>Okay, true. The real point behind <code>Semigroup</code> isn’t that
+it lets you add numbers. It’s the other two functions. What were they
+again?</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Semigroup</span> a <span class="kw">where</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    (&lt;&gt;) ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    sconcat ::</span> <span class="dt">NonEmpty</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ot">    stimes ::</span> <span class="dt">Integral</span> b <span class="ot">=&gt;</span> b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p>Right, <code>sconcat</code> and <code>stimes</code>.</p>
+<hr />
+<h1 id="the-sconcat-function">The <code>sconcat</code> function</h1>
+<p><code>sconcat</code> will take any <code>NonEmpty</code> list of a
+monoid, and convert it into a single value.</p>
+<p>That’s the real power of <code>Monoid</code>s. They represent a
+universal “foldable” type in which we don’t have to specify
+associativity.</p>
+<p>Remember with folding we needed to specify <code>foldl</code>,
+<code>foldr</code>, <code>foldl'</code>, etc.? We had to specify the
+associativity and strictness, because it was a meaningful
+distinction.</p>
+<p>Sometimes it’s not meaningful, and if something is a Semigroup, we
+can just flatten any non-empty list into a single thing.</p>
+<p>And what’s more, we don’t have to ask how to do it. We know how to do
+it. <code>Sum</code> is flattened with <code>+</code>. So
+<code>sconcat</code> is less work to call than <code>fold</code> et
+al.</p>
+<p>So instead of <code>Semigroup</code>, think “naturally foldable
+without extra info”</p>
+<hr />
+<h1 id="questions">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="what-is-nonempty">What is <code>NonEmpty</code>?</h1>
+<p>Which brings us to <code>NonEmpty</code>. What is the point?</p>
+<p><code>NonEmpty a</code> is basically a <code>[a]</code>, except that
+it has no empty constructor.</p>
+<p>A <code>List a</code> has two constructors: <code>[]</code> and
+<code>a : [a]</code>.</p>
+<p>That is, we can either create an empty list or add the value to an
+existing list.</p>
+<p><code>NonEmpty</code> only has one constructor: <code>a :| [a]</code>
+The <code>:|</code> is just like <code>:</code> but for
+<code>NonEmpty</code>. It means we must have an existing list (which can
+be empty) <em>and</em> a value to construct a <code>NonEmpty</code>.</p>
+<p>Therefore, it is impossible for a <code>NonEmpty</code> to ever be
+empty, because we needed at least one value to construct it.</p>
+<p>And when we destructure it, the resulting right side list might be
+empty, which is right.</p>
+<hr />
+<h1 id="using-sconcat">Using <code>sconcat</code></h1>
+<p>We can use <code>sconcat</code> to sum some values:
+<code>sconcat $ Sum 10 :| [Sum 20] == Sum {getSum = 30}</code></p>
+<p>We can use the same function to multiply too:
+<code>sconcat $ Product 10 :| [Product 20, Product 30] == Product {getProduct = 6000}</code></p>
+<p>And if we get tired of writing <code>Product</code>, we can use
+<code>map</code>, right? Not quite, we haven’t learned
+<code>Functor</code> yet, and <code>map</code> only works for regular
+lists, not <code>NonEmpty</code> (we can do this though:
+<code>sconcat $ fmap Product $ 10 :| [20, 30]</code>)</p>
+<p>We can also use <code>sconcat</code> to concatenate strings, without
+any extra work:
+<code>sconcat $ "hey" :| ["there", "hi", "there"] == "heytherehithere"</code></p>
+<hr />
+<h1 id="why-nonempty">Why <code>NonEmpty</code>?</h1>
+<p>So why do we have to use this janky weird list instead of a regular
+list? Why can’t <code>sconcat</code> just take a normal list? Who cares
+if the list is empty?</p>
+<p>Because <code>Semigroup</code> doesn’t have a “default” value. What
+should the sum of an empty list be? You might assume it would be
+<code>0</code>, and that makes sense, but what about the product? In
+that case, it probably makes more sense for it to be <code>1</code>
+(because <code>1</code> means the same thing as “do nothing” when
+multiplying)</p>
+<p>Because it’s not obvious, <code>Semigroup</code> doesn’t make a
+distinction. Not in Haskell and not in mathematics: semigroups in math
+are not required to have an identity element.</p>
+<p>And that’s annoying, because if we had an identity element, we’d have
+a useful value to use if the list were empty, and then we wouldn’t have
+to use <code>NonEmpty</code>.</p>
+<hr />
+<h1 id="monoid">Monoid</h1>
+<p>A semigroup which also has an identity element is called a
+<em>Monoid</em>, both in Haskell and in general mathematics.</p>
+<p>There is a <code>Monoid</code> typeclass just like you’d expect:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Semigroup</span> a <span class="ot">=&gt;</span> <span class="dt">Monoid</span> a <span class="kw">where</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    mempty ::</span> a</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    mappend ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mappend</span> <span class="ot">=</span> (<span class="op">&lt;&gt;</span>) <span class="co">-- by default, `mappend` is just the Semigroup operator</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                   <span class="co">-- don&#39;t override it: that makes sense.</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ot">    mconcat ::</span> [a] <span class="ot">-&gt;</span> a</span></code></pre></div>
+<hr />
+<h1 id="typeclasses-can-require-a-global-value">Typeclasses can require
+a global value</h1>
+<p>First, this illustrates a cool thing about typeclasses in
+Haskell.</p>
+<p>Notice that <code>mempty</code> is a constant. The typeclass can say
+“there needs to be a value named <code>mempty</code> somewhere”.</p>
+<p>This is a rare and powerful feature. In Java, we can’t use
+inheritance to require the existence of a value (only of a method,
+called on an object, that produces a value).</p>
+<p>Also, now that we have an <code>mempty</code>, we don’t need the list
+to be <code>NonEmpty</code>. Now if the list is empty we just return
+<code>mempty</code>.</p>
+<hr />
+<h1 id="what-is-mempty-for-some-common-values">What is
+<code>mempty</code> for some common values?</h1>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span><span class="ot"> mempty ::</span> <span class="dt">Sum</span> <span class="dt">Int</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Sum</span> {getSum <span class="ot">=</span> <span class="dv">0</span>}</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span><span class="ot"> mempty ::</span> <span class="dt">Product</span> <span class="dt">Int</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Product</span> {getProduct <span class="ot">=</span> <span class="dv">1</span>}</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span><span class="ot"> mempty ::</span> <span class="dt">String</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;</span></span></code></pre></div>
+<p>That last one is why it’s called <code>mempty</code>: the empty
+string is a prime example.</p>
+<p>It’s an identity element of strings under concatination, because if
+you concatinate an empty string, it doesn’t do anything.</p>
+<hr />
+<h1 id="what-about-stimes">What about <code>stimes</code>?</h1>
+<p>There was another <code>Semigroup</code> function:
+<code>stimes :: Integral b =&gt; b -&gt; a -&gt; a</code></p>
+<p>This function calls <code>&lt;&gt;</code> on the same value the given
+number of times.</p>
+<p>So <code>stimes 3 monoid</code> is equivalent to
+<code>monoid &lt;&gt; monoid &lt;&gt; monoid</code></p>
+<p>So for the <code>Sum</code> monoid, it’s the equivalent of
+mulitplication (hence the name). For <code>Product</code>, it’s
+exponentiation.</p>
+<p>For strings, it’s particularly interesting:
+<code>stimes 5 "hi" == "hihihihihi"</code> or more naturally:
+<code>5 `stimes` "hi" == "hihihihihi"</code></p>
+<p>Wrinkle: for <code>stimes 0 ...</code> to make sense, the
+<code>Semigroup</code> must be a <code>Monoid</code>. [why?]</p>
+<hr />
+<h1 id="get-that">Get that?</h1>
+<p>Because of the <code>Semigroup</code> typeclass, we automatically get
+the ability to repeat strings.</p>
+<p>We didn’t need a special operator for it that only works on strings.
+It actually works on them because they form a semigroup.</p>
+<p>Notice the Haskell mindset: find a way to encode a mathematical
+structure. They often elegantly describe coding patterns.</p>
+<p>Very cool: soon we will learn about monads, which are one way that
+Haskell represents commands to do IO. Many monads are also monoids,
+which allows us to use <code>stimes</code> on them. So
+<code>5 `stimes` putStrLn "hi"</code> actually prints “hi” 5 times like
+you would expect.</p>
+<hr />
+<h1 id="summary-of-semigroups">Summary of Semigroups</h1>
+<ul>
+<li><code>Semigroup</code> is a typeclass</li>
+<li>To make something a semigroup, it needs a closed binary operation
+(called <code>&lt;&gt;</code>)</li>
+<li>Once you make something a semigroup, you can call
+<code>sconcat</code> and <code>stimes</code> on it.</li>
+<li><code>sconcat</code> requires a non-empty list, and
+<code>stimes</code> isn’t guaranteed to work on <code>0</code>, because
+a <code>Semigroup</code> is not required to have an identity
+element.</li>
+</ul>
+<hr />
+<h1 id="summary-of-monoids">Summary of Monoids</h1>
+<ul>
+<li><code>Monoid</code> is a typeclass which <em>inherits</em> from
+<code>Semigroup</code> (which means it must be a <code>Semigroup</code>
+first to be a <code>Monoid</code>).</li>
+<li>A <code>Monoid</code> must have an identity element, which is called
+<code>mempty</code>.</li>
+<li>The operation <code>&lt;&gt;</code> is also called
+<code>mappend</code> (this is because <code>Semigroup</code> came
+later)</li>
+<li><code>mconcat</code> is like <code>sconcat</code>, but now the list
+can be empty.</li>
+<li><code>Semigroups</code> represents operations that are
+<em>collapsable</em> and repeatable. They represent operations that can
+be squashed down into a single value, or that can be done over and
+over.</li>
+</ul>
+<hr />
+<h1 id="questions-1">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="semigroup-laws-technically-law">Semigroup laws (technically
+law)</h1>
+<p>Just because we can provide an operator <code>&lt;&gt;</code> doesn’t
+mean it’s valid.</p>
+<p><code>Semigroup</code> instances also are supposed to follow certain
+laws (there’s only one, technically, but most of these mathematical
+typeclasses have more than one)</p>
+<p>These laws are not checked by Haskell. Instead, you must check your
+own code and make sure it follows these rules.</p>
+<p>If it doesn’t, weird, non-deterministic things can happen depending
+on which Haskell implementation you use.</p>
+<p>You will also upset any Mathematicians nearby, which is risky.</p>
+<p>Note: the type checker can make sure that, e.g., the operator is a
+binary operator with type <code>a -&gt; a -&gt; a</code>. But some laws
+are not visible to it.</p>
+<hr />
+<h1 id="semigroup-laws-technically-law-2">Semigroup laws (technically
+law) (2)</h1>
+<p>The one law that every semigroup must follow: the operation
+<code>&lt;&gt;</code> is associative.</p>
+<p>That means:
+<code>(a &lt;&gt; b) &lt;&gt; c == a &lt;&gt; (b &lt;&gt; c)</code> for
+<em>any</em> instances of your semigroup.</p>
+<p>Addition, multiplication, and string concatenation all follow this
+rule.</p>
+<p>But, e.g., if <code>&lt;&gt;</code> meant “midpoint”, it wouldn’t
+work. <code>(1 &lt;&gt; 2) &lt;&gt; 3 == 1.5 &lt;&gt; 3 == 2.25</code>,
+but <code>1 &lt;&gt; (2 &lt;&gt; 3) == 1 &lt;&gt; 2.5 == 1.75</code>. So
+the real numbers under the midpoint operation is not a semigroup.</p>
+<p>Why do we care, though? Because, fundamentally,
+<code>Semigroups</code> are things that are naturally “timesable”. That
+is, they have an operation that behaves like addition, and that can be
+extended into multiplication by repeatedly doing them an integral number
+of times.</p>
+<hr />
+<h1 id="semigroup-laws-3">Semigroup law(s) (3)</h1>
+<p>Also unlike <code>fold</code>, <code>sconcat</code> does not specify
+whether it goes right to left or left to right.</p>
+<p>In fact, it might even be interleaved on special hardware (e.g.,
+SIMD).</p>
+<p>This additional flexibility is nice, but it means some operations
+just aren’t semigroups.</p>
+<hr />
+<h1 id="monoid-laws">Monoid laws</h1>
+<p>Monoids have laws too.</p>
+<p>First, all monoids are semigroups, so they follow the semigroup law
+(<code>&lt;&gt;</code> is associative).</p>
+<p>In addition, recall that monoids have an indentity element
+<code>mempty :: a</code>. Note: nothing about the type requires it to
+actually <em>be</em> an identity element, but if it’s not, get ready for
+weird bugs.</p>
+<p>To make it an identity, this must follow:
+<code>x &lt;&gt; mempty == mempty &lt;&gt; x == x</code> for any
+instance <code>x</code> of the monoid.</p>
+<hr />
+<h1 id="laws-in-general">Laws in general</h1>
+<p>Many of these mathematically-based typeclasses have laws to
+follow.</p>
+<p>You are responsible for following them.</p>
+<p>In languages like <a href="https://www.idris-lang.org/">Idris</a>,
+the language actually treats proofs as a first-class value. In order to
+make something a Monoid, <a
+href="https://github.com/anotherArka/idris-algebra/blob/master/Monoid.idr">you
+can actually have the typeclass require proofs be supplied that it obeys
+associativity, left identity, and right identity</a>.</p>
+<p>The type system is <em>dependently typed</em>. Dependently typed type
+systems can actually encode logical predicates, and values of those
+types are proofs.</p>
+<p>Haskell has some community members who <a
+href="https://ghc.serokell.io/dh">want to add this feature</a>, but it’s
+not there yet, so until then, you need to take note when a typeclass has
+<em>laws</em>. The type system won’t protect you, here.</p>
+<hr />
+<h1 id="questions-2">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="making-a-monoid">Making a monoid</h1>
+<p>To make sure we understand this concept, let’s make a monoid of our
+own.</p>
+<p>Consider the <code>max</code> function on unsigned integers. Haskell
+calls an unsigned <code>Int</code> a <code>Word</code>. Let’s define a
+<code>newtype</code> to make into a <code>Monoid</code>.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">Max</span> <span class="ot">=</span> <span class="dt">Max</span> <span class="dt">Word</span> <span class="kw">deriving</span> <span class="dt">Show</span> <span class="co">-- deriving Show for convenience</span></span></code></pre></div>
+<p>Now, we need a new type because <code>Word</code> can’t be a monoid
+by itself. There are more than one useful operation (addition,
+multiplication, etc.) that we could define on a <code>Word</code>.
+Therefore, we are creating a new data type which will only work with one
+operation.</p>
+<p><code>Max</code> is a type, but also a constructor. It stores a
+single word.</p>
+<hr />
+<h1 id="making-a-semigroup">Making a semigroup</h1>
+<p>Not so fast. In order for something to be a monoid, it needs to be a
+Semigroup, first.</p>
+<p>Let’s make taking the maximum between two <code>Word</code>s our
+<code>&lt;&gt;</code> operation:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Semigroup</span> <span class="dt">Max</span> <span class="kw">where</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Max</span> x) <span class="op">&lt;&gt;</span> (<span class="dt">Max</span> y) <span class="ot">=</span> <span class="dt">Max</span> <span class="op">$</span> <span class="fu">max</span> x y </span></code></pre></div>
+<p>So now, if I write <code>Max 20 &lt;&gt; Max 30</code> I get
+<code>Max 30</code>, which makes sense.</p>
+<hr />
+<h1 id="what-about-the-laws">What about the laws</h1>
+<p>Just because we created a typeclass instance doesn’t mean it’s valid.
+It needs to follow the law for <code>Semigroup</code> too, which
+requires that <code>max</code> over <code>Word</code> be
+associative.</p>
+<p>Here’s a simple proof by case analysis over permutations of
+<code>x</code>, <code>y</code>, and <code>z</code>.</p>
+<pre><code>forall natural numbers x, y, z, (x `max` y) `max` z == x `max` (y `max` z)
+case x &lt;= y &lt;= z: both sides simplify to z
+case x &lt;= z &lt;= y: both sides simplify to y
+case y &lt;= x &lt;= z: both sides simplify to z
+case z &lt;= x &lt;= y: both sides simplify to y
+case y &lt;= z &lt;= x: both sides simplify to x
+case z &lt;= y &lt;= x: both sides simplify to x</code></pre>
+<p>So we can make <code>Max</code> into a semigroup safely.</p>
+<hr />
+<h1 id="making-it-a-monoid">Making it a monoid</h1>
+<p>Of course, a <code>Semigroup</code> is fine, but a
+<code>Monoid</code> is much easier to work with.</p>
+<p>Luckily, once a type is a <code>Semigroup</code>, we only need an
+instance of <code>mempty</code> to make it a <code>Monoid</code>.</p>
+<p>What would be a good choice of <code>mempty</code>? That is, what is
+a value, where, if we take <code>max mempty x</code> we get
+<code>x</code> for all <code>x</code>?</p>
+<hr />
+<h1 id="try-0">Try 0</h1>
+<p>0 is a logical choice. <code>max 0 x</code> is always <code>x</code>,
+and <code>max x 0</code> is also always <code>x</code>, so 0 is both a
+left and right identity.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monoid</span> <span class="dt">Max</span> <span class="kw">where</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mempty</span> <span class="ot">=</span> <span class="dt">Max</span> <span class="dv">0</span></span></code></pre></div>
+<p>Now that <code>Max</code> is a monoid, we can take the maximum of a
+list of numbers instead of only applying it between pairs:
+<code>print $ mconcat $ map Max [1, 0, 50, 2, 30, 4, 9, 0]</code> prints
+<code>Max 50</code></p>
+<hr />
+<h1 id="knowledge-check-what-about-min">Knowledge check: what about
+Min?</h1>
+<p>Could we make <code>newtype Min = Min Word</code> a
+<code>Semigroup</code>? What about a <code>Monoid</code>?</p>
+<hr />
+<h1 id="answer-sort-of">Answer: sort of</h1>
+<p>We can make it a <code>Semigroup</code>. We just replace
+<code>max</code> with <code>min</code>.</p>
+<p>Making it a <code>Monoid</code> is harder. We can’t use 0 as our
+identity element. Instead, we would need to use maxBound. The biggest
+number is the only one that will never be the minimum with a less-big
+number.</p>
+<p>If we used an indefinitely large datatype, like <code>Integer</code>,
+then there is no identity element. Therefore, in that case, we couldn’t
+make it a <code>Monoid</code>, and every list of elements to take the
+min over would have to be non-empty for a meaningful result.</p>
+<hr />
+<h1 id="i-have-no-idea-whats-going-on">I have no idea what’s going
+on</h1>
+<p>While you will need to go back, come to office hours, and/or do some
+studying, I will provide this super-short summary of what we’ve
+discussed so far to help guide your own work. These bullet points are
+roughly in order of when we learned them, so you can stop as soon as you
+hit a confusing one and know what to review. - A data type is basically
+a combination of a struct and/or an enum. They can have multiple
+constructors (like an enum has variants), but they can also have
+multiple fields like a struct. The <code>newtype</code> keyword is
+preferred if there is exactly one constructor with one field, the
+<code>data</code> keyword is used otherwise. - A typeclass is basically
+a collection of datatypes and the functions that they all support. It’s
+like an OO interface. When a datatype is an <em>instance</em> of a
+typeclass, that’s like <em>implementing</em> an interface. For example,
+because <code>Int</code>, <code>Word</code>, and <code>Integer</code>
+all are instances of the <code>Num</code> typeclass, we can call
+<code>+</code> on all of them.</p>
+<hr />
+<h1 id="i-have-no-idea-whats-going-on-2">I have no idea what’s going on
+(2)</h1>
+<ul>
+<li><code>Semigroup</code> is a typeclass for any type that has a
+closed, associative, binary operation which we call
+<code>&lt;&gt;</code>.</li>
+<li>The real purpose of this operation is to run it over and over:
+either on a collection of things to combine them all down into one or a
+certain number of times.</li>
+<li>Sometimes we need to define a <code>newtype</code> or
+<code>data</code> to create a new semigroup, because there are more than
+one useful operation. (e.g., <code>Sum Int</code> and
+<code>Prod Int</code>)</li>
+<li><code>Semigroup</code> is useful becuase of the <code>sconcat</code>
+method, which magically flattens any non-empty list. What does flatten
+mean? It means applying <code>&lt;&gt;</code> repeatedly.</li>
+<li><code>stimes</code> just repeats <code>&lt;&gt;</code> the given
+number of times.</li>
+<li><code>sconcat</code> requires a non-empty list, constructed with
+<code>value :| regularList</code>. It has to be non-empty because there
+isn’t necessarily an identity element.</li>
+</ul>
+<hr />
+<h1 id="i-have-no-idea-whats-going-on-3">I have no idea what’s going on
+(3)</h1>
+<ul>
+<li>For example, <code>sconcat</code> on
+<code>Sum 10 :| [Sum 10, Sum 10]</code> yields <code>Sum 30</code>
+<code>sconcat</code> on <code>"hey" :| ["there", "hi", "there"]</code>
+yields <code>"heytherehithere"</code> <code>sconcat</code> on
+<code>Max 0 :| [Max 10, Max 20]</code> yields <code>Max 20</code>.</li>
+<li>But it’s annoying to have to use <code>:|</code> to construct
+<code>NonEmpty</code> lists. Therefore, we have <code>Monoid</code>,
+which is a <code>Semigroup</code> that also has a “do nothing” element
+named <code>mempty</code>. Mathematicians know this as the identity
+element.</li>
+<li>Now we can use <code>mconcat</code> and pass a normal list instead
+of a <code>NonEmpty</code> list. If the list is empty, it returns
+<code>mempty</code>.</li>
+</ul>
+<hr />
+<h1 id="i-have-no-idea-whats-going-on-4">I have no idea what’s going on
+(4)</h1>
+<ul>
+<li>Fundamentally, a <code>Semigroup</code> or <code>Monoid</code>
+represents a kind of thing that can always be combined with others of
+the same sort to simplify a collection into one value.</li>
+<li>It also represents a kind of thing that can be combined with itself
+a certain number of times. That’s what <code>stimes</code> does.</li>
+<li>Even <code>IO</code> code in Haskell is a <code>Monoid</code>:
+<code>stimes 5 $ putStrLn "hi"</code> prints hi 5 times.</li>
+<li>There are lots of examples of where this is useful:
+<ul>
+<li>Matrices are monoids: matrix multiplication combines two matrices
+into one.</li>
+<li>Strings are monoids: string concatenation is
+<code>&lt;&gt;</code></li>
+<li>Game events in a video game could be monoids</li>
+</ul></li>
+<li>Most languages make you treat all these cases different. Haskell
+lets you just <code>mconcat</code> them all down into one value
+automatically, using <code>&lt;&gt;</code>.</li>
+</ul>
+<hr />
+<h1 id="using-that-summary">Using that summary</h1>
+<p>If something stood out to you in those slides, please ask about
+it.</p>
+<p>We’re about to learn another abstract typeclass from math, so it’s a
+good time to clarify.</p>
+<p>One of the things that makes abstract stuff hard is that “monoid” is
+such a general concept that it feels like it could apply to tons of
+different things, but that’s also why it’s so useful. Feel free to ask
+for more examples.</p>
+<hr />
+<h1 id="questions-3">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="functors">Functors</h1>
+<p>You know what’s a useful function? <code>map</code>.</p>
+<p>It lets you take a unary function, and a list, and apply the function
+to every element of the list! What’s not to like?</p>
+<p>Hey, I like the list <code>[1, 2, 3]</code>, but I’d like it more if
+every element were one larger.</p>
+<p>Boom: <code>map (+1) [1, 2, 3] == [2, 3, 4]</code></p>
+<p>Wow! Thanks, <code>map</code>!</p>
+<hr />
+<h1 id="functors-2">Functors (2)</h1>
+<p>But you know what’s lame? I can only map things over a list.</p>
+<p>What if I have a tree?</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Tree</span> a <span class="ot">=</span> <span class="dt">Leaf</span> a <span class="op">|</span> <span class="dt">Inner</span> [<span class="dt">Tree</span> a] <span class="kw">deriving</span> <span class="dt">Show</span></span></code></pre></div>
+<p>This kind of tree is either a <code>Leaf</code>, or a list of
+trees.</p>
+<p>We can represent any kind of tree with this, but you know what we
+can’t do? <code>map</code>!</p>
+<p>What if we want to apply a function to every item in the tree?</p>
+<p>We can map the function over the list in the <code>Inner</code>
+constructor, but what if the tree is a <code>Leaf</code>? And also, we
+want it to propagate further down.</p>
+<hr />
+<h1 id="the-functor-class">The Functor class</h1>
+<p>This is what a <code>Functor</code> is:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Functor</span> f <span class="kw">where</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    fmap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    (&lt;$) ::</span> a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f a <span class="co">-- the &quot;replace&quot; operator. optional.</span></span></code></pre></div>
+<p>The only required function a <code>Functor</code> has is
+<code>fmap</code>. That just means “functor map”. That is, a
+<code>Functor</code> is any type that has a <code>map</code>
+implementation, and we call it <code>fmap</code>.</p>
+<p>There is an interesting wrinkle to this type class, though. Can
+anyone see what it is?</p>
+<p>Consider how <code>f</code> is being used in the types of
+<code>fmap</code> and <code>&lt;$</code></p>
+<hr />
+<h1 id="higher-kinded-types">Higher kinded types</h1>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Functor</span> f <span class="kw">where</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    fmap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    (&lt;$) ::</span> a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f a <span class="co">-- the &quot;replace&quot; operator. optional.</span></span></code></pre></div>
+<p>Notice that we’re writing <code>f a</code>. <code>f</code> isn’t
+being used by itself: it takes an argument.</p>
+<p>However, <code>f</code> is a type. This is the first time we have
+seen a very rare and powerful Haskell feature: the higher-kinded
+type.</p>
+<p>Before going into that, let’s make sure this typeclass definition
+makes sense. <code>fmap</code> is a function that takes a function from
+<code>a</code> to <code>b</code>, and a functor of <code>a</code>s, and
+it returns a functor of <code>b</code>s.</p>
+<p>Remember, list is a functor, so just imagine how <code>map</code>
+works. It takes a function <code>a -&gt; b</code> and a list of
+<code>a</code> and it produces a list of <code>b</code>. Same idea but
+it works for any functor.</p>
+<hr />
+<h1 id="type-constructor">Type Constructor</h1>
+<p>Okay, but what was that about higher-kinded types? What does that
+mean?</p>
+<p>A <em>kind</em> in general is word that we use to describe a type, or
+maybe a type constructor.</p>
+<p>What is a type constructor? A type that takes a type:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Pair</span> a <span class="ot">=</span> <span class="dt">Pair</span> a a</span></code></pre></div>
+<p>This type, <code>Pair</code>, takes a type. It’s kind of like a
+function.</p>
+<p>In fact, it’s like a constructor for a new type. <code>Pair</code>
+takes a type, like <code>Int</code>, and constructs a new type:
+<code>Pair Int</code>.</p>
+<p>And that’s why it’s called a type constructor.</p>
+<hr />
+<h1 id="higher-kinded-types-2">Higher kinded types (2)</h1>
+<p>Is a type constructor a higher kinded type? Yes.</p>
+<p>But not every type constructor is the same.</p>
+<p>Consider a simple datatype, like <code>Int</code>. It’s <em>kind</em>
+is <code>*</code> (pronounced “splat”)</p>
+<p>Consider a list. Lists are different from <code>Int</code>s. You
+can’t just make a list without knowing what it’s a list of. So
+<code>[]</code> is like a function, it’s a function that takes a type
+and returns a more specific kind of list. So its kind is
+<code>* -&gt; *</code>.</p>
+<p>That means “<code>List</code> takes a specific type like
+<code>Int</code>, and it returns another specific type
+<code>[Int]</code>. So <code>List</code> is like a function that takes a
+type and returns a type. <code>* -&gt; *</code>.</p>
+<p>If you want to know the kind of a type, you can use <code>:k</code>
+in <code>ghci</code>. E.g., <code>:k []</code> prints
+<code>[] :: * -&gt; *</code></p>
+<hr />
+<h1 id="higher-kinded-types-3">Higher kinded types (3)</h1>
+<p>In general, the kind of a type is how many other types you need to
+know to make one.</p>
+<p>For example, an <code>Int</code> is self contained, and its kind is
+<code>*</code>.</p>
+<p>A list requires one extra piece of information:
+<code>* -&gt; *</code>.</p>
+<p>What about <code>Maybe</code>? Also <code>* -&gt; *</code>. It can be
+a <code>Maybe Int</code> or a <code>Maybe String</code>.</p>
+<p>What about <code>Either</code>? That one is a
+<code>* -&gt; * -&gt; *</code>. It requires <em>two</em> types, one for
+<code>Left</code> and one for <code>Right</code>.</p>
+<hr />
+<h1 id="higher-kinded-types-3-1">Higher kinded types (3)</h1>
+<p>As we saw in the <code>Functor</code> type class, we named the
+functor <code>f</code>, and we were applying it: <code>f a</code>.</p>
+<p>That means “some functor of <code>a</code>s”.</p>
+<p>This means a functor <em>must</em> be a higher kinded type. It’s
+always a functor <em>of</em> something.</p>
+<p>List is a functor, and list meets this constraint. We always have a
+list of something.</p>
+<p>Haskell is one of the rare programming languages that has a higher
+kinded type system. Many languages have parameterized types (like
+<code>ArrayList&lt;T&gt;</code> in Java), but you can’t really say “this
+is an interface that potentially can be implemented by any type with two
+type parameters”.</p>
+<hr />
+<h1 id="questions-4">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="the-replace-operator">The replace operator
+<code>&lt;$</code></h1>
+<p>Recall that to be a functor, a type constructor must have the
+<code>fmap</code> function, which is supposed to apply a given function
+to values inside the functor.</p>
+<p>However, there’s also an optional <code>&lt;$</code> operator that
+they can support. This is the “replace” operator. It replaces whatever
+data is in the functor with the first argument.</p>
+<p>Here’s an example of how
+<code>&lt;$ :: Functor f =&gt; a -&gt; f b -&gt; f a</code> works:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="dv">20</span> <span class="op">&lt;$</span> [<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>]</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">20</span>, <span class="dv">20</span>, <span class="dv">20</span>] </span></code></pre></div>
+<p>It’s an operator that is useful to “project” a value into many
+places, but I don’t find myself using it often. [Can you write a default
+implementation of <code>&lt;$</code> in terms of <code>fmap</code>?]</p>
+<hr />
+<h1 id="the-fmap-operator">The fmap operator <code>&lt;$&gt;</code></h1>
+<p>Functors are so common, there is a special operator for them:
+<code>&lt;$&gt;</code>. It’s just a synonym for <code>fmap</code> but
+it’s written infix:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fmap</span> (<span class="op">+</span><span class="dv">1</span>) [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>] <span class="op">==</span> [<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;$&gt;</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>] <span class="op">==</span> [<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]</span></code></pre></div>
+<p>Honestly I think I see <code>&lt;$&gt;</code> more often than
+<code>fmap</code>, so maybe they should have made that the way the
+typeclass is defined.</p>
+<hr />
+<h1 id="more-functors">More functors</h1>
+<p>Okay, list is a functor, we get it. But what are some other
+functors?</p>
+<p><code>Maybe</code> is a useful functor. Does it have the right kind?
+Yes, <code>Maybe</code> is an “of” type, it has kind
+<code>* -&gt; *</code>. That is, a <code>Maybe Int</code> is a “maybe of
+ints”.</p>
+<p>What happens when we use <code>&lt;$&gt;</code> on a Maybe? It
+depends:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Just</span> <span class="dv">1</span> <span class="op">==</span> <span class="dt">Just</span> <span class="dv">2</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Nothing</span> <span class="op">==</span> <span class="dt">Nothing</span></span></code></pre></div>
+<p>A Maybe is kind of like a special list that can only have zero or one
+elemnt, so this behavior makes sense. If we call <code>fmap</code> on an
+empty list, we get <code>[]</code>. If we call <code>fmap</code> on a
+<code>Nothing</code>, we just get <code>Nothing</code>.</p>
+<p>But if the <code>Maybe</code> is a <code>Just</code>, we apply the
+function to the value inside the <code>Just</code>.</p>
+<hr />
+<h1 id="what-about-either">What about Either?</h1>
+<p>It doesn’t make sense to make <code>Either</code> a functor,
+right?</p>
+<p>If I have an <code>Either String Int</code>, if I apply
+<code>(+1)</code> to it, what should happen?</p>
+<p>If it’s a <code>Right</code>, sure, add one to it. But what if it’s a
+<code>Left</code>? We can’t <code>(+1)</code> a string!</p>
+<p>It also doesn’t have the right kind! Functors are supposed to be
+<code>* -&gt; *</code>. But either is a
+<code>* -&gt; * -&gt; *</code>.</p>
+<p>And it’s true, <code>Either</code> is not a functor…but
+<code>Either a</code> is!</p>
+<p>Wait, what’s the difference between <code>Either</code> and
+<code>Either a</code>?</p>
+<hr />
+<h1 id="what-about-either-2">What about Either? (2)</h1>
+<p><code>Either</code> is a type with kind
+<code>* -&gt; * -&gt; *</code></p>
+<p><code>Either a</code> is a type in which we have already decided that
+the left type will be <code>a</code>, and we’re just waiting for the
+right type. Therefore, <code>Either a</code> has kind
+<code>* -&gt; *</code>.</p>
+<p>Proof:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="op">:</span>k <span class="dt">Either</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Either</span><span class="ot"> ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="op">:</span>k <span class="dt">Either</span> <span class="dt">Int</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Either</span> <span class="dt">Int</span><span class="ot"> ::</span> <span class="op">*</span> <span class="ot">-&gt;</span> <span class="op">*</span></span></code></pre></div>
+<p>And it turns out, <code>Either a</code> <em>is</em> a functor!</p>
+<hr />
+<h1 id="what-about-either-a">What about <code>Either a</code>?</h1>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Either</span> a b <span class="ot">=</span> <span class="dt">Left</span> a <span class="op">|</span> <span class="dt">Right</span> b</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> <span class="dt">Show</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">Either</span> a) <span class="kw">where</span> </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">Left</span> x) <span class="ot">=</span> <span class="dt">Left</span> x</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">Right</span> y) <span class="ot">=</span> <span class="dt">Right</span> <span class="op">$</span> f y</span></code></pre></div>
+<p>With <code>Either</code>, <code>fmap</code> only applies when it’s a
+<code>Right</code>. If it’s a <code>Left</code> the map is ignored.</p>
+<p>If it’s a <code>Right</code>, we apply the function to the value.</p>
+<p>Why? Because <code>Left</code> represents the “an error occurred”
+case. Once we enter that case, we don’t do any further computation.</p>
+<p>We therefore have a useful way to apply functions as long as a value
+is valid.</p>
+<hr />
+<h1 id="what-about-either-a-2">What about <code>Either a</code>?
+(2)</h1>
+<p>So, <code>Either</code> is not a functor, but <code>Either a</code>
+is. For any <code>a</code>.</p>
+<p>What about <code>Either b</code>? That’s the same thing. The
+<code>b</code> just represents a type.</p>
+<p><code>fmap</code> has the type
+<code>Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b</code></p>
+<p>In this case, if we consider <code>Either String</code> to be our
+functor, <code>f a</code> means <code>Either String a</code>. So
+<code>fmap</code> in the context of <code>Either String</code> has
+type:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>(a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">String</span> a <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">String</span> b</span></code></pre></div>
+<p>The logic here is that the function modifies only right values, so
+the right type changes because of the function, but the left type (in
+this case <code>String</code>) stays the same.</p>
+<hr />
+<h1 id="questions-5">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="functor-knowledge-check">Functor knowledge check</h1>
+<ol type="1">
+<li>Create a new type called <code>Either3 a b c</code> which has three
+constructors, <code>Leftmost a</code>, <code>Middle b</code>, and
+<code>Rightmost c</code>.</li>
+<li>What is the kind of this type?</li>
+<li>Make <code>Either3 a b</code> a functor. Apply <code>fmap</code>
+only if it is a <code>Rightmost</code>.</li>
+<li>Could we also make <code>Either3 a</code> a functor? If so, what
+would <code>fmap</code> look like? If not, why not?</li>
+<li>What would <code>(+1) &lt;$&gt; Rightmost 20</code> return? What
+about <code>Middle 20</code>? Assume the type is
+<code>Either3 Int Int Int</code></li>
+</ol>
+<hr />
+<h1 id="functor-kc-answers">Functor KC answers</h1>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1.</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Either3</span> a b c <span class="ot">=</span> <span class="dt">Leftmost</span> a <span class="op">|</span> <span class="dt">Middle</span> b <span class="op">|</span> <span class="dt">Rightmost</span> c</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2. The kind is: * -&gt; * -&gt; * -&gt; *</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 3.</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> (<span class="dt">Either3</span> a b) <span class="kw">where</span> </span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">Rightmost</span> x) <span class="ot">=</span> <span class="dt">Rightmost</span> <span class="op">$</span> f x</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">Leftmost</span> y) <span class="ot">=</span> <span class="dt">Leftmost</span> y</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">Middle</span> z) <span class="ot">=</span> <span class="dt">Middle</span> z</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- we can&#39;t just handle the other two cases with</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- fmap f other = other</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- because &quot;other&quot; could have a different `c` than the (Rightmost x).</span></span></code></pre></div>
+<ol start="4" type="1">
+<li>No we could not. <code>Either3 a</code> has kind
+<code>* -&gt; * -&gt; *</code>, so it cannot be a
+<code>Functor</code>.</li>
+<li><code>(+1) &lt;$&gt; (Rightmost 20 :: Either3 Int Int Int) == Rightmost 21</code>
+<code>(+1) &lt;$&gt; (Middle 20 :: Either3 Int Int Int) == Middle 20</code></li>
+</ol>
+<hr />
+<h1 id="questions-6">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="functor-laws">Functor laws</h1>
+<p>Remember how <code>Semigroup</code>s and <code>Monoid</code>s had
+laws they had to follow to make sure their behavior was predictable to
+the user?</p>
+<p>Functors have laws too. Two of them: 1. <code>fmap id = id</code>.
+That is, mapping the identity function inside the functor won’t change
+anything. This law forces <code>fmap</code> to <em>only</em> apply the
+function <code>f</code>, and not to modify the functor in any other way.
+2. `fmap (f . g) = fmap f . fmap g. This law is how functors are thought
+of in category theory. It basically says you can’t take a compound
+function and do something wacky based on the specific identity of that
+function. Like “if it happens to be (+1) . (*2) just output 42 instead
+of computing the value”. Instead, the functor must respect
+composition.</p>
+<hr />
+<h1 id="warning-about-functors">Warning about functors</h1>
+<p>Functor is a concept that comes from a branch of math called
+<em>category theory</em>.</p>
+<p>It is a very abstract branch of math that is used to prove things
+about mathematical structures, families of structures, and their
+compositions.</p>
+<p>This mathematical basis is partly what makes Haskell what it is. It
+turns out that good engineering emerges from good mathematics, so
+designing the language from these first principles is often a good
+idea.</p>
+<p>Unfortunately, the use of abstract math terms also makes them hard to
+understand, and people use the terms sometimes without knowing that they
+are also mathematical terms (or without knowing what the term
+means).</p>
+<hr />
+<h1 id="warning-about-functors-2">Warning about functors (2)</h1>
+<p>There is a <em>Functor</em> design pattern in the C++ community.</p>
+<p>In C++, a functor is a basically a class that overloads the
+<code>()</code> operator, so instances of it can be called like a
+function.</p>
+<p>You can see why the name was chosen: it sounds like “thing that does
+function stuff”.</p>
+<p>However, it has <em>nothing</em> to do with <code>Functor</code>s in
+math. Don’t get confused when you look it up! <em>Our</em> functors are
+things that support <em>map</em>, they don’t have to be functions!</p>
+<p>But…is a function a functor?</p>
+<hr />
+<h1 id="actually-yes">Actually yes</h1>
+<p>Specifically, ((-&gt;) a) is a functor. That is, a function from
+<code>a</code> to…something.</p>
+<p>It has this instance definition:</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> ((<span class="ot">-&gt;</span>) a) <span class="kw">where</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> <span class="ot">=</span> (<span class="op">.</span>)</span></code></pre></div>
+<p>Mapping a function <code>f</code> to another function <code>g</code>
+means applying <code>f</code> to the result.</p>
+<p>That is the same as <code>f . g</code></p>
+<p>This gives us a little more insight into functors. They are data
+types that can be “composed” with a function, just like a function
+can.</p>
+<p>Composition really is fundamental to functional programming. It’s how
+we build more complex programs. So it makes sense that functors are
+important.</p>
+<hr />
+<h1 id="what-cant-a-functor-do">What can’t a functor do?</h1>
+<p>But functors are not infinitely powerful.</p>
+<p>We have seen an example of when we want to apply a function to every
+value in a list: <code>(+1) &lt;$&gt; [1,2,3,4,5]</code> returns
+<code>[2,3,4,5,6]</code>. Easy.</p>
+<p>But what if we want to apply a list of functions to a single value?
+<code>[(+1), (*2), (^3)] &lt;???&gt; [2]</code></p>
+<p>Well, we can do it, but not as a functor. The issue is that mapping
+is for applying a function outside of a functor to everything inside
+it.</p>
+<p>But what if the functions we want to apply are <em>already</em> in a
+functor? That is, we have a functor full of functions and we want to use
+them with another functor?</p>
+<hr />
+<h1 id="applicative-functors">Applicative functors</h1>
+<p>This more powerful kind of functor is called an <em>applicative
+functor</em>.</p>
+<p>Haskell calls the typeclass <a
+href="https://hackage.haskell.org/package/base-4.21.0.0/docs/Control-Applicative.html"><code>Applicative</code></a>
+for short. It looks like this:</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    (&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b <span class="co">-- &lt;*&gt; is pronounced &quot;app&quot;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    pure ::</span> a <span class="ot">-&gt;</span> f a</span></code></pre></div>
+<p>Here, <code>&lt;*&gt;</code> is the mystery operator from before. It
+lets us take a functor which has a function inside of it, then another
+functor, and it applies the function inside the first functor to the raw
+data in the second one.</p>
+<p><code>pure</code> just injects data into the data structure. So
+<code>pure 2 :: [Int] == [2]</code></p>
+<hr />
+<h1 id="applicative-functors-2">Applicative functors (2)</h1>
+<p>Notice the <code>Functor f =&gt; Applicative f</code> in the
+typeclass. In order for <code>f</code> to be an applicative, it must
+already be a <code>Functor</code>.</p>
+<p>That is, all <code>Applicative</code>s are <code>Functor</code>s, but
+not necessarily all <code>Functor</code>s are <code>Applicative</code>s
+(although most are)</p>
+<p>Recall that functors basically represented some kind of data
+structure that we could “inject” a function into.</p>
+<p>An applicative functor is a functor which has a natural way to
+combine a functor with a function and a functor with data.</p>
+<p>Let’s see how it works for lists…</p>
+<hr />
+<h1 id="lists-as-applicative-functors">Lists as applicative
+functors</h1>
+<p>Before we saw the example of wanting to apply many functions to the
+same value: <code>[(+1), (*2), (^3)] &lt;???&gt; [2]</code></p>
+<p>It turns out, <code>&lt;*&gt;</code> is the magic operation:
+<code>[(+1), (*2), (^3)] &lt;*&gt; [2] == [3, 4, 8]</code></p>
+<p>When would we need to do this?</p>
+<p>It actually wasn’t obvious: Applicative functors were invented in
+2008 in this paper: <a
+href="https://www.cambridge.org/core/services/aop-cambridge-core/content/view/C80616ACD5687ABDC86D2B341E83D298/S0956796807006326a.pdf/applicative-programming-with-effects.pdf">Applicative
+programming with effects</a>.</p>
+<p>They don’t come from Math originally (at least the name doesn’t, they
+are technically a kind of functor called a <em>lax monoidal
+functor</em>, which is a functor that is also a monoid and which is not
+necessarily invertible).</p>
+<hr />
+<h1 id="what-happens-for-many-elements-in-the-2nd-arg">What happens for
+many elements in the 2nd arg?</h1>
+<p>So we saw this example:
+<code>[(+1), (*2), (^3)] &lt;*&gt; [2] == [3, 4, 8]</code></p>
+<p>Lots of operations happening on a single value. We get a list of
+results.</p>
+<p>But what would this do?
+<code>[(+1), (*2), (^3)] &lt;*&gt; [1, 2, 3] == ???</code></p>
+<hr />
+<h1 id="many-elements-in-2nd-arg-2">Many elements in 2nd arg (2)</h1>
+<p>We get this:
+<code>[(+1), (*2), (^3)] &lt;*&gt; [1, 2, 3] == [2,3,4,2,4,6,1,8,27]</code></p>
+<p>That is:
+<code>[1 + 1, 2 + 1, 3 + 1, 1 * 2, 2 * 2, 3 * 2, 1^3, 2^3, 3^3]</code></p>
+<p>Notice that it’s:
+<code>[1 + 1, 2 + 1, 3 + 1] ++ [1 * 2, 2 * 2, 3 * 2] ++ [1^3, 2^3, 3^3]</code></p>
+<p>We apply the first operation to every value in the second list, then
+the second operation to every value in the second list, etc. It’s every
+combination.</p>
+<p>But why?</p>
+<hr />
+<h1 id="when-list-is-useful-applicatively">When list is useful
+applicatively</h1>
+<p>Sometimes we want to do a sequence of operations to a bunch of
+values.</p>
+<p>Since it’s impossible to avoid using graphical user interfaces to
+illustrate fancy design patterns, imagine that you have a bunch of GUI
+widgets, and you need to update, position, and draw them.</p>
+<p>That might look like this:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>[<span class="dt">Update</span>, <span class="dt">Position</span>, <span class="dt">Draw</span>] <span class="op">&lt;*&gt;</span> [<span class="dt">QuitButton</span>, <span class="dt">LoadButton</span>, <span class="dt">BackgroundImage</span>, <span class="op">...</span>]</span></code></pre></div>
+<p>The result will be a list of every action applied to every
+button.</p>
+<p>It’s a simple trick, but pretty cool.</p>
+<hr />
+<h1 id="are-there-other-applicatives">Are there other
+<code>Applicative</code>s?</h1>
+<p>Yes, and arguably more useful ones. Consider <code>Maybe</code>.</p>
+<p>We learned that <code>Maybe a</code> was a value that was either
+<code>Just</code> an <code>a</code>, or instead
+<code>Nothing</code>.</p>
+<p>When we map over a <code>Maybe</code>, if it’s <code>Just</code>, we
+apply the function:</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Just</span> <span class="dv">2</span> <span class="op">==</span> <span class="dt">Just</span> <span class="dv">3</span></span></code></pre></div>
+<p>And if it’s nothing we don’t do anything:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;$&gt;</span> <span class="dt">Nothing</span> <span class="op">==</span> <span class="dt">Nothing</span></span></code></pre></div>
+<p>But what if we do this?</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>(<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;*&gt;</span> <span class="dt">Just</span> <span class="dv">2</span> <span class="op">==</span> <span class="op">???</span></span></code></pre></div>
+<hr />
+<h1 id="that-doesnt-work">That doesn’t work</h1>
+<p>Then we get a type error.</p>
+<p>But <em>this</em>:</p>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Just</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;*&gt;</span> <span class="dt">Just</span> <span class="dv">2</span> <span class="op">==</span> <span class="dt">Just</span> <span class="dv">3</span></span></code></pre></div>
+<p><em>Does</em> work.</p>
+<p>Wait, what? We have <code>(+1)</code> insid the just? So it’s a Maybe
+of a function?</p>
+<p>Yes, we can store the function itself in the maybe and then use it as
+an applicative.</p>
+<p>And <code>Nothing</code> works like you’d expect:</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Nothing</span> <span class="op">&lt;*&gt;</span> <span class="dt">Just</span> <span class="dv">2</span> <span class="op">==</span> <span class="dt">Nothing</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Just</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">&lt;*&gt;</span> <span class="dt">Nothing</span> <span class="op">==</span> <span class="dt">Nothing</span></span></code></pre></div>
+<hr />
+<h1 id="butwhy">But…why?</h1>
+<p>This raises a question: why on Earth would we do that?</p>
+<p>It’s actually useful.</p>
+<p>Suppose we have some function that takes 2 arguments. However, the
+arguments have to be computed, and the computation can fail. If the
+computation fails, we want the whole result to be <code>Nothing</code>
+But if the computation succeeds for <em>both</em> arguments, we want the
+function to go thru.</p>
+<p>Let the binary function be <code>+</code>, and the computation that
+can fail be:</p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fallableComputation ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Int</span> </span></code></pre></div>
+<p>We can represent this as follows…</p>
+<hr />
+<h1 id="why-2">Why (2)</h1>
+<p><code>Just (+) &lt;*&gt; fallableComputation &lt;*&gt; fallableComputation</code></p>
+<p>The first <code>Just</code> establishes how many arguments the
+function can have. In this case <code>+</code> takes two arguments, so
+there can be two <code>&lt;*&gt;</code>s.</p>
+<p>Each one is a computation that can fail.</p>
+<p>If any computation fails, the whole thing fails.</p>
+<p>But if they both succeed, the whole thing succeeds.</p>
+<hr />
+<h1 id="and-either">And Either?</h1>
+<p>Same thing. <code>Either a</code> is an applicative. It chains
+together <code>Either</code>s until one of them becomes
+<code>Left</code>, then the whole thing is the value of the first
+<code>Left</code>.</p>
+<p>But if the whole computation succeeds, the result is a
+<code>Right</code> that is the result of the computation.</p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Right</span> (<span class="op">+</span>) <span class="op">&lt;*&gt;</span> <span class="dt">Right</span> <span class="dv">2</span> <span class="op">&lt;*&gt;</span> <span class="dt">Right</span> <span class="dv">2</span> <span class="op">==</span> <span class="dt">Right</span> <span class="dv">4</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pure</span> (<span class="op">+</span>) <span class="op">&lt;*&gt;</span> <span class="dt">Right</span> <span class="dv">2</span> <span class="op">&lt;*&gt;</span> <span class="dt">Right</span> <span class="dv">2</span> <span class="op">==</span> <span class="dt">Right</span> <span class="dv">4</span> <span class="co">-- `pure` for Either a is just Right</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Right</span> (<span class="op">+</span>) <span class="op">&lt;*&gt;</span> <span class="dt">Right</span> <span class="dv">2</span> <span class="op">&lt;*&gt;</span> <span class="dt">Left</span> <span class="st">&quot;error&quot;</span> <span class="op">==</span> <span class="dt">Left</span> <span class="st">&quot;error&quot;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Right</span> (<span class="op">+</span>) <span class="op">&lt;*&gt;</span> <span class="dt">Left</span> <span class="st">&quot;error&quot;</span> <span class="op">&lt;*&gt;</span> <span class="dt">Right</span> <span class="dv">2</span> <span class="op">==</span> <span class="dt">Left</span> <span class="st">&quot;error&quot;</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Left</span> <span class="st">&quot;error&quot;</span> <span class="op">&lt;*&gt;</span> <span class="dt">Left</span> <span class="st">&quot;hello&quot;</span> <span class="op">&lt;*&gt;</span> <span class="dt">Left</span> <span class="st">&quot;world&quot;</span> <span class="op">==</span> <span class="dt">Left</span> <span class="st">&quot;error&quot;</span></span></code></pre></div>
+<p>(Note: pure is the constructor for all <code>Applicatives</code>, but
+for <code>Either a</code>, it just wraps the result in
+<code>Right</code>.)</p>
+<hr />
+<h1 id="what-applicatives-are">What <code>Applicative</code>s are</h1>
+<p>Functors are data structures that can have functions “injected” into
+them.</p>
+<p>Applicatives are data structures that can be “chained”.</p>
+<p>What happens when they are chained depends on the data structure: -
+<code>[a]</code> makes a new list that pairs every element of the left
+list with every element of the right. It lets you compute combinations,
+and it models non-determinism. - <code>Maybe</code> takes a function and
+feeds operands to it unless one of them is <code>Nothing</code>, in
+which case the whole thing is <code>Nothing</code>. -
+<code>Either</code> takes a function and feeds operands to it unless one
+of them is <code>Left x</code>, in which case the whole thing is
+<code>Left x</code> (and only the first <code>Left</code> value is the
+result).</p>
+<hr />
+<h1 id="what-applicatives-are-1">What <code>Applicative</code>s are</h1>
+<p>The concept <code>Applicative</code> is basically “structure that can
+hold functions and be chained with their arguments”.</p>
+<p>However, it leaves “what happens when you chain” up to you.</p>
+<p>[Can you think of any “chainable structures” that you’ve encountered
+in your coding? Think about concrete things that you’ve built for your
+classes: game events, image effects, sound filters, web server
+responses, etc.]</p>
+<hr />
+<h1 id="applicative-laws"><code>Applicative</code> laws</h1>
+<p>In order for a structure to be <code>Applicative</code>, it’s
+supposed to follow certain laws to make sure it behaves as everyone
+expects. Same as <code>Functor</code>. Here they are: - Identity:
+<code>pure id &lt;*&gt; v = v</code>. Applying the identity doesn’t do
+anything weird. - Composition:
+<code>pure (.) &lt;*&gt; u &lt;*&gt; v &lt;*&gt; w = u &lt;*&gt; (v &lt;*&gt; w)</code>.
+Same for the composition operator. here, <code>u</code> and
+<code>v</code> are functions that are already injected inside of
+applicatives. - Homomorphism:
+<code>pure f &lt;*&gt; pure x = pure (f x)</code>. “pure” also shouldn’t
+do anything to any other function or value, and <code>&lt;*&gt;</code>
+calls the function on the value. - Interchange:
+<code>u &lt;*&gt; pure y = pure ($ y) &lt;*&gt; u</code>. This means
+that <code>&lt;*&gt;</code> can’t do something that changes “apply to y”
+to mean something different when it’s on the right hand side. Remember
+that <code>$</code> is the function application operator.</p>
+<hr />
+<h1 id="lifta2"><code>liftA2</code></h1>
+<p>Another function you see along with applicatives is
+<code>liftA2</code>. Technically, this is a function that is part of the
+typeclass, and it can be defined instead of <code>&lt;*&gt;</code>. Its
+type is:</p>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ot">liftA2 ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b <span class="ot">-&gt;</span> f c</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>liftA2 f x y <span class="ot">=</span> f <span class="op">&lt;$&gt;</span> x <span class="op">&lt;*&gt;</span> y </span></code></pre></div>
+<p>This stands for “lift action 2-arg funciton”. It just means “take a
+function and apply it to the values in two different applicative
+instances”. For example:
+<code>liftA2 (+) (Just 2) (Just 2) == Just 4</code></p>
+<hr />
+<h1 id="and"><code>&lt;*</code> and <code>*&gt;</code></h1>
+<p>There are two more useful operations for applicatives. 1.
+<code>&lt;* :: f a -&gt; f b -&gt; f a</code> takes the first
+applicative and ignores the result of the second if it has one:
+<code>Just 2 &lt;* Just 3 == Just 2</code> However, it still applies the
+chaining rules: <code>Just 2 &lt;* Nothing == Nothing</code> 2.
+<code>*&gt; :: f a -&gt; f b -&gt; f b</code> the mirror of
+<code>&lt;*</code>. <code>Just 2 *&gt; Just 3 == Just 3</code>
+<code>Just 2 *&gt; Nothing == Nothing</code></p>
+<p>Why would we want to apply the chaining rules but throw away
+values?</p>
+<hr />
+<h1 id="theyre-very-useful">They’re <em>very</em> useful</h1>
+<p>It turns out, <code>*&gt;</code> in particular is very useful.</p>
+<p>Finally, <em>finally</em>, we see something that can help us
+understand how to write a hello world program in Haskell.</p>
+<p><code>*&gt;</code> says basically “chain these two things together
+but don’t try to apply the first one as a function.”</p>
+<p>We can use this to chain prints:
+<code>main = putStrLn "hello" *&gt; putStrLn "world"</code></p>
+<p>It’s not expected that this makes sense yet, I just want to motivate
+the next module, which is about monads.</p>
+<hr />
+<h1 id="other-simple-functors-and-applicatives">Other simple functors
+and applicatives</h1>
+<p>There are lots of functors. Remember the <code>Sum</code> and
+<code>Product</code> monoids from before? They are functors.</p>
+<p>They also implement <code>Num</code>, so we can normally just use
+arithmetic operators on them directly without having to use
+<code>&lt;$&gt;</code>. Example: <code>Sum 2 + 5 == Sum 7</code></p>
+<p>But suppose I want to divide the thing inside <code>Sum 20.0</code>
+by 2. This actually fails, because <code>Num</code> doesn’t guarantee
+division.</p>
+<p>But we can map division by 2 into the <code>Sum</code>:
+<code>(/2.0) &lt;$&gt; Sum 20.0</code></p>
+<p><code>Product</code> is the same</p>
+<hr />
+<h1 id="other-simple-functors-and-applicatives-2">Other simple functors
+and applicatives (2)</h1>
+<p>These are also <code>Applicative</code> instances.</p>
+<p><code>Sum (+) &lt;*&gt; pure 10 &lt;*&gt; pure 20 == Sum 30</code></p>
+<p>Remember, almost every <code>Functor</code> can easily be an
+applicative. It’s not required to do anything interesting when you call
+<code>&lt;*&gt;</code> like <code>Maybe</code> or <code>[]</code> do, it
+can just call the function on the value.</p>
+<p>These simple “container” types pretty much always do the same thing.
+They apply the function inside to the value inside.</p>
+<hr />
+<h1 id="questions-7">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="quiz-format">Quiz format</h1>
+<p>The quiz will consist of 4 questions, each of equal weight.</p>
+<p>The questions will involve: - Defining a typeclass - Making a
+datatype an instance of a typeclass, especially <code>Functor</code>,
+<code>Applicative</code>, <code>Semigroup</code>, <code>Monoid</code>,
+or any other one from this lecture. - Determining if an implementation
+follows/can follow certain laws - Using a typeclass</p>
+<p>Let’s look at some practice quizzes.</p>
+<hr />
+<h1 id="practice-quiz-1">Practice quiz 1</h1>
+<ol type="1">
+<li>(25%) Consider this data type: <code>data Pair a = Pair a a</code>
+make it be a <code>Functor</code>. The function should apply to both of
+its <code>a</code>s.</li>
+<li>(25%) What is the result of
+<code>(*3) &lt;$&gt; (Pair 7 8)</code>?</li>
+<li>(25%) Consider this data type:
+<code>data SumPair = SumPair Int Int</code> make it be a
+<code>Semigroup</code> whose binary operation is addition.</li>
+<li>(25%) Can this type be a <code>Monoid</code>? If so, make it one. If
+not, explain why not. Be specific about which law it breaks or other
+contraint it violates.</li>
+</ol>
+<hr />
+<h1 id="practice-quiz-1-answer">Practice quiz 1 answer</h1>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1.</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Pair</span> <span class="kw">where</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">Pair</span> x y) <span class="ot">=</span> <span class="dt">Pair</span> (f x) (f y)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2.: Pair 21 24</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- 3.</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Semigroup</span> <span class="dt">SumPair</span> <span class="kw">where</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Pair</span> a b) <span class="op">&lt;&gt;</span> (<span class="dt">Pair</span> x y) <span class="ot">=</span> <span class="dt">Pair</span> (a <span class="op">+</span> x) (b <span class="op">+</span> y)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- 4. Yes:</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monoid</span> <span class="dt">SumPair</span> <span class="kw">where</span> </span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mempty</span> <span class="ot">=</span> <span class="dt">SumPair</span> <span class="dv">0</span> <span class="dv">0</span></span></code></pre></div>
+<hr />
+<h1 id="practice-quiz-2">Practice quiz 2</h1>
+<ol type="1">
+<li>(25%) Consider the <code>min</code> operation between two integers.
+It returns the more negative of the two. <code>min 2 3 == 2</code>.
+<code>min -2 0 == -2</code>. Define a datatype that will be a semigroup
+wrapper for integers that we want to apply this operation to. I.e., we
+want <code>Min 20 &lt;&gt; Min 15 == Min 15</code></li>
+<li>(25%) Make that data type a <code>Semigroup</code>. You can assume
+the funciton <code>min</code> exists.</li>
+<li>(25%) Can we make this data type a <code>Monoid</code>? If so, do
+so. Otherwise, clearly explain why it is impossible.</li>
+<li>(25%) Can we make this data type a <code>Functor</code>? If so, do
+so. Otherwise, clearly explain why it is impossible.</li>
+</ol>
+<hr />
+<h1 id="practice-quiz-2-answer">Practice quiz 2 answer</h1>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1.</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Min</span> <span class="ot">=</span> <span class="dt">Min</span> <span class="dt">Integer</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2.</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Semigroup</span> <span class="dt">Min</span> <span class="kw">where</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Min</span> x <span class="op">&lt;&gt;</span> <span class="dt">Min</span> y <span class="ot">=</span> <span class="dt">Min</span> (<span class="fu">min</span> x y)</span></code></pre></div>
+<ol start="3" type="1">
+<li>It is impossible because there is no identity element. Integers are
+unbounded, so there is no “maximum” integer we could use for ‘x’ which
+guarantees <code>Min x &lt;&gt; Min y == Min y</code> for any choice of
+y.</li>
+<li>No, because a functor must have kind <code>* -&gt; *</code>, but Min
+has kind <code>*</code>. If Min were declared as
+<code>data Min a = ...</code>, then we could make it a functor.</li>
+</ol>
+<hr />
+<h1 id="practice-quiz-3">Practice quiz 3</h1>
+<ol type="1">
+<li>(25%) Define a data type <code>Triplet a</code> which has one
+constructor which stores three fields of <code>a</code>.</li>
+<li>(25%) Make it a functor. It should apply the function to all 3 of
+its fields.</li>
+<li>(25%) Make it an applicative. It should apply each function to its
+respective value. So
+<code>Triplet (+1) (+2) (+3) &lt;*&gt; Triplet 0 0 0 == Triplet 1 2 3</code>.
+Define <code>pure</code> so that it projects the value to all 3 fields:
+<code>pure 7 == Triplet 7 7 7</code></li>
+<li>(25%) Evaluate
+<code>liftA2 (*) (Triplet 1 2 3) (Triplet 3 2 1)</code>.</li>
+</ol>
+<hr />
+<h1 id="practice-quiz-3-answers">Practice quiz 3 answers</h1>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1.</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Triplet</span> a <span class="ot">=</span> <span class="dt">Triplet</span> a a a <span class="kw">deriving</span> <span class="dt">Show</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2.</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">Triplet</span> <span class="kw">where</span> </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fmap</span> f (<span class="dt">Triplet</span> x y z) <span class="ot">=</span> <span class="dt">Triplet</span> (f x) (f y) (f z)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- 3.</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">Triplet</span> <span class="kw">where</span> </span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Triplet</span> f g h) <span class="op">&lt;*&gt;</span> (<span class="dt">Triplet</span> x y z) <span class="ot">=</span> <span class="dt">Triplet</span> (f x) (g y) (h z)</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pure</span> x <span class="ot">=</span> <span class="dt">Triplet</span> x x x </span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>liftA2 (<span class="op">*</span>) (<span class="dt">Triplet</span> <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span>) (<span class="dt">Triplet</span> <span class="dv">3</span> <span class="dv">2</span> <span class="dv">1</span>) <span class="op">==</span> <span class="dt">Triplet</span> <span class="dv">3</span> <span class="dv">4</span> <span class="dv">3</span></span></code></pre></div>
+<hr />
+<h1 id="practice-quiz-4">Practice quiz 4</h1>
+<p>Consider this color-storing data type. It stores <code>RGB</code>
+colors in 3 fields, one for red, one for green, and one for blue:
+<code>data Rgb = Rgb Int Int Int deriving (Ord, Eq, Show)</code> 1.
+(25%) Make the datatype bounded by making it an instance of the
+<code>Bounded a</code> typeclass. This means you must provide a
+<code>minBound :: a</code> and <code>maxBound :: a</code>. Make the
+minimum value for each of the 3 values 0, and the maximum value 255. 2.
+(25%) Write a function <code>clamp</code> which takes any bounded value
+(not just <code>Rgb</code>) and “clamps” it so taht if it’s less than
+<code>minBound</code> it returns <code>minBound</code>, if it is greater
+than <code>maxBound</code> it returns <code>maxBound</code>, and if it’s
+between, returns the unmodified value. 3. (25%) Make it a Semigroup such
+that <code>&lt;&gt;</code> adds the 3 colors but keeps then in bounds
+(i.e., it clamps the result). 4. (25%) Make it a <code>Monoid</code> or
+explain why you can’t.</p>
+<hr />
+<h1 id="practice-quiz-4-answers">Practice quiz 4 answers</h1>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Bounded</span> <span class="dt">Rgb</span> <span class="kw">where</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">minBound</span> <span class="ot">=</span> <span class="dt">Rgb</span> <span class="dv">0</span> <span class="dv">0</span> <span class="dv">0</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">maxBound</span> <span class="ot">=</span> <span class="dt">Rgb</span> <span class="dv">255</span> <span class="dv">255</span> <span class="dv">255</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="ot">clamp ::</span> (<span class="dt">Ord</span> a, <span class="dt">Bounded</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>clamp x </span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> x <span class="op">&lt;</span> <span class="fu">minBound</span> <span class="ot">=</span> <span class="fu">minBound</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> x <span class="op">&gt;</span> <span class="fu">maxBound</span> <span class="ot">=</span> <span class="fu">maxBound</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> x</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Semigroup</span> <span class="dt">Rgb</span> <span class="kw">where</span> </span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Rgb</span> a b c) <span class="op">&lt;&gt;</span> (<span class="dt">Rgb</span> x y z) <span class="ot">=</span> </span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>        clamp <span class="op">$</span> <span class="dt">Rgb</span> (a <span class="op">+</span> x) (b <span class="op">+</span> y) (c <span class="op">+</span> z)</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Monoid</span> <span class="dt">Rgb</span> <span class="kw">where</span> </span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mempty</span> <span class="ot">=</span> <span class="dt">Rgb</span> <span class="dv">0</span> <span class="dv">0</span> <span class="dv">0</span></span></code></pre></div>
+<hr />
+<h1 id="ask-an-ai">Ask an AI</h1>
+<p>Ask an AI to generate a practice quiz for you like the above! Give it
+the slides starting with “# Quiz Format” and up to and including this
+slide. Or give it the whole markdown.</p>
+<p>Then, ask it to grade you. I like to use this scale: 1. 0 points off
+for extremely minor things. Misspellings or missing grouping operators
+that are clearly intended. 2. 5 points for mistakes that cause the code
+to fail but are more than just minor mistakes. For example a small type
+error where it’s clear you get the big idea but, e.g., applied the
+applicative to too many arguments or something. 3. 10 points for bigger
+mistakes, like type errors that can’t work, but there’s still “more than
+half” of the understanding demonstrated. 4. Zero points total if there
+are several major mistakes or it looks like you’re guessing.</p>
+<hr />
+<h1 id="questions-8">Questions?</h1>
+<!-- _class: invert questions -->
+</body>
+</html>

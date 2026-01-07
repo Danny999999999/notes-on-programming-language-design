@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>module_06_more_operators</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="programming-language-design">Programming Language Design</h1>
+<h2 id="module-6-more-functional-operators">Module 6: More functional
+operators</h2>
+<p><br> <br></p>
+<p>Slides © Grant Williams, <a
+href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+4.0</a>.</p>
+<p><br></p>
+<p>This is an open educational resource. Feel free to submit fixes,
+improvements, and new material <a
+href="https://github.com/grantwill74/notes-on-programming-language-design">here</a>.</p>
+<hr />
+<h1 id="last-time">Last time</h1>
+<p>We learned about lexing. [what is it?]</p>
+<p>We learned about functional operators. [what are they?]</p>
+<hr />
+<h1 id="this-time">This time</h1>
+<p>Way more functional operators! (I know you think they’re awesome)</p>
+<p>Tail recursion (an optimizable way to write recursive functions)</p>
+<hr />
+<h1 id="tail-recursion">Tail recursion</h1>
+<p>Is recursion really good enough?</p>
+<p>We know about for-loops. We also know they’re pretty fast.</p>
+<p>Function calls have overhead.</p>
+<p>So doesn’t using recursion everywhere slow us down?</p>
+<p>Well, most of the time there really is some overhead to it. But not
+<em>always</em>…</p>
+<hr />
+<h1 id="tail-recursion-2">Tail recursion (2)</h1>
+<p>There’s a special time in which recursion doesn’t necessarily require
+much more overhead than a loop does.</p>
+<p>It’s when the last thing we do (the “return”) is the recursive
+call.</p>
+<p>We refer to such a function call as a “tail call”.</p>
+<p>For example, this is <em>not</em> a tail call:
+<code>sum (x : xs) = x + sum xs</code></p>
+<p>Because, after we call <code>sum xs</code> recursively, we then add x
+to the result.</p>
+<p>However, what if we wrote it like this…</p>
+<hr />
+<h1 id="tail-recursion-3">Tail recursion (3)</h1>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span> acc [] <span class="ot">=</span> acc</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span> acc (x <span class="op">:</span> xs) <span class="ot">=</span> <span class="fu">sum</span> (acc <span class="op">+</span> x) xs </span></code></pre></div>
+<p>Here, we’re still computing the sum. <code>sum 0 [1,2,3]</code> still
+returns <code>6</code>. However, the recursive call of sum is the last
+(and only) thing the function does. Adding <code>x</code> happens
+before.</p>
+<p>Here, we call <code>acc</code> an <em>accumulator</em> (hence its
+name). We add each <code>x</code> value to the accumulator, and when
+we’re out of elements, we return it.</p>
+<hr />
+<h1 id="tail-recursion-4">Tail recursion (4)</h1>
+<p>Why is this faster?</p>
+<p>Because the function’s stack frame can be re-used.</p>
+<p>Consider what would happen in the classic C calling convention:
+<code>int result = sum(0, p, n);</code></p>
+<p>In old-school 32-bit <code>ccall</code>, we first push
+<code>n</code>, then <code>p</code>, then <code>0</code>.</p>
+<p>Inside the function, we do the same thing for the recursive call.</p>
+<p>And again…</p>
+<p>So every time there’s a recursive call, we push the function’s
+data.</p>
+<p>When it’s done, we free the data by moving the stack pointer back up
+(adding to it).</p>
+<hr />
+<h1 id="tail-recursion-5">Tail recursion (5)</h1>
+<p>There are two issues: 1. Pushing/moving the stack pointer takes a
+little time 2. We don’t actually free that memory until the very end.
+The stack stays allocated.</p>
+<p>Are these things bad? Well, number 1 is a small slowdown, but number
+2 is a bigger problem. In C, there is a limited amount of stack
+memory.</p>
+<p>In Haskell, there’s quite a lot more stack space by default, but you
+can still have stack overruns if you’re not careful.</p>
+<p>Given the importance of recursion in functional programming, we like
+to use recursion heavily, and we don’t want to run out of stack
+space.</p>
+<hr />
+<h1 id="tail-recursion-6">Tail recursion (6)</h1>
+<p>So, if the <em>last thing</em> a function does is to return a
+recursive call, we can just re-use the same stack space:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> sum<span class="op">(</span><span class="dt">int</span> acc<span class="op">,</span> <span class="dt">int</span><span class="op">*</span> vals<span class="op">,</span> <span class="dt">int</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>n <span class="op">&lt;=</span> <span class="dv">0</span><span class="op">)</span> <span class="cf">return</span> acc<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sum<span class="op">(</span>acc <span class="op">+</span> <span class="op">*</span>vals<span class="op">,</span> vals <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> n <span class="op">-</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Here, for the recursive call to <code>sum</code>, we can overwrite
+<code>acc</code> with <code>acc + *vals</code>, we can overwrite
+<code>vals</code> with <code>vals + 1</code> (which makes it point to
+the next value), and we can overwrite <code>n</code> with
+<code>n - 1</code>.</p>
+<hr />
+<h1 id="tail-recursion-7">Tail recursion (7)</h1>
+<p>This function is <em>not</em> tail recursive, because the addition
+happens after the recursive call:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> sum<span class="op">(</span><span class="dt">int</span><span class="op">*</span> vals<span class="op">,</span> <span class="dt">int</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>n <span class="op">&lt;=</span> <span class="dv">0</span><span class="op">)</span> <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sum<span class="op">(</span>vals <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> n <span class="op">-</span> <span class="dv">1</span><span class="op">)</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>So we have to keep pushing the pointer and <code>n</code> on the
+stack until finally, we reach <code>n == 0</code>, and we can return
+from each call.</p>
+<hr />
+<h1 id="tail-recursion-8">Tail recursion (8)</h1>
+<p>In haskell, not tail recursive:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sumNoTail [] <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sumNoTail (x <span class="op">:</span> xs) <span class="ot">=</span> x <span class="op">+</span> sumNoTail xs</span></code></pre></div>
+<p>Tail recursive:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sumTail acc [] <span class="ot">=</span> acc</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sumTail acc (x <span class="op">:</span> xs) <span class="ot">=</span> sumTail (acc <span class="op">+</span> x) xs</span></code></pre></div>
+<p>Is it worth it? Well, if we expect the list to be long,
+<em>maybe</em> it’s worth optimizing. Sometimes, though, it’s vastly
+faster to use tail recursion. We’ll see an example soon.</p>
+<p>But, even if you use tail recursion in Haskell, you can still crash
+from stack overflow. That’s because of lazy evaluation.</p>
+<hr />
+<h1 id="lazy-eval-and-tail-recursion">Lazy eval and tail recursion</h1>
+<p>What happens in Haskell when we do this?
+<code>y = sumTail 0 [1,2,3]</code></p>
+<p>Normally: nothing, because of lazy evaluation. However, suppose we
+actually use <code>y</code> later: <code>main = print y</code>. Now we
+need to compute <code>y</code> so we can print it.</p>
+<p>We apply the definition of <code>sumTail</code>:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sumTail <span class="dv">0</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>] <span class="op">==</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sumTail (<span class="dv">0</span> <span class="op">+</span> <span class="dv">1</span>) [<span class="dv">2</span>,<span class="dv">3</span>] <span class="op">==</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>sumTail (<span class="dv">0</span> <span class="op">+</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span>) [<span class="dv">3</span>] <span class="op">==</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>sumTail (<span class="dv">0</span> <span class="op">+</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span>) [] <span class="op">==</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">0</span> <span class="op">+</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span>) <span class="co">-- &lt;- actual answer</span></span></code></pre></div>
+<p>We don’t actually combine <code>0 + 1 + 2 + 3</code> into one value
+until printing.</p>
+<hr />
+<h1 id="lazy-eval-and-tail-recursion-2">Lazy eval and tail recursion
+(2)</h1>
+<p>Why do we keep collecting values? Why does the accumulator end up
+being <code>0 + 1 + 2 + 3</code> instead of <code>6</code>? Because of
+lazy evaluation.</p>
+<p>When we compute something like <code>x + 1</code>, Haskell doesn’t
+immediately reduce that into a single value. Instead, it creates a
+<em>thunk</em> which is like an eager lambda function that, when run,
+will eventually return a value.</p>
+<p>So here, the thunk would be a function that calls the thunk for
+<code>x</code> and then adds <code>1</code>.</p>
+<p>This means that we still end up using extra space until the function
+returns, even when we’re using tail recursion.</p>
+<p>This is the real cost of lazy evaluation: it makes memory usage
+unpredictable. This is one reason why Haskell wouldn’t be my first
+choice as a system or gamedev language.</p>
+<hr />
+<h1 id="can-we-fix-that">Can we fix that?</h1>
+<p>We actually can just tell Haskell not to lazy-evaluate stuff using
+the <code>$!</code> operator.</p>
+<p>This operator is almost identical to the <code>$</code> operator, but
+it forces its right argument to be eagerly evaluated by one stage, so
+you basically do one addition.</p>
+<p>For example:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sumTail acc [] <span class="ot">=</span> acc</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sumTail acc (x <span class="op">:</span> xs) <span class="ot">=</span> (sumTail <span class="op">$!</span> (acc <span class="op">+</span> x)) xs</span></code></pre></div>
+<p>So now, because of the <code>$!</code>, we actually reduce the
+<code>acc + x</code> into a single value each time we recursive call,
+preventing the thunk from growing.</p>
+<hr />
+<h1 id="foldl">Foldl?</h1>
+<p>So, what about <code>foldl</code> and <code>foldr</code>? Remember
+when we defined those?</p>
+<p>I don’t, because we only defined <code>fold</code>, so here it
+is:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">foldl&#39;&#39; ::</span> (b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> b</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>foldl&#39;&#39; _ <span class="fu">init</span> [] <span class="ot">=</span> <span class="fu">init</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>foldl&#39;&#39; f acc (x <span class="op">:</span> xs) <span class="ot">=</span> foldl&#39;&#39; f (acc <span class="ot">`f`</span> x) xs</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ot">foldr&#39;&#39; ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> b</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>foldr&#39;&#39; _ <span class="fu">init</span> [] <span class="ot">=</span> <span class="fu">init</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>foldr&#39;&#39; f acc (x <span class="op">:</span> xs) <span class="ot">=</span> f x (foldr&#39;&#39; f acc xs)</span></code></pre></div>
+<p>Notice that <code>foldl</code> is tail-recursive and
+<code>foldr</code> is not.</p>
+<p>So does that mean we should use <code>foldl</code> when we can?
+Because it’s tail recursive? Well, not really… I mean, first, we should
+notice that it’s lazy, not eager!</p>
+<hr />
+<h1 id="foldl-2">Foldl (2)</h1>
+<p>There’s actually another version of <code>foldl</code> that forces
+strict evaluation.</p>
+<p>You have to <code>import Data.List</code> to use it…</p>
+<p>It’s called…[drumroll]</p>
+<p><code>foldl'</code></p>
+<p>It’s the same as <code>foldl</code>, but it’s strict. So
+<code>sum = foldl' (+) 0</code> won’t stack overflow.</p>
+<p>There’s also <code>foldr'</code>, but it seems less useful to me,
+because it’s still not tail recursive, so the stack keeps growing.</p>
+<hr />
+<h1 id="should-i-use-it">Should I use it?</h1>
+<p>So if <code>foldl'</code> is tail-recursive and eager, that must be
+the fastest one, right?</p>
+<p>It makes sense, but we should test it.</p>
+<p>I’m going to make a simple microbenchmark, but first, <strong>big
+warning</strong>: microbenchmarks are highly specific. They show you how
+a language performs on a very specific task on a specific platform at a
+specific point in time and phase of the moon.</p>
+<p>I’m going to show you what happens when we use <code>foldl'</code>
+instead of <code>foldl</code> specifically to sum a giant list of
+<code>Int</code> (not <code>Integer</code>) <em>and</em> the list has
+already been fully constructed (not lazily) <em>and</em> it’s running on
+Windows <em>and</em> probably a bunch of other stuff I haven’t
+controlled for.</p>
+<hr />
+<h1 id="a-microbenchmark">A microbenchmark</h1>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> count <span class="ot">=</span> <span class="dv">100000000</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> xs <span class="ot">=</span> [<span class="dv">1</span><span class="op">..</span>count]<span class="ot"> ::</span> [<span class="dt">Int</span>]</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    deepseq xs (<span class="fu">return</span> ()) <span class="co">-- force construct list first: I&#39;ll explain this</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    start <span class="ot">&lt;-</span> getCurrentTime </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="op">$</span> <span class="fu">foldl</span> (<span class="op">+</span>) <span class="dv">0</span> xs</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    end <span class="ot">&lt;-</span> getCurrentTime</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;foldl time: &quot;</span> <span class="op">++</span> <span class="fu">show</span> (diffUTCTime end start)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    start <span class="ot">&lt;-</span> getCurrentTime</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> <span class="op">$</span> foldl&#39; (<span class="op">+</span>) <span class="dv">0</span> xs</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    end <span class="ot">&lt;-</span> getCurrentTime </span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;foldl&#39; time: &quot;</span> <span class="op">++</span> <span class="fu">show</span> (diffUTCTime end start) </span></code></pre></div>
+<p>Note: if you want to do this, import <code>Data.List</code>,
+<code>Data.Time</code>, and <code>Control.DeepSeq</code></p>
+<hr />
+<h1 id="results">Results</h1>
+<p>On my specific computer I get this:</p>
+<pre><code>5000000050000000
+foldl time: 15.7061889s
+5000000050000000
+foldl&#39; time: 0.5516658s</code></pre>
+<p>So it actually made a huge difference.</p>
+<p>But note: <em>big</em> list. I’ve seen another person online run this
+test in different circumstances online and they said that it actually
+slowed it down.</p>
+<p>Also, in other news, <code>foldr</code> is actually faster for me
+than <code>foldl</code>. Probably because it doesn’t end up needing to
+build thunks for each addition.</p>
+<p>Okay, now let me answer your other question…</p>
+<hr />
+<h1 id="what-is-deepseq">What is <code>deepseq</code></h1>
+<p><code>deepseq</code> is related to <code>$!</code>.</p>
+<p>In fact, there is a function called <code>seq</code> that is closely
+related to <code>$!</code>.</p>
+<p><code>seq a b</code> means “slightly simplify <code>a</code>, then
+return <code>b</code></p>
+<p>This technically means it has a side effect. It is one of the few
+haskell “functions” with side effects. If they are observable, you
+probably don’t want to use it.</p>
+<p>We can define <code>$!</code> in terms of <code>seq</code>:
+<code>f $! x = f (seq x x)</code></p>
+<p>What is “slightly simplify”? In the case of a list, it will remove
+the outer thunk and expose the <em>cons</em>:
+<code>seq (1 : 2 : []) (1 : 2 : [])</code> will create a single list
+node with a value of <code>1</code>, whose next pointer is a thunk that
+will construct <code>2 : []</code></p>
+<hr />
+<h1 id="what-is-deepseq-2">What is <code>deepseq</code>? (2)</h1>
+<p>That’s all <code>seq</code> does. Calling it again won’t help. It
+just consumes the outer thunk.</p>
+<p>For arithmetic operations, it actually does simplify the whole thing,
+but those are a special case.</p>
+<p>Since seq isn’t that helpful, if we want to thoroughly construct the
+entire list, we use <code>deepseq</code>.</p>
+<p>This consumes the thunk and replaces it with a fully initialized
+list, so that we can compare <code>foldl</code> and <code>foldl'</code>
+directly without also including the time it takes to allocate list
+nodes.</p>
+<p><code>deepseq x (return ())</code> means “first compute
+<code>x</code>, and then do nothing”. <code>return</code> in Haskell
+does not mean what it means in C. It’s a constructor for monads. In this
+case, an IO object that does nothing and returns <code>()</code>. We’ll
+talk about this later.</p>
+<hr />
+<h1 id="section">$!!</h1>
+<p>In the same way that <code>$!</code> does <code>seq</code> before
+calling a function, <code>$!!</code> does <code>deepseq</code>.</p>
+<p>We don’t need to do these things often, but it can occassionally be
+important, especially when doing performance optimization.</p>
+<hr />
+<h1 id="questions">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="knowledge-check-1">Knowledge check 1</h1>
+<ol type="1">
+<li>Define a function <code>reverse'</code>, which should take a list an
+reverse it. Include its type. Do not use tail recursion.</li>
+<li>What is the big-O runtime of this function?</li>
+<li>Define a tail-recursive version. Include its type.</li>
+<li>What is the big-O runtime of this function? This is the one I warned
+you about earlier when I said tail recursion would have a huge impact on
+performance.</li>
+<li>Now use one of the folds to define <code>reverse</code>.</li>
+<li>Suppose we had a giant list we wanted to reverse. How could we force
+evaluation to reverse it before we needed to use it later.</li>
+</ol>
+<hr />
+<h1 id="kc-1-answers-1">KC 1 answers (1)</h1>
+<ol type="1">
+<li></li>
+</ol>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">reverse&#39; ::</span> [a] <span class="ot">-&gt;</span> [a]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>reverse&#39; [] <span class="ot">=</span> []</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>reverse&#39; (x <span class="op">:</span> xs) <span class="ot">=</span> reverse&#39; xs <span class="op">++</span> [x]</span></code></pre></div>
+<ol start="2" type="1">
+<li>It’s quadratic! Because <code>++</code> is linear and we’re doing it
+<code>n</code> times, where <code>n</code> is the length of the list.
+It’s much slower than you’d think.</li>
+<li></li>
+</ol>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">reverse&#39;&#39; ::</span> [a] <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [a]</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>reverse&#39;&#39; acc [] <span class="ot">=</span> acc</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>reverse&#39;&#39; acc (x <span class="op">:</span> xs) <span class="ot">=</span> reverse&#39;&#39; (x <span class="op">:</span> acc) xs</span></code></pre></div>
+<hr />
+<h1 id="kc-1-answers-2">KC 1 answers (2)</h1>
+<ol start="4" type="1">
+<li><p>This one is actually linear. We’re prepending each value in the
+list to the front of the accumulator, which is fast (constant time). We
+do this for each value in the list.</p></li>
+<li></li>
+</ol>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">reverse&#39;&#39;&#39; ::</span> [a] <span class="ot">-&gt;</span> [a]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>reverse&#39;&#39;&#39; <span class="ot">=</span> <span class="fu">foldl</span> (<span class="fu">flip</span> (<span class="op">:</span>)) [] </span></code></pre></div>
+<p>More explanation about <code>flip</code> on the next slide.</p>
+<hr />
+<h1 id="flip"><code>flip</code></h1>
+<p><code>flip</code> is a function that takes a function and flips its
+arguments. It’s defined like this:
+<code>flip f = \y x -&gt; f x y</code>. So instead of <code>:</code>
+taking a value and a list and prepending the left argument to the right,
+<code>flip (:)</code> returns a function that takes a list and then a
+value to prepend.</p>
+<p>We run this on each value of the list. It’s like using a stack to
+reverse a list. We push each value from left to right onto the front of
+the return list.</p>
+<p>[can you do it without flip given the definition above?]</p>
+<hr />
+<h1 id="kc-1-answers-3">KC 1 answers (3)</h1>
+<ol start="6" type="1">
+<li><code>let reversed = deepseq (reverse l) (reverse l) in ...</code></li>
+</ol>
+<p>Here, <code>deepseq</code> makes it so that the list is fully
+allocated and not just a bunch of thunks that perform the
+<code>cons</code> operation.</p>
+<p>It’s really not required to do this. Remember that premature
+optimization is the root of all evil.</p>
+<hr />
+<h1 id="questions-1">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="more-operators-zip">More operators: zip</h1>
+<p>I know what you’re thinking.</p>
+<p>“We love functional programming, but there aren’t enough higher order
+functions. Please teach us another functional operator!”</p>
+<p>Okay, let’s learn about <code>zip</code>. This is a surprisingly
+useful operator that doesn’t show up very often in imperative languages
+(although Python has it).</p>
+<hr />
+<h1 id="zip"><code>zip</code></h1>
+<p>Sometimes we have two lists that we want to “pair up” somehow.</p>
+<p>For example, maybe there are a lists of names, and their employee ids
+and we want to print them out together.</p>
+<p>First, let’s see how we would do this in C…</p>
+<hr />
+<h1 id="pairing-up-lists-in-c">Pairing up lists in C</h1>
+<p>The most common way I see imperative programmers solve this problem
+is by using the same index in both lists.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span><span class="op">*</span> names<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;Alice&quot;</span><span class="op">,</span> <span class="st">&quot;Bob&quot;</span><span class="op">,</span> <span class="st">&quot;Camille&quot;</span><span class="op">,</span> <span class="st">&quot;Dan&quot;</span><span class="op">,</span> <span class="op">...</span> <span class="op">};</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span><span class="op">*</span> eids<span class="op">[]</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;1234&quot;</span><span class="op">,</span> <span class="st">&quot;5678&quot;</span><span class="op">,</span> <span class="st">&quot;9123&quot;</span><span class="op">,</span> <span class="st">&quot;4567&quot;</span><span class="op">,</span> <span class="op">...</span> <span class="op">}</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> print_names_and_eids<span class="op">(</span><span class="dt">char</span><span class="op">**</span> names<span class="op">,</span> <span class="dt">char</span><span class="op">**</span> ids<span class="op">,</span> <span class="dt">size_t</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">size_t</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%s</span><span class="st">: </span><span class="sc">%s\n</span><span class="st">&quot;</span><span class="op">,</span> names<span class="op">[</span>i<span class="op">],</span> ids<span class="op">[</span>i<span class="op">]);</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Here, <code>i</code> is an index (a <code>size_t</code>, which is
+usually an <code>unsigned long</code>).</p>
+<p>We iterate through both lists with the same index, so we “pair up”
+names and eids which are in the same order.</p>
+<hr />
+<h1 id="pairing-up-lists-in-haskell">Pairing up lists in Haskell</h1>
+<p>There is no reason we can’t do this in Haskell, too:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">printNamesAndEids ::</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>printNamesAndEids _ [] <span class="ot">=</span> <span class="fu">return</span> ()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>printNamesAndEids [] _ <span class="ot">=</span> <span class="fu">return</span> ()</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>printNamesAndEids (name <span class="op">:</span> names) (eid <span class="op">:</span> eids) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">putStrLn</span> <span class="op">$</span> name <span class="op">++</span> <span class="st">&quot;: &quot;</span> <span class="op">++</span> eid </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    printNamesAndEids names eids</span></code></pre></div>
+<p>(Note: I don’t expect you to understand what <code>return ()</code>
+does yet, or what an <code>IO ()</code> really is. I’m just showing you
+that Haskell can do the same thing as C.)</p>
+<p>However, as you might have started noticing, even though recursion is
+important to functional programming, we usually end up finding elegant
+ways of solving problems that handle the recursion for us.</p>
+<hr />
+<h1 id="using-zip-to-pair-up-lists">Using <code>zip</code> to pair up
+lists</h1>
+<p>That is what we will do here. We will use <code>zip</code>.</p>
+<p><code>zip</code> is a function that takes a pair of lists, and
+returns a list of pairs.</p>
+<p>That is,
+<code>zip ["Alice", "Bob", "Camille"] ["123", "456", "789"] ==</code>
+<code>[("Alice", "123"), ("Bob", "456"), ("Camille", "789")]</code></p>
+<p>Let’s do a bit of clean up.</p>
+<hr />
+<h1 id="using-zip-to-pair-up-lists-1">Using <code>zip</code> to pair up
+lists</h1>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Control.Monad</span> <span class="co">-- we will learn more about monads later. Just a taste!</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>names <span class="ot">=</span> [<span class="st">&quot;Alice&quot;</span>, <span class="st">&quot;Bob&quot;</span>, <span class="st">&quot;Camille&quot;</span>]</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>ids <span class="ot">=</span> [<span class="st">&quot;123&quot;</span>, <span class="st">&quot;456&quot;</span>, <span class="st">&quot;789&quot;</span>]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="ot">namesAndEids ::</span> [<span class="dt">String</span>]</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>namesAndEids <span class="ot">=</span> <span class="fu">map</span> (\(n, e) <span class="ot">-&gt;</span> n <span class="op">++</span> <span class="st">&quot;: &quot;</span> <span class="op">++</span> e) <span class="op">$</span> <span class="fu">zip</span> names eids</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="ot">printNamesAndEids&#39; ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>printNamesAndEids&#39; <span class="ot">=</span> <span class="fu">mapM_</span> <span class="fu">putStrLn</span> <span class="op">$</span> namesAndEids names ids  </span></code></pre></div>
+<p>Don’t worry to much about the <code>mapM_</code> function. It’s kind
+of like Haskell’s version of “foreach” in that it applies a function to
+a list.</p>
+<p>The important thing is that <code>map ... zip</code> above…</p>
+<hr />
+<h1 id="using-zip-2">Using <code>zip</code> (2)</h1>
+<p>Here it is again</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ot">namesAndEids ::</span> [<span class="dt">String</span>]</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>namesAndEids <span class="ot">=</span> <span class="fu">map</span> (\(n, e) <span class="ot">-&gt;</span> n <span class="op">++</span> <span class="st">&quot;: &quot;</span> <span class="op">++</span> e) <span class="op">$</span> <span class="fu">zip</span> names eids</span></code></pre></div>
+<p><code>zip names eidss</code> is returning a list of pairs.</p>
+<p>Then, <code>map (\(n, e) -&gt; n ++ ": " ++ e) ...</code> is applying
+that lambda function to each pair. It is taking the name and eid and
+pasting them together with <code>": "</code>.</p>
+<p>The result is just a list of strings like “Alice: 123”, “Bob: 456”,
+“Camille: 789”</p>
+<hr />
+<h1 id="zip-and-map-together"><code>zip</code> and <code>map</code>
+together</h1>
+<p>Using map with zip is so common, there’s a special combination
+operator: <code>zipWith</code>:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>namesAndEids&#39; <span class="ot">=</span> <span class="fu">zipWith</span> (\n e <span class="ot">-&gt;</span> n <span class="op">++</span> <span class="st">&quot;: &quot;</span> <span class="op">++</span> e) names ids</span></code></pre></div>
+<p>It also automatically uncurries the function, so we can write
+<code>\n e</code> instead of <code>\(n, e)</code>.</p>
+<p>[what is currying and uncurrying again?]</p>
+<hr />
+<h1 id="knowledge-check-2">Knowledge check 2</h1>
+<ol type="1">
+<li>Use zip to create a list of <code>(n, n^2)</code> for each natural
+number <code>n</code>. This should be an infinite list.</li>
+<li>Print the first 10 elements of that infinite list.</li>
+<li>Now construct a new infinite list that is the sum of each element of
+the first list. So
+<code>(0 + 0^2), (1 + 1^2), (2 + 2^2), (3 + 3^2), ...</code></li>
+<li>Print the first 10 elements of this infinite list.</li>
+<li>Now, use <code>zipWith</code> to construct the same list as 3
+without needing <code>uncurry</code>.</li>
+</ol>
+<hr />
+<h1 id="kc-2-answers">KC 2 answers</h1>
+<ol type="1">
+<li></li>
+</ol>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ot">nAndN2 ::</span> [(<span class="dt">Integer</span>, <span class="dt">Integer</span>)]</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>nAndN2 <span class="ot">=</span> <span class="fu">zip</span> [<span class="dv">0</span><span class="op">..</span>] <span class="op">$</span> <span class="fu">map</span> (<span class="op">^</span><span class="dv">2</span>) [<span class="dv">0</span><span class="op">..</span>]</span></code></pre></div>
+<ol start="2" type="1">
+<li><p><code>print $ take 10 nAndN2</code></p></li>
+<li><p><code>sumNAndN2 = map (uncurry (+)) nAndN2</code></p></li>
+<li><p><code>print $ take 10 sumNAndN2</code></p></li>
+<li><p><code>sumNAndN2' = zipWith (+) [0..] $ map (^2) [0..]</code></p></li>
+</ol>
+<hr />
+<h1 id="questions-2">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="making-zip">Making <code>zip</code></h1>
+<p>Can we define <code>zip</code> ourselves?</p>
+<p>First, [what should its type be?]</p>
+<hr />
+<h1 id="making-zip-1">Making <code>zip</code></h1>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">zip</span><span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> [b] <span class="ot">-&gt;</span> [(a, b)]</span></code></pre></div>
+<p>“Give me a list of <code>a</code>s and a list of <code>b</code>s and
+I will give you a list of <code>(a, b)</code> pairs.</p>
+<p>Now, [code it up]. First, let’s use recursion…</p>
+<hr />
+<h1 id="making-zip-2">Making <code>zip</code></h1>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">zip</span><span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> [b] <span class="ot">-&gt;</span> [(a, b)]</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">zip</span> _ [] <span class="ot">=</span> []   </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">zip</span> [] _ <span class="ot">=</span> [] </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">zip</span> (x <span class="op">:</span> xs) (y <span class="op">:</span> ys) <span class="ot">=</span> (x, y) <span class="op">:</span> (<span class="fu">zip</span> xs ys)</span></code></pre></div>
+<p>If either list is empty, we’re done.</p>
+<p>Otherwise, we pair up the head of both remaining lists, and append it
+to the end of the result.</p>
+<p>This is the most straightforward way to do it. It’s hard to use one
+of the <code>fold</code>s to make <code>zip</code>, because it takes 2
+list arguments instead of 1.</p>
+<p>It’s technically possible, but it involves some goofy coding, like
+having the accumulator be a tuple of the 2nd list and an empty list of
+pairs and such. It’s easier recursively.</p>
+<hr />
+<h1 id="zip-on-infinite-lists">Zip on infinite lists</h1>
+<p>Remember when we talked about the Fibonacci series?</p>
+<p>Here was our definition of a Fibonacci function:</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fibo ::</span> [<span class="dt">Integer</span>] <span class="ot">-&gt;</span> [<span class="dt">Integer</span>] <span class="ot">-&gt;</span> [<span class="dt">Integer</span>]</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>fibo <span class="dv">0</span> <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>fibo <span class="dv">1</span> <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>fibo n <span class="ot">=</span> fibo (n <span class="op">-</span> <span class="dv">1</span>) <span class="op">+</span> fibo (n <span class="op">-</span> <span class="dv">2</span>)</span></code></pre></div>
+<p>This works, but it’s very slow. It re-calculates Fibonacci terms. It
+ends up taking exponential time (we’ll cover the details of that in CS
+450).</p>
+<p>We can make it faster by using two accumulators to store the previous
+two values in the series [how?]</p>
+<hr />
+<h1 id="fibo-with-accumulator"><code>fibo</code> with accumulator</h1>
+<p>Like this:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>fibo n <span class="ot">=</span> fibo&#39; n <span class="dv">0</span> <span class="dv">1</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    fibo&#39; <span class="dv">0</span> _ b <span class="ot">=</span> b</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    fibo&#39; n a b <span class="ot">=</span> fibo&#39; (n <span class="op">-</span> <span class="dv">1</span>) b (a <span class="op">+</span> b)</span></code></pre></div>
+<p>This is much faster. We are basically adding the previous 2 numbers
+in the list <code>n</code> times.</p>
+<p>But it turns out there’s a way to do this with raw lists. We don’t
+need a function. We can just store the Fibonacci series as an infinite
+list using <code>zip</code> and lazy evaluation.</p>
+<p>Any ideas how? [this one is a brain-bender, but instructive]</p>
+<hr />
+<h1 id="heres-how">Here’s how</h1>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fibo ::</span> [<span class="dt">Integer</span>]</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>fibo <span class="ot">=</span> [<span class="dv">0</span>, <span class="dv">1</span>] <span class="op">++</span> <span class="fu">zipWith</span> (<span class="op">+</span>) fibo (<span class="fu">drop</span> <span class="dv">1</span> fibo)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> <span class="fu">take</span> <span class="dv">100</span> fibo</span></code></pre></div>
+<p>This actually works. It generates an infinite list of Fibonacci
+numbers. It’s also reasonably fast (it doesn’t require exponential
+time).</p>
+<p>But why? Well, <code>fibo</code> is the concatenation of two lists:
+<code>[0, 1]</code> and that <code>zipWith</code> term.</p>
+<p><code>[0, 1]</code> just tells us the first two values.</p>
+<p>But then the real clever trick happens…</p>
+<hr />
+<h1 id="lazy-fibo">Lazy <code>fibo</code></h1>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>fibo <span class="ot">=</span> [<span class="dv">0</span>, <span class="dv">1</span>] <span class="op">++</span> <span class="fu">zipWith</span> (<span class="op">+</span>) fibo (<span class="fu">drop</span> <span class="dv">1</span> fibo)</span></code></pre></div>
+<p>After that, we append <code>zipWith (+) fibo (drop 1 fibo)</code></p>
+<p>This is self-referential: <code>fibo</code> refers to the list
+itself, and <code>drop 1 fibo</code> refers to the list itself but
+skipping the zeroth element.</p>
+<p><code>zipWith (+)</code> applies the <code>+</code> operation to the
+head of its two arguments, which start off at <code>0</code> and
+<code>1</code>.</p>
+<p>This causes it to produce <code>1</code> for its first result.</p>
+<p><em>But then it starts to consume itself.</em> It produces 2, because
+<code>1 +</code> its first output is <code>2</code>. Because this
+function is lazy, it’s able to pull from lists that it is creating,
+indefinitely.</p>
+<hr />
+<h1 id="questions-3">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="knowledge-check-3">Knowledge check 3</h1>
+<ol type="1">
+<li>Define an element-wise multiplication function using
+<code>zipWith</code>. That is
+<code>mul [1, 2, 3] [4, 5, 6] == [1, 10, 18]</code></li>
+<li>Now define a dot product that treats the vectors as lists, using the
+<code>mul</code> function you just defined. The dot product of two
+vectors <code>a</code> and <code>b</code> is
+<code>ax * bx + ay * by + az * bz + ...</code>. That is, we multiply
+each component together and we sum all the piecewise multiplications
+together.</li>
+</ol>
+<hr />
+<h1 id="kc-3-answers">KC 3 answers</h1>
+<ol type="1">
+<li></li>
+</ol>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ot">mul ::</span> [<span class="dt">Integer</span>] <span class="ot">-&gt;</span> [<span class="dt">Integer</span>] <span class="ot">-&gt;</span> [<span class="dt">Integer</span>]</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>mul <span class="ot">=</span> <span class="fu">zipWith</span> (<span class="op">*</span>)</span></code></pre></div>
+<ol start="2" type="1">
+<li></li>
+</ol>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ot">dot ::</span> [<span class="dt">Integer</span>] <span class="ot">-&gt;</span> [<span class="dt">Integer</span>] <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>dot x y <span class="ot">=</span> <span class="fu">sum</span> <span class="op">$</span> x <span class="ot">`mul`</span> y </span></code></pre></div>
+<hr />
+<h1 id="questions-4">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="what-about-the-opposite">What about the opposite?</h1>
+<p>If there is a zip, which takes two lists and makes a list of pairs,
+is there also an unzip?</p>
+<p>[What do you think?]</p>
+<hr />
+<h1 id="of-course-there-is">Of course there is!</h1>
+<p>And if there weren’t, we could make it ourselves.</p>
+<p><code>unzip [(1, 'a'), (2, 'b'), (3, 'c')]</code> should be
+<code>([1,2,3], ['a', 'b', 'c'])</code></p>
+<p>Right?</p>
+<p>What would its type be?</p>
+<hr />
+<h1 id="unzips-type"><code>unzip</code>’s type</h1>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span><span class="ot"> ::</span> [(a, b)] <span class="ot">-&gt;</span> ([a], [b])</span></code></pre></div>
+<p>“Give me a list of pairs, I will give you a pair of lists.”</p>
+<p>How do we code it?</p>
+<p>Start recursively…</p>
+<hr />
+<h1 id="unzip"><code>unzip</code></h1>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ot">unzip&#39; ::</span> [(a, b)] <span class="ot">-&gt;</span> ([a], [b])</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>unzip&#39; [] <span class="ot">=</span> ([], [])</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>unzip&#39; ((x, y) <span class="op">:</span> rest) <span class="ot">=</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (xs, ys) <span class="ot">=</span> unzip&#39; rest</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span>  (x <span class="op">:</span> xs, y <span class="op">:</span> ys)</span></code></pre></div>
+<p>The wrinkle here is that we need to bind the <code>xs</code> and
+<code>ys</code> from the recursive call so we can push new values onto
+them.</p>
+<p>You might have preferred the recursive solutions to these built-in
+operators so far, but I think you’ll like the one using fold for this
+one.</p>
+<p>First, which fold do we use? <code>foldl</code> or
+<code>foldr</code>?</p>
+<hr />
+<h1 id="unzip-2"><code>unzip</code> (2)</h1>
+<p><code>foldl</code> would end up reversing the order (trace through it
+to see why!). We use <code>r</code>.</p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ot">unzip&#39;&#39; ::</span> [(a, b)] <span class="ot">-&gt;</span> ([a], [b])</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>unzip&#39;&#39; <span class="ot">=</span> <span class="fu">foldr</span> (\(x, y) (accx, accy) <span class="ot">-&gt;</span> (x <span class="op">:</span> accx, y <span class="op">:</span> accy)) ([], [])</span></code></pre></div>
+<p>Here, we start with an empty pair of lists. The binary function
+appends each of the pair in the original list to the appropriate value
+in the accumulator.</p>
+<p>When we’re done, the accumulator holds our result.</p>
+<p>It ends up being in the right order because we push from right to
+left. <code>foldl</code> would push from left to right and flip the
+order!</p>
+<hr />
+<h1 id="is-unzip-the-inverse-of-zip">Is <code>unzip</code> the inverse
+of <code>zip</code>?</h1>
+<p>We say that <code>g</code> is the inverse of <code>f</code> if
+<code>g . f</code> is equivalent to <code>id</code>.</p>
+<p><code>id</code> is the identity function. <code>id x = x</code>. It’s
+just the lambda that returns its argument without doing anything.</p>
+<p>If applying <code>g</code> after <code>f</code> is the same as doing
+nothing at all, <code>g</code> is an inverse of <code>f</code>.</p>
+<p>It seems like <code>unzip</code> “undoes” <code>zip</code>. Is that
+true?</p>
+<hr />
+<h1 id="not-quite">Not quite</h1>
+<p>We can do this: <code>unzip $ zip xs ys</code> and we get back
+<code>(xs, ys)</code></p>
+<p>It’s not quite the same though. We get the arguments packed into a
+pair, whereas previously they weren’t stored that way.</p>
+<p>The identity function has a definite meaning. It’s a unary function.
+The issue is that <code>zip</code> is a binary function. So
+<code>unzip . zip</code> isn’t really the same as <code>id</code>.</p>
+<p>What about the other way around? Is <code>zip</code> the inverse of
+<code>unzip</code>?</p>
+<hr />
+<h1 id="no">No</h1>
+<p><code>unzip</code> returns a tuple, but zip takes two singles, so
+<code>zip . unzip</code> is a type error. We can’t compose those two
+functions.</p>
+<p>There is a way to do it, though. <code>zip</code> normally takes 2
+arguments.</p>
+<p>Is there a way we can make it take one? Specifically, one pair of two
+lists?</p>
+<hr />
+<h1 id="yes">Yes</h1>
+<p>Remember <code>curry</code> and <code>uncurry</code>? Here, we want
+to <code>uncurry zip</code>.</p>
+<p><code>uncurry zip . unzip</code> is equivalent to
+<code>id</code>.</p>
+<p>That is, call unzip on a list of pairs, and then called the uncurried
+version of zip on the result to zip them back together.</p>
+<p>Example:
+<code>(uncurry zip . unzip) [(1,'a'), (2,'b'), (3, 'c')]</code> returns
+<code>[(1,'a'), (2,'b'), (3, 'c')]</code>, the same thing that
+<code>id</code> returns.</p>
+<hr />
+<h1 id="composability">Composability</h1>
+<p>Remember that <code>.</code> is the composition operatorer.</p>
+<p>The reason we care about composition at all? Because in functional
+programming, it’s the main way we build bigger functions out of smaller
+ones.</p>
+<p>If two functions are compatible with each other (that is, we can pass
+the result of one to the other), we call them “composable”.</p>
+<p>At the very least, we need type-composability. That is, if
+<code>f</code> and <code>g</code> are functions, then:</p>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> a <span class="ot">-&gt;</span> b</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ot">g ::</span> b <span class="ot">-&gt;</span> c</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">.</span><span class="ot"> g ::</span> a <span class="ot">-&gt;</span> c</span></code></pre></div>
+<hr />
+<h1 id="composability-2">Composability (2)</h1>
+<p>Composability becomes an issue when we start making our programs more
+complicated.</p>
+<p>For example, suppose I have a random function like
+<code>f = div 100</code>.</p>
+<p>This function divides 100 by integers. So <code>f 25 == 4</code> and
+<code>f 10 == 10</code>.</p>
+<p>Suppose I want to compose this function with the function
+<code>show</code> to make it a string.</p>
+<p>So in <code>g = show . f</code>, <code>g</code> is a function that
+takes a number, divides it into 100, and then converts the result into a
+string. It is compatible with the type
+<code>Integer -&gt; String</code>.</p>
+<p>But here’s a question: what happens if we write <code>g 0</code>?
+[What string do we get?]</p>
+<hr />
+<h1 id="composability-3">Composability (3)</h1>
+<p>We don’t get a string, we get an error:
+<code>"*** Exception: divide by zero</code> (there’s a double quote
+there but it’s not a string, it’s the text in the exception)</p>
+<p>The issue is that <code>div n</code> is a <em>partial function</em>.
+That is, it’s a function that isn’t defined on all its arguments. In
+this case, <code>0</code>.</p>
+<p>So we don’t have anything to give to show. <code>div n</code> is not
+perfectly composable.</p>
+<p>We could return an optional value. So if there is a quotient, we
+return it, but if there isn’t we return a “nothing” kind of value. What
+is a good candidate for that?</p>
+<hr />
+<h1 id="maybe">Maybe</h1>
+<p>Consider this version of division:</p>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ot">divMaybe ::</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Integer</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>divMaybe _ <span class="dv">0</span> <span class="ot">=</span> <span class="dt">Nothing</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>divMaybe x y <span class="ot">=</span> <span class="dt">Just</span> <span class="op">$</span> x <span class="ot">`div`</span> y</span></code></pre></div>
+<p>Now there’s no immediate problem:</p>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>divMaybe <span class="dv">100</span> <span class="dv">25</span> <span class="op">==</span> <span class="dt">Just</span> <span class="dv">4</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>divMaybe <span class="dv">100</span> <span class="dv">0</span> <span class="op">==</span> <span class="dt">Nothing</span></span></code></pre></div>
+<p>Suppose <code>f = divMaybe 100</code> like before. [What is the type
+of <code>f</code>?]</p>
+<hr />
+<h1 id="composing-maybe">Composing maybe</h1>
+<p><code>f :: Integer -&gt; Maybe Integer</code></p>
+<p>Which means now <code>g = show . f</code> stil works, but now it
+prints “Just”…</p>
+<p>What if we only want to print the value if it’s there and “Error” if
+it’s not?</p>
+<p>[Class, write that for me]</p>
+<hr />
+<h1 id="composing-maybe-2">Composing maybe (2)</h1>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>g (<span class="dt">Just</span> x) <span class="ot">=</span> <span class="fu">show</span> x</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>g <span class="dt">Nothing</span> <span class="ot">=</span> <span class="st">&quot;Error&quot;</span></span></code></pre></div>
+<p>Now <code>g $ f 25</code> returns <code>"4"</code> And
+<code>g $ f 0</code> returns <code>"Error"</code></p>
+<p>Which is correct, but it also made <code>g</code> less elegant. We
+had to handle both cases. Previously we just wrote
+<code>g = show . f</code>.</p>
+<hr />
+<h1 id="composability-4">Composability (4)</h1>
+<p>Composability is a major part of functional software design.</p>
+<p>We like functions that are composable.</p>
+<p>Does that mean we don’t like <code>Maybe</code>? Because it makes it
+harder to compose?</p>
+<p>No, it turns out there’s an easier way. We can compose with
+<code>Maybe</code>, we just have to extend our idea of <code>map</code>
+so that it works with <code>Maybe</code> instead of only lists.</p>
+<p>What would that look like?</p>
+<hr />
+<h1 id="map-on-lists"><code>map</code> on lists</h1>
+<p>Remember that <code>map</code> takes a function and a list and it
+returns a new list in which the function is applied to every element of
+the original list.</p>
+<p>So <code>map show [1,2,3] == ["1", "2", "3"]</code> and
+<code>map show [] == []</code></p>
+<p>And what is a <code>Maybe</code> but a list of either 1 or 0
+elements?</p>
+<hr />
+<h1 id="fmap"><code>fmap</code></h1>
+<p>The concept of “thing that we can map over” is more general than just
+a list.</p>
+<p>In fact, we can do it to <code>Maybe</code>s, too.</p>
+<p>Instead of <code>map</code>, we call this function
+<code>fmap</code>:</p>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="ot">g ::</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">String</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>g <span class="ot">=</span> (<span class="fu">fmap</span> <span class="fu">show</span>) <span class="op">.</span> f</span></code></pre></div>
+<p>Now, we get <code>Nothing</code> if the argument is <code>0</code>,
+and <code>Just</code> a string if the argument.</p>
+<p>…which isn’t what we want. We want it to say <code>"Error"</code>,
+and we want the result to be a <code>String</code>, not a
+<code>Maybe String</code>.</p>
+<p>But before we fix that, let’s briefly consider: why is it called
+<code>fmap</code>? What is the <code>f</code>?</p>
+<hr />
+<h1 id="the-f-in-fmap">The <code>f</code> in <code>fmap</code></h1>
+<p>The <code>f</code> stands for <code>Functor</code>.</p>
+<p>A <code>Functor</code> is anything that can be mapped on. Lists are
+functors, but so are <code>Maybe</code>s.</p>
+<p>In fact, almost every data structure is a <code>Functor</code>. We
+frequently want to do something to ever member of a data structure, so
+it makes sense to map over them.</p>
+<p><code>Functor</code> is a term from category theory, an advanced and
+abstract area of mathematics. Haskell takes many terms from category
+theory. Frankly, I don’t know very much about category theory, so I will
+explain these things differently. You don’t need to know category theory
+in order to make sense of Haskell. (Although it probably wouldn’t
+hurt).</p>
+<hr />
+<h1 id="fixing-the-function">Fixing the function</h1>
+<p>Okay, so <code>g = (fmap show) . f</code></p>
+<p>But we don’t want a <code>Maybe String</code>. We want a regular
+<code>String</code>, and if there isn’t one, we want it to be replaced
+by <code>"Error"</code></p>
+<p>This is a function we could easily write. It replaces
+<code>Nothing</code> with a default value:</p>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="ot">replaceNothing ::</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>replaceNothing def <span class="dt">Nothing</span> <span class="ot">=</span> def</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>replaceNothing def (<span class="dt">Just</span> x) <span class="ot">=</span> x</span></code></pre></div>
+<p>This function already exists. It’s called <code>fromMaybe</code>:</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Maybe</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="ot">fromMaybe ::</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> a</span></code></pre></div>
+<hr />
+<h1 id="fixing-the-function-2">Fixing the function (2)</h1>
+<p>So now we can finally fix it:</p>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ot">g ::</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>g <span class="ot">=</span> (fromMaybe <span class="st">&quot;Error&quot;</span>) <span class="op">.</span> (<span class="fu">fmap</span> <span class="fu">show</span>) <span class="op">.</span> f</span></code></pre></div>
+<p>If <code>f</code> returns <code>Just</code> a number,
+<code>fmap show</code> turns that into <code>Just</code> a string, and
+<code>fromMaybe</code> turns it into a regular string.</p>
+<hr />
+<h1 id="is-that-good">Is that good?</h1>
+<p>So it’s more complicated now, but that makes sense: we added more
+requirements.</p>
+<p>But it’s not <em>dramatically</em> more complicated. It’s still just
+a chain of compositions. There still aren’t any <code>if</code>
+expressions in our final answer.</p>
+<p><code>divMaybe</code> has an implicit one, but it also kind of needs
+one: <code>0</code> is a special case.</p>
+<p>Managing complexity in an object-oriented language is more about
+encapulating code into classes. But here, we don’t really hide anything.
+We just put together a pipeline that does what we want.</p>
+<p>Functional programming instruction focuses a lot on immutability and
+functions (obviously), but to me, the core of functional programming is
+composition and creating “pipelines” of code.</p>
+<hr />
+<h1 id="questions-5">Questions?</h1>
+<!-- _class: questions invert -->
+<hr />
+<h1 id="odds-and-ends">Odds and ends</h1>
+<p>These are just some important odds and ends. You need to know these
+things, and they are in the required reading, but I didn’t know where to
+put them in lecture…</p>
+<hr />
+<h1 id="indexing-lists">Indexing lists (<code>!!</code>)</h1>
+<p>If you want to get, e.g., the 3rd element of a list (starting from
+0), you can write <code>l !! 3</code>.</p>
+<p>So <code>[0, 1, 2, 3, 4, 5] !! 3</code> == <code>3</code></p>
+<p>Practice: treat the <code>(!!)</code> operator as a function and
+define it. What is the base case?</p>
+<hr />
+<h1 id="words"><code>words</code></h1>
+<p>There is a function that lets you take a <code>String</code> and
+split it into a list of <code>String</code>s on whitespace. It’s called
+<code>words</code>:</p>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">words</span><span class="ot"> ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [<span class="dt">String</span>]</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">words</span> <span class="st">&quot;Hello, world! How are you today?&quot;</span> <span class="op">==</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    [<span class="st">&quot;Hello,&quot;</span>,<span class="st">&quot;world!&quot;</span>,<span class="st">&quot;How&quot;</span>,<span class="st">&quot;are&quot;</span>,<span class="st">&quot;you&quot;</span>,<span class="st">&quot;today?&quot;</span>]</span></code></pre></div>
+<p>What if we want to split on something other than whitespace?</p>
+<p>Surprisingly, there isn’t a built-in “split” method that lets us
+split on other things besides whitespace.</p>
+<p>Practice: make one.</p>
+<hr />
+<h1 id="unwords"><code>unwords</code></h1>
+<p>The opposite of <code>words</code>. Takes a list of strings and
+pastes them together with single spaces in between:</p>
+<p><code>unwords ["hello", "world", "hi"] == "hello world hi"</code></p>
+<hr />
+<h1 id="intercalate"><code>intercalate</code></h1>
+<p>What if we want to paste them together with something other than a
+single space?</p>
+<p>We can use the <code>intercalate</code> function:</p>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.List</span>; <span class="co">-- needed for intercalate. It works with any list.</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="ot">intercalate ::</span> [a] <span class="ot">-&gt;</span> [[a]] <span class="ot">-&gt;</span> [a] <span class="co">-- get that?</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co">--example:</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>intercalate <span class="st">&quot;;;&quot;</span> [<span class="st">&quot;hello&quot;</span>, <span class="st">&quot;world&quot;</span>, <span class="st">&quot;hi&quot;</span>] <span class="op">==</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;hello;;world;;hi&quot;</span></span></code></pre></div>
+<p>Practice: write this function!</p>
+<hr />
+<h1 id="lines"><code>lines</code></h1>
+<p>Splits a string into lines instead of words:</p>
+<div class="sourceCode" id="cb41"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span><span class="ot"> ::</span> </span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span> <span class="st">&quot;hello\nworld&quot;</span> <span class="op">==</span> [<span class="st">&quot;hello&quot;</span>, <span class="st">&quot;world&quot;</span>]</span></code></pre></div>
+<p>Practice: you know what to do! Bonus points: make it work with both
+“” and “” (Windows line endings)</p>
+<hr />
+<h1 id="unlines"><code>unlines</code></h1>
+<p>And of course there’s an unlines:</p>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unlines</span><span class="ot"> ::</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unlines</span> [<span class="st">&quot;hello&quot;</span>, <span class="st">&quot;world&quot;</span>] <span class="op">==</span> <span class="st">&quot;hello\nworld\n&quot;</span></span></code></pre></div>
+<p>Notice that extra “” at the end. <code>unlines</code> does that for
+some reason.</p>
+<p>Practice: …?</p>
+<hr />
+<h1 id="take-and-drop">Take and drop</h1>
+<p><code>take :: Int -&gt; [a] -&gt; [a]</code> takes n values from the
+list. <code>drop :: Int -&gt; [a] -&gt; [a]</code> skips over the next n
+values from the list.</p>
+<p>This is useful for working with infinite lists:</p>
+<div class="sourceCode" id="cb43"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> squares <span class="ot">=</span> <span class="fu">map</span> (<span class="op">^</span><span class="dv">2</span>) [<span class="dv">1</span><span class="op">..</span>]</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">10</span> squares</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">9</span>,<span class="dv">16</span>,<span class="dv">25</span>,<span class="dv">36</span>,<span class="dv">49</span>,<span class="dv">64</span>,<span class="dv">81</span>,<span class="dv">100</span>]</span></code></pre></div>
+<p>Suppose I want the first 10 squares after 100:</p>
+<div class="sourceCode" id="cb44"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">take</span> <span class="dv">10</span> <span class="op">$</span> <span class="fu">drop</span> <span class="dv">10</span> squares</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">121</span>, <span class="dv">144</span>, <span class="dv">169</span>, <span class="dv">196</span>, <span class="dv">225</span>, <span class="dv">256</span>, <span class="dv">289</span>, <span class="dv">324</span>, <span class="dv">361</span>, <span class="dv">400</span>]</span></code></pre></div>
+<p>Practice: I think we already wrote these, but do it again!</p>
+<hr />
+<h1 id="takedropwhile">(take|drop)While</h1>
+<p>Recall that, in programming, a predicate is a function that returns a
+Bool. <code>takeWhile</code> takes a predicate and a list, and grabs
+values from it as long as the predicate is true.</p>
+<div class="sourceCode" id="cb45"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">takeWhile</span> (isEven) [<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>]</span></code></pre></div>
+<p>But it stops as <em>soon</em> as the predicate fails:</p>
+<div class="sourceCode" id="cb46"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">takeWhile</span> (isEven) [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>]</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>[]</span></code></pre></div>
+<p>Here, it failed on the very first value, so it returned the empty
+list. That’s how <code>takeWhile</code> is different from
+<code>filter</code>. This is a great one to write yourself as
+practice.</p>
+<hr />
+<h1 id="takedropwhile-2">(take|drop)While (2)</h1>
+<p>There is also <code>dropWhile</code>, which drops as long as a
+predicate is true:</p>
+<div class="sourceCode" id="cb47"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">dropWhile</span> (isEven) [<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>]</span></code></pre></div>
+<p>Now, as practice, try writing <code>takeUntil</code>, which takes as
+long as the predicate is <em>false</em>.</p>
+<p>You can write this using function composition. Remember that
+<code>not</code> is a function.</p>
+<hr />
+<h1 id="questions-6">Questions?</h1>
+<!-- _class: questions invert -->
+<hr />
+<h1 id="required-reading">Required reading</h1>
+<p><a
+href="https://en.wikibooks.org/wiki/Haskell/More_on_datatypes">More on
+datatypes</a></p>
+<p><a
+href="https://en.wikibooks.org/wiki/Haskell/Other_data_structures">Other
+data structures</a> (note: this is a tough one, but it’s only reading.
+No exercises.)</p>
+<hr />
+<h1 id="quiz-format">Quiz format</h1>
+<p>You know the drill! 15 minutes, and 4 questions, each worth 25%.
+These questions will focus on functional operators: 1. <code>map</code>
+or <code>fmap</code> 2. <code>filter</code> 3. <code>zip</code> 4.
+<code>fold</code> and friends 5. Point-free style with the above 6.
+Currying and uncurrying 7. The odds-and-ends functions</p>
+<hr />
+<h1 id="practice-quiz-1">Practice quiz 1</h1>
+<p><strong>Include types for all of these functions.</strong> You can
+define intermediate functions that are not point-free, but your solution
+functions must be point free. 1. Define a function <em>point free</em>
+named <em>uppify</em> which converts a string to upper case, using the
+<code>toUpper</code> function. So
+<code>uppify "heLLo" == "HELLO"</code>. Your solution must be point free
+to receive credit. 2. Define a function <code>replacify</code> which
+uses <code>isLower</code> and replaces all the lowercase letters with a
+question mark. So <code>replacify "heLLo" == ??LL?</code> 3. Use
+<code>filter</code> define a point free function
+<code>countUppers</code>, which uses <code>isUpper</code> and
+<code>length</code> to count the number of upper case characters in a
+string. <code>countUppers "heLLo" == 2</code>. Your solution must be
+point free to receive credit. 4. Do the same thing as 3 using
+<code>foldl</code> and <code>map</code> and not using
+<code>filter</code>.</p>
+<hr />
+<h1 id="practice-quiz-1-answers">Practice quiz 1 answers</h1>
+<div class="sourceCode" id="cb48"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1.</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="ot">uppify ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>uppify <span class="ot">=</span> <span class="fu">map</span> <span class="fu">toUpper</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2.</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="ot">replacify ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>replacify <span class="ot">=</span> <span class="fu">map</span> (\x <span class="ot">-&gt;</span> <span class="kw">if</span> <span class="fu">isLower</span> x <span class="kw">then</span> <span class="ch">&#39;?&#39;</span> <span class="kw">else</span> x)</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 3.</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="ot">countUppers ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>countUppers <span class="ot">=</span> <span class="fu">length</span> <span class="op">.</span> <span class="fu">filter</span> <span class="fu">isUpper</span></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- 4.</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a><span class="ot">countUppers&#39; ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>countUppers&#39; <span class="ot">=</span> <span class="fu">foldl</span> (<span class="op">+</span>) <span class="dv">0</span> <span class="op">.</span> <span class="fu">map</span> oneIfUpper</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>        oneIfUpper x <span class="ot">=</span> <span class="kw">if</span> <span class="fu">isUpper</span> x <span class="kw">then</span> <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span></span></code></pre></div>
+<hr />
+<h1 id="practice-quiz-2">Practice quiz 2</h1>
+<p><strong>Include types for all of these functions. 1 and 4 must be
+point free for any credit.</strong> 1. Write a function
+<strong>point-free</strong> which returns the first letter of every word
+in a given string (assume non-empty). For example:
+<code>firstLetters "hello world!" == "hw"</code>. 2. Write a function
+(not point free) that takes a pair of strings, converts them to a list
+of words, and then counts the number of those word pairs that are
+identical. So
+<code>sameWordCount "hello world how is it?" "hello world is it good?" == 2</code>
+because “hello” and “world” are the same word in the same position in
+both. (note: the “it” is the 5th word in the first string and the 4th in
+the second: doesn’t count) 3. Write a function that determines if two
+strings have the same length 4. Write a function <strong>point
+free</strong> that determines the longest line in a string with newlines
+in it. Function must be point free to receive credit. You can use
+<code>maximum :: [Int] -&gt; Int</code> which returns the largest value
+of a list.</p>
+<hr />
+<h1 id="practice-quiz-2-answers">Practice quiz 2 answers</h1>
+<div class="sourceCode" id="cb49"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1.</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="ot">firstLetters ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>firstLetters <span class="ot">=</span> <span class="fu">map</span> <span class="fu">head</span> <span class="op">.</span> <span class="fu">words</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2.</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="ot">sameWordCount ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> </span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>sameWordCount s t <span class="ot">=</span> <span class="fu">length</span> <span class="op">$</span> <span class="fu">filter</span> (<span class="op">==</span> <span class="dt">True</span>) <span class="op">$</span> <span class="fu">zipWith</span> (<span class="op">==</span>) (<span class="fu">words</span> s) (<span class="fu">words</span> t)</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 3.</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="ot">sameLength ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>sameLength s t <span class="ot">=</span> <span class="fu">length</span> s <span class="op">==</span> <span class="fu">length</span> t</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- 4.</span></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a><span class="ot">longestLineLength ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>longestLineLength <span class="ot">=</span> <span class="fu">maximum</span> <span class="op">.</span> <span class="fu">map</span> <span class="fu">length</span> <span class="op">.</span> <span class="fu">lines</span></span></code></pre></div>
+<hr />
+<h1 id="practice-quiz-3">Practice quiz 3</h1>
+<p><strong>Include types for all these functions. If it says define a
+point-free function, it must be point-free for credit.</strong></p>
+<ol type="1">
+<li>Suppose we had a function <code>isPrime :: Int -&gt; Bool</code>
+that took an <code>Int</code> and returned whether or not it was prime.
+Define an infinite list of the prime numbers.</li>
+<li>Define a function <code>sumOfFirstPrimes</code> that takes
+<code>n</code> and returns the sum of the first <code>n</code> primes
+(the number of primes is the argument). For example
+<code>sumOfFirstPrimes 3 == 10</code>, becuase the first 3 primes are 2,
+3, and 5, and the sum 2 + 3 + 5 is 10.</li>
+<li>Define a function <code>whichPrime</code> which, given a positive
+<code>Int</code> <code>n</code>, returns which prime number it is,
+starting from 1 (assume <code>n</code> is prime) So
+<code>whichPrime 5 == 3</code> (hint: try using <code>takeWhile</code>
+on the list of primes by those less than the given number)</li>
+<li>Define a <strong>point-free</strong> function that returns whether
+or not an <code>Int</code> is even.</li>
+</ol>
+<hr />
+<h1 id="practice-quiz-3-answers">Practice quiz 3 answers</h1>
+<div class="sourceCode" id="cb50"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1.</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="ot">primes ::</span> [<span class="dt">Int</span>]</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>primes <span class="ot">=</span> <span class="fu">filter</span> isPrime [<span class="dv">1</span><span class="op">..</span>]</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2.</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="ot">sumOfFirstPrimes ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>sumOfFirstPrimes n <span class="ot">=</span> <span class="fu">sum</span> <span class="op">$</span> <span class="fu">take</span> n primes</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 3.</span></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a><span class="ot">whichPrime ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> </span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>whichPrime n <span class="ot">=</span> <span class="fu">length</span> <span class="op">$</span> <span class="fu">takeWhile</span> (<span class="op">&lt;=</span>n) primes</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- 4.</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a><span class="ot">isEven ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>isEven <span class="ot">=</span> (<span class="op">==</span> <span class="dv">0</span>) <span class="op">.</span> (<span class="ot">`mod`</span> <span class="dv">2</span>)</span></code></pre></div>
+<hr />
+<h1 id="practice-quiz-4">Practice quiz 4</h1>
+<p><strong>Include types for all these functions. If it says define a
+point-free function, it must be point-free for credit.</strong></p>
+<ol type="1">
+<li>Write a function <code>last</code> which returns the last element of
+any type of list if it exists, or <code>Nothing</code> if the list is
+empty. Do not return a list.</li>
+<li>Use this function to define <strong>point-free</strong> a function
+named <code>endsWithQuestion</code>. You must handle <code>Maybe</code>s
+correctly.</li>
+<li>Now define a function <strong>point-free</strong> named
+<code>any'</code> which returns true if <em>any</em> element of a list
+of bools is true, and false otherwise (this function already exists,
+which is why there’s a <code>'</code>)</li>
+<li>Now define a function <strong>point-free</strong> called
+anyLineEndsWithQuestion, using <code>any'</code>,
+<code>endsWithQuestion</code>, and any other useful functions you know
+or define.</li>
+</ol>
+<hr />
+<h1 id="practice-quiz-4-answers">Practice quiz 4 answers</h1>
+<div class="sourceCode" id="cb51"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Maybe</span> <span class="co">-- &lt;- you wouldn&#39;t need to write this on a real quiz</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1.</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">last</span><span class="ot"> ::</span> [a] <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="fu">last</span> l <span class="ot">=</span> <span class="kw">case</span> <span class="fu">drop</span> (<span class="fu">length</span> l <span class="op">-</span> <span class="dv">1</span>) <span class="kw">of</span> </span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>        (h <span class="op">:</span> _) <span class="ot">-&gt;</span> <span class="dt">Just</span> h</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>        _ <span class="ot">-&gt;</span> <span class="dt">Nothing</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2.</span></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="ot">endsWithQuestion ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>endsWithQuestion <span class="ot">=</span> (<span class="op">==</span> <span class="ch">&#39;?&#39;</span>) <span class="op">.</span> fromMaybe <span class="ch">&#39;_&#39;</span> <span class="op">.</span> <span class="fu">last</span></span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- 3.</span></span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a><span class="ot">any&#39; ::</span> [<span class="dt">Bool</span>] <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>any&#39; <span class="ot">=</span> <span class="fu">not</span> <span class="op">.</span> <span class="fu">null</span> <span class="op">.</span> <span class="fu">filter</span> (<span class="op">==</span> <span class="dt">True</span>)</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a><span class="co">-- I made a small mistake on this one originally, using &#39;$&#39; instead of &#39;.&#39;.</span></span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- That would require the right argument of not $ ... to be a boolean</span></span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- -5 points from me!</span></span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a><span class="co">-- 4.</span></span>
+<span id="cb51-17"><a href="#cb51-17" aria-hidden="true" tabindex="-1"></a><span class="ot">anyLineEndsWithQuestion ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb51-18"><a href="#cb51-18" aria-hidden="true" tabindex="-1"></a>anyLineEndsWithQuestion <span class="ot">=</span> any&#39; <span class="op">.</span> <span class="fu">map</span> endsWithQuestion <span class="op">.</span> <span class="fu">lines</span></span></code></pre></div>
+<hr />
+<h1 id="ask-an-ai">Ask an AI</h1>
+<p>Ask an AI to generate a practice quiz for you like the above! Give it
+the slides starting with “# Quiz Format” and up to and including this
+slide. Or give it the whole markdown.</p>
+<p>Then, ask it to grade you. I like to use this scale: 1. 0 points off
+for extremely minor things. Misspellings or missing grouping operators
+that are clearly intended. 2. 5 points for mistakes that cause the code
+to fail but are more than just minor mistakes. For example a small type
+error where it’s clear you get the big idea but, e.g., applied the
+applicative to too many arguments or something. 3. 10 points for bigger
+mistakes, like type errors that can’t work, but there’s still “more than
+half” of the understanding demonstrated. 4. Zero points total if there
+are several major mistakes or it looks like you’re guessing.</p>
+<hr />
+<h1 id="questions-7">Questions?</h1>
+<!-- _class: invert questions -->
+</body>
+</html>

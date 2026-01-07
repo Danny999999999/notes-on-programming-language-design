@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>module_01_course_intros</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="programming-language-design">Programming Language Design</h1>
+<h2 id="module-1-introduction-to-programming-languages">Module 1:
+Introduction to Programming Languages</h2>
+<p><br> <br></p>
+<p>Slides © Grant Williams, <a
+href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+4.0</a>.</p>
+<p><br></p>
+<p>This is an open educational resource. Feel free to submit fixes,
+improvements, and new material <a
+href="https://github.com/grantwill74/notes-on-programming-language-design">here</a>.</p>
+<hr />
+<h1 id="what-is-this-class">What is this class?</h1>
+<p>This class is about programming languages</p>
+<p>Those things we use to write computer programs.</p>
+<p>Specifically, it’s about: - Programming paradigms: the different ways
+that programming languages see the world. - Language design: how to
+actually design and implement a programming language from scratch -
+Functional programming: the programming paradigm that is very popular
+now in the industry, but which many of you have not ever used before. -
+Haskell: the specific functional programming language we will be
+learning</p>
+<hr />
+<h1 id="about-me">About me</h1>
+<p>I am a teaching professor here</p>
+<p>I used to work at Microsoft as a data scientist and software
+engineer.</p>
+<p>Before that, most of my research focused on automated requirements
+engineering.</p>
+<p>However, I have published a workshop paper in which I created a
+programming language (<a
+href="https://scholar.google.com/citations?view_op=view_citation&amp;hl=en&amp;user=uifpy9gAAAAJ&amp;citation_for_view=uifpy9gAAAAJ:LkGwnXOMwfcC">Copper</a>).
+Programming languages have always been of interest to me.</p>
+<hr />
+<h1 id="whats-interesting-about-programming-languages">What’s
+interesting about programming languages?</h1>
+<p>At this point, you’ve learned a few languages: - You’ve had computer
+org, so some assembly experience. Maybe C and assembly, so some C. - You
+may have had systems programming: more C. - Some of you had CS 220,
+which teaches Typescript. - Those of you who started here: Python was
+the language of CS 122. - You may have also learned Java for algorithms
+and data structures. - Transfer students may have had C++ at clark.</p>
+<p>So that’s like 5, right off the bat.</p>
+<hr />
+<h1 id="those-languages">Those languages</h1>
+<p>Now that you’ve had the experience of learning a bunch of languages,
+you’re probably starting to realize that learning a new language is kind
+of…I don’t want to say “automatic”, but…</p>
+<p>Like, you know what questions to ask: - How do I make a variable? -
+How do I make a class/struct? - How do I make a function? - How do i do
+a loop?</p>
+<hr />
+<h1 id="those-languages-2">Those languages (2)</h1>
+<p>The reason for this isn’t that all of computing can be reduced to
+those concepts, and that all languages are basically the same.</p>
+<p>The reason is actually that all the languages you’ve learned have
+been imperative paradigm languages, with varying degrees of
+object-orientation.</p>
+<p>They’ve all been the same <em>kind</em> of language. There are
+radically different ways that programming can work. And as someone who
+uses them reasonably often, IMO they’re just as good.</p>
+<p>But before we go too deep, let’s talk about how class is going to
+work…</p>
+<hr />
+<h1 id="questions">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="the-structure-of-this-class">The structure of this class</h1>
+<p>This is a learning mastery class. That means there will be several
+things that you need to demonstrate (mastery elements) to pass.</p>
+<p>Each one is worth a chunk of your final grade.</p>
+<p>However, even though they will all be tested in in-class quizzes, I
+will give you two retakes for each one.</p>
+<p>Therefore, there will be 3 opportunities to demonstrate each mastery
+element.</p>
+<p>I will take the maximum score of all of these to determine what you
+make on the mastery element.</p>
+<hr />
+<h1 id="the-quizzes">The quizzes</h1>
+<p>Each mastery element will have one quiz focused on that element.</p>
+<p>There will be six quizzes in total, and each will be 15 minutes
+long.</p>
+<p>If you get a 100% on all the quizzes, congratulations, you don’t need
+to show up at the midterms or the final.</p>
+<hr />
+<h1 id="the-exams">The “exams”</h1>
+<p>There will be a “midterm” and an “endterm” exam.</p>
+<p>Each one will just be three mastery problems stapled together.</p>
+<p>It’s not really an exam, it’s just a retest opportunity. There will
+be 3 new problems.</p>
+<p>There’s a final too. It’s going to have problems for all six mastery
+elements stapled together.</p>
+<hr />
+<h1 id="the-retakes">The retakes</h1>
+<p>If you get a 100% on mastery element 1, a 0% on mastery element 2,
+and a 50% on mastery element 3, you will want to take the midterm.</p>
+<p>When you do, you can skip problem 1. It’s just going to be a re-take
+opportunity for ME 1, which you have already gotten a 100% on so you
+can’t improve.</p>
+<p>However, it will be an opportunity to improve on ME 2 and 3.</p>
+<p>If you still need an opportunity, you can take the final. It will
+have all six.</p>
+<hr />
+<h1 id="skipping-tests">Skipping tests</h1>
+<p>If you’re happy with your grade, you can skip the final. Therefore,
+the exams and final are optional. They are just retake options that are
+made universally available.</p>
+<p>You can also skip the quizzes and take the midterm, or even skip
+everything except the final.</p>
+<p>The latter is a bad idea: if you miss everything, I can’t give you an
+incomplete grade for the class, because you haven’t attempted 70% of it.
+You would fail unless you could obtain a withdrawal (or medical
+withdrawal)</p>
+<hr />
+<h1 id="mastery-areas-before-midterm">Mastery areas: before midterm</h1>
+<ol type="1">
+<li>Demonstrate a basic understanding of lambda calculus, including
+anonymous functions, partial application, and curried definitions.</li>
+<li>Demonstrate a basic level of competence with Haskell. E.g., define
+types, use functions, write some non-trivial functions.</li>
+<li>Demonstrate an understanding of functional operators such as map,
+filter, and fold.</li>
+</ol>
+<hr />
+<h1 id="mastery-areas-before-second-term">Mastery areas: before second
+term</h1>
+<ol start="4" type="1">
+<li>Demonstrate an understanding of type-classes, especially Functor and
+Applicative.</li>
+<li>Evaluate and classify a programming language according to the design
+paradigm and features provided.</li>
+<li>Demonstrate an understanding of the dreaded monad, especially the
+bind operation (either implementing, using, or both).</li>
+</ol>
+<hr />
+<h1 id="the-book">The Book</h1>
+<p>We will mainly be using <a
+href="https://en.wikibooks.org/wiki/Haskell">The Haskell
+Wikibook</a>.</p>
+<p>It’s an open educational resource, and it’s excellent. Easily as good
+as a regular pay book.</p>
+<p>Whenever I assign readings, be sure to <em>do all the
+exercises</em>.</p>
+<p>Another good one is <a
+href="https://learnyouahaskell.github.io/">Learn You a Haskell for Great
+Good</a>. <a
+href="https://learnyouahaskell.github.io/chapters.html">There’s a free
+online version</a>. This used to be the main textbook, but the main
+issue was that the harder chapters didn’t have any unworked practice
+problems, only problems that were worked inline.</p>
+<p>Still highly recommended, and also free.</p>
+<hr />
+<h1 id="lets-look-at-the-rest-of-the-syllabus">Let’s look at the rest of
+the syllabus</h1>
+<hr />
+<h1 id="questions-1">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="languages">Languages</h1>
+<p>What is a language?</p>
+<p>According to Wikipedia: “a structured system of communication”</p>
+<p>I like this definition. If a communication system doesn’t have
+structure, it’s hard to call it a language</p>
+<p>Structure here means grammar: a set of rules for building complex
+thoughts out of groups simple ones.</p>
+<p>Crows communicate by caw-ing, but I haven’t heard evidence that crow
+communication supports nested sub-clauses or grammar.</p>
+<hr />
+<h1 id="languages-2">Languages (2)</h1>
+<p>Nested sub-clauses? That’s what makes human languages rich.</p>
+<p>Humans can nest clauses inside of clauses: “I thought that he liked
+that he wasn’t having to work nights.”</p>
+<p>“I thought that ( he liked that ( he wasn’t having to work nights. )
+)”</p>
+<hr />
+<h1 id="human-languages">Human languages</h1>
+<p>In academia, we put languages into 2 categories: human and
+formal.</p>
+<p>A human language is spoken by humans. There are two sub-categories of
+human language: 1. Natural: the language evolved over time 2.
+Constructed: someone invented the language intentionally</p>
+<p>Most human languages are natural languages.</p>
+<p>However, there are some human languages that are not natural. They
+are called “constructed languages” or “conlangs” for short. [Can anyone
+name some?]</p>
+<hr />
+<h1 id="formal-languages">Formal languages</h1>
+<p>In contrast to human languages, formal languages are created by
+specifying precise grammar rules with no room for ambiguity.</p>
+<p>With formal languages, we can say that a phrase is “valid” or
+“invalid”.</p>
+<p>There’s no “mostly understandable but confusing” like with human
+languages.</p>
+<p>Instead, we follow rules precisely.</p>
+<hr />
+<h1 id="example-of-rules">Example of rules</h1>
+<p><a
+href="https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm">This</a>
+is an exhaustive syntax of the C programming language.</p>
+<p>It contains all the information needed to determine whether a given
+string of letters is a valid C program or not.</p>
+<p>This is called “syntax”</p>
+<p>Note: it does not tell you how to execute that language or what it
+means (that’s called “semantics”), only whether it’s a C program.</p>
+<p>We’ll talk more about how to read this grammar later in the course,
+but notice how much smaller it is than a book on English grammar.</p>
+<hr />
+<h1 id="human-languages-1">Human Languages</h1>
+<ul>
+<li>Natural
+<ul>
+<li>English</li>
+<li>Japanese</li>
+<li>Albanian</li>
+<li>Cherokee</li>
+<li>… like 7,000 more …</li>
+</ul></li>
+<li>Constructed
+<ul>
+<li>Esperanto</li>
+<li>Toki pona</li>
+<li>Elvish</li>
+<li>…</li>
+</ul></li>
+</ul>
+<hr />
+<h1 id="formal-languages-1">Formal Languages</h1>
+<ul>
+<li>Mathematical expressions</li>
+<li>Predicate/first-order/second-order logic</li>
+<li>C</li>
+<li><a href="https://en.wikipedia.org/wiki/Malbolge">Malbolge</a> (any
+other <em>esoteric</em> languages?)</li>
+<li>Python</li>
+<li>Ruby</li>
+<li>Scratch (yes, visual languages can be formal)</li>
+<li>UML</li>
+<li>The event scripting language for RPG Maker games.</li>
+</ul>
+<hr />
+<h1 id="history-of-programming-languages">History of programming
+languages</h1>
+<p>This is strange to think about, but programming is older than
+programming languages</p>
+<p>Programmers still had to use language to describe their programs, but
+the language they used was not specifically for programming.</p>
+<p>Many of them used mathematical formalisms instead.</p>
+<hr />
+<h1 id="example-ada-lovelace">Example: Ada Lovelace</h1>
+<p>The first computer programmer was Ada Lovelace (Augusta Ada King)</p>
+<p>She wrote the first computer program <a
+href="https://en.wikipedia.org/wiki/File:Diagram_for_the_computation_of_Bernoulli_numbers.jpg">“Note
+G”</a>, which explained how to generate the Bernoulli numbers on
+Babbage’s analytical engine.</p>
+<p>Notice that it’s just a table. Each operation is on one row. Each
+operation is identified by its mathematical operation, the variables it
+acts upon, and the variable results</p>
+<p>It’s like assembly language but using mathematical notation. Notice
+that some steps are bracketed: these can be repeated</p>
+<hr />
+<h1 id="the-first-programming-language-plankalkül">The first programming
+language: Plankalkül</h1>
+<p>The first formal language specifically made for writing programs is
+probably Plankalkül</p>
+<p>Developed in the mid 1940’s by Konrad Zuse, the first person (known)
+to have built a working mechanical computer.</p>
+<p>He was working for the bad guys during WW2: he was funded by the
+German government to develop computers (one was used to develop the
+guidance mechanism of the Hs 293 and 294 radio guided missiles).</p>
+<p>His prototype computers got blown up by Allied bombers several
+times.</p>
+<p>However, his programming language, developed for his computers,
+survived as an influence on ALGOL (another influential programming
+language).</p>
+<hr />
+<h1 id="it-was-weird">It was weird</h1>
+<p>Plankalkül had several unique features: - Only one primitive
+datatype: the bit - Bits could be grouped together into sequences or
+records for complex types - It used two-dimensional notation - Invented
+the assignment operator (he used → for it)</p>
+<p><a href="https://wtf.hijacked.us/wiki/index.php/Plankalk%C3%BCl">Here
+are some examples.</a></p>
+<hr />
+<h1 id="it-was-weird-2">It was weird (2)</h1>
+<p>By our standards, Plankalkül seems strange.</p>
+<p>Especially the 2D notation. But recall: Lovelace’s program was also
+tabular.</p>
+<p>However, it was revolutionary for introducing the concept of a
+specialized formal language for describing computer programs.</p>
+<p>Plankalkül was not implemented by Zuse. It wasn’t actually
+implemented until decades later by hobbyists.</p>
+<hr />
+<h1 id="high-level-languages">High level languages</h1>
+<p>Plankalkül was a “high level” programming language.</p>
+<p>High level means that you don’t need to know all the details of the
+computer to write code in it. Instead, you use a standardized set of
+operations that the programming language specifies.</p>
+<p>Someone may then implement a system that allows that high level code
+to run on an actual machine. (that system can be a compiler or
+interpreter for example, or even an algorithm for hand-compiling the
+program)</p>
+<p>[do we know about compilers and interpreters?]</p>
+<hr />
+<h1 id="low-level-languages">Low level languages</h1>
+<p>Oddly, the first low-level language actually came out after the first
+high-level language.</p>
+<p>It was the assembly language for the automatic relay computer (ARC),
+developed by Andrew Booth and his assistants Kathleen Britten, and Xenia
+Sweeting (pictured right) <img src="arc_devs.png"
+alt="bg right:56% an image of Andrew Booth, Kathleen Britten, and Xenia Sweeting reading outputs and specs in a room with type-writer visible." /></p>
+<hr />
+<h1 id="example-arc-code">Example Arc code</h1>
+<figure>
+<img src="arc_code.png"
+alt="An ARC assembly listing. The actual opcodes are arcane, and consist of thins like “M(14) to cA” and “+-M(15) to A”. It’s not obvious what the instructions are meant to do, but of interest is the fact that there are two sub-listings written as columns, where some execute if a value is less than 0, and others if it is greater than or equal to zero." />
+<figcaption aria-hidden="true">An ARC assembly listing. The actual
+opcodes are arcane, and consist of thins like “M(14) to cA” and “+-M(15)
+to A”. It’s not obvious what the instructions are meant to do, but of
+interest is the fact that there are two sub-listings written as columns,
+where some execute if a value is less than 0, and others if it is
+greater than or equal to zero.</figcaption>
+</figure>
+<hr />
+<h1 id="compilers-assemblers-interpretors">Compilers, assemblers,
+interpretors</h1>
+<p>Assemblers take a list of instructions (often, assembly programs are
+called “listings” instead) and turn each one into machine code.</p>
+<p>A compiler is a tool that turns code written for one language into
+another language (often assembly, but many compilers output to C or to a
+virtual language instead).</p>
+<p>Sometimes people call it a “transpiler” if it translates from one
+high-level language to another. (e.g., Typescript refers to its
+compilation process in Javascript as “transpiling”).</p>
+<p>Compilers are harder to write than assemblers: it wasn’t until the
+early 1950s that we started to see the first compiled languages.</p>
+<hr />
+<h1 id="questions-2">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="high-level-vs.-low-level">High level vs. low level</h1>
+<p>Assembly language has a 1-to-1 or almost 1-to-1 correspondence
+between an operation in the language and an operation performed by the
+computer.</p>
+<p>For example, if I write the x86 assembly instruction: “add eax, ecx”,
+that assembles to 1 machine opcode (which adds the ecx and eax registers
+together writing the sum to eax)</p>
+<p>On the other hand, if I write in C: “x = x + y”, this could actually
+result in multiple instructions being generated (depending on whether
+the variables are in registers).</p>
+<p>For example:</p>
+<pre><code>mov eax, [x]
+add eax, [y]
+mov [x], eax</code></pre>
+<hr />
+<h1 id="blurring-the-lines">Blurring the lines</h1>
+<p>Of course, that 1-to-1 definition is not hard and fast</p>
+<p>Some assemblers support “macros”, which are custom instructions that
+can generate multiple instructions</p>
+<p>For example, many assemblers support a “times” macro that performs an
+operation a certain number of times. This is not an instruction that the
+machine supports.</p>
+<p>Therefore, it’s hard to really make a hard dividing line between high
+and low-level languages. I’ve even seen people use the term “high level
+assembly” for some assemblers, like <a
+href="https://www.randallhyde.com/AssemblyLanguage/www.artofasm.com/index.html">this
+one</a>.</p>
+<hr />
+<h1 id="the-language-continuum">The language continuum</h1>
+<p>Instead of a hard boundary between high-level and low-level
+languages, we often think of a continuum.</p>
+<p>At the far left end are the lowest level languages: machine languages
+for different computers.</p>
+<p>A little to the right are assembly languages. Then macro
+assemblers.</p>
+<p>Then to the right of that are the simplest high-level programming
+languages. Plankalkül probably goes here.</p>
+<p>As we go further to the right, we get more and more expressive
+features, and we have to write less and less code, but the result is
+“farther away” from the machine and therefore less predictable in how it
+will be implemented and how fast it will be.</p>
+<hr />
+<h1 id="fallacies">Fallacies</h1>
+<p>The language continuum is not fast and hard vs. slow and easy.</p>
+<p>Sometimes, a low-level language can have a feature that a high-level
+language doesn’t. For example, an assembly language with a true ‘mod’
+instruction would make it easier to compute a possibly negatively
+indexed modulus than doing it in C.</p>
+<p>Sometimes, a low-level language can be <em>slower</em> than a
+high-level language. If you are doing a ton of string comparisons for
+equality, a language with automatic string-interning, like Java or
+Python, will be faster.</p>
+<hr />
+<h1 id="control-over-hardware">Control over hardware</h1>
+<p>The main distinction between low and high level languages is about
+how much control/interaction the language gives over hardware.</p>
+<p>For example, a low level language lets you express exactly
+<em>how</em> a string comparison is done. Whether by byte-matching (raw
+comparison) or identity (interned comparison).</p>
+<p>A low level language lets you choose <em>where</em> a value lives. In
+a register, on the stack, etc.</p>
+<p>Normally the distinction makes only a small difference, but sometimes
+it matters. We need both low and high level languages.</p>
+<hr />
+<h1 id="questions-3">Questions?</h1>
+<!-- _class: questions invert -->
+<hr />
+<h1 id="languages-in-time-the-50s">Languages in time: the 50s</h1>
+<p>When high-level programming languages were new, they weren’t actually
+very high level.</p>
+<p>To our modern eyes, many of these languages look like they might as
+well be assembly. However, they often contained many helpful convenience
+features for common tasks.</p>
+<p>Example: input/output. In assembly, it often involves writing special
+values to memory-mapped addresses or hardware ports.</p>
+<p>Early high-level languages in the 50’s typically had some “print” or
+“read” equivalents that were cross platform and much easier.</p>
+<hr />
+<h1 id="fortran">FORTRAN</h1>
+<p>The first commercially successful programming language is called <a
+href="https://en.wikipedia.org/wiki/Fortran">FORTRAN</a>. Developed by
+John Backus at IBM.</p>
+<p>It stands for “FORmula TRANslating system”.</p>
+<p>The idea was to let scientists write down formulas and run them
+instead of needing to translate them to assembly code.</p>
+<p>For example: x = 20 * y + z + w is more natural than:</p>
+<pre><code>mov eax, [y]
+mul 20
+add eax, [z]
+add eax, [w]
+mov [x], eax</code></pre>
+<hr />
+<h1 id="fortran-2">FORTRAN (2)</h1>
+<p>As you might expect from a programming language introduced in the
+50s, it’s very, very simple. There were no loops. There were no
+functions.</p>
+<p>The “if” statement always had 3 branches: one for if the result of an
+expression was negative, one for zero, and one for positive.</p>
+<p>So “if x &lt; 20: do something” was actually written:</p>
+<pre><code>IF( X – 20 ) 20, 30, 30
+20 do something
+30 … program continues … </code></pre>
+<p>Bizarre feature: you could give the Monte Carlo frequency of one of
+the branches so the compiler could give the most likely branches the
+best memory locations.</p>
+<hr />
+<h1 id="fun-notes-about-fortran">Fun notes about FORTRAN</h1>
+<p>It was referred to as “old-fashioned” in a 1968 journal article*.</p>
+<p>…yet, it is still widely used in the scientific/supercomputer
+community</p>
+<p>It has a lot more features now than it used to. People aren’t still
+using the weird 3-branch if statement anymore.</p>
+<p>It’s an extremely fast language. FORTRAN compilers used to regularly
+beat C compilers. It’s not so true today, but if you look at the fastest
+C programs on <a
+href="https://benchmarksgame-team.pages.debian.net/benchmarksgame/fastest/gcc-ifx.html">this
+site</a>, most of them are basically assembly anyway:</p>
+<p>(FORTRAN ties C in pi-digits computation)</p>
+<div class="footnote">
+<p>*Kemeny, John G.; Kurtz, Thomas E. (11 October 1968). “Dartmouth
+Time-Sharing”. Science. 162 (3850): 223–228. Bibcode:1968Sci…162..223K.
+doi:10.1126/science.162.3850.223. PMID 5675464</p>
+</div>
+<hr />
+<h1 id="flow-matic">FLOW-MATIC</h1>
+<p>Designed by Rear Admiral lower-half Grace Hopper</p>
+<p>One of her goals was to make a compiler for a language that seemed as
+“English-like” as possible.</p>
+<p>The idea was to make it easy for business logic to be programmed
+(requiring less formal language expertise).</p>
+<p>She developed a language called B-0 (business language 0), later
+renamed FLOW-MATIC</p>
+<hr />
+<h1 id="example-code">Example code</h1>
+<pre class="flowmatic"><code> (0)  INPUT INVENTORY FILE-A PRICE FILE-B ; OUTPUT PRICED-INV FILE-C UNPRICED-INV
+     FILE-D ; HSP D .
+ (1)  COMPARE PRODUCT-NO (A) WITH PRODUCT-NO (B) ; IF GREATER GO TO OPERATION 10 ;
+     IF EQUAL GO TO OPERATION 5 ; OTHERWISE GO TO OPERATION 2 .
+ (2)  TRANSFER A TO D .
+ (3)  WRITE-ITEM D .
+ (4)  JUMP TO OPERATION 8 .
+ (5)  TRANSFER A TO C .
+ (6)  MOVE UNIT-PRICE (B) TO UNIT-PRICE (C) .
+ (7)  WRITE-ITEM C .
+ (8)  READ-ITEM A ; IF END OF DATA GO TO OPERATION 14 .
+ (9)  JUMP TO OPERATION 1 .
+(10)  READ-ITEM B ; IF END OF DATA GO TO OPERATION 12 .
+(11)  JUMP TO OPERATION 1 .
+(12)  SET OPERATION 9 TO GO TO OPERATION 2 .
+(13)  JUMP TO OPERATION 2 .
+(14)  TEST PRODUCT-NO (B) AGAINST ; IF EQUAL GO TO OPERATION 16 ;
+     OTHERWISE GO TO OPERATION 15 .
+(15)  REWIND B .
+(16)  CLOSE-OUT FILES C ; D .
+(17)  STOP . (END)</code></pre>
+<hr />
+<h1 id="flow-matic-to-cobol">FLOW-MATIC to COBOL</h1>
+<p>The idea behind FLOW-MATIC was accessibility</p>
+<p>It was a language focused on the needs of the business community; it
+was intended to be used by people who weren’t computer scientists.</p>
+<p>It was noticed by computer scientist Mary K. Hawes at Burroughs
+Corporation (an IBM competitor) who wanted to create a common business
+programming language.</p>
+<hr />
+<h1 id="flow-matic-to-cobol-2">FLOW-MATIC to COBOL (2)</h1>
+<p>Mary Hawes invited Grace Hopper to work on the spec. Grace Hopper
+suggested petitioning the department of defense for funding.</p>
+<p>They did so, and the resulting committee created COBOL.</p>
+<p>According to Hopper, COBOL was 95% FLOW-MATIC.</p>
+<hr />
+<h1 id="flow-charts">Flow-charts</h1>
+<p>Notice that the code reads more like a process than we’re used
+to.</p>
+<p>There’s isn’t a lot of hierarchical organization (if any).</p>
+<p>Instead there’s a lot of “jump to operation X”.</p>
+<p>This is true of both FORTRAN and COBOL.</p>
+<p>The developer workflow as very different in those days. People would
+often start programming by writing a flow-chart.</p>
+<p>The flow-chart would then be converted to code. Each line was a goto.
+Each split was a branch.</p>
+<hr />
+<h1 id="flow-charts-2">Flow-charts (2)</h1>
+<p>Interestingly, this made it fairly easy to write even assembly too.
+Starting with a flowchart is straightforward.</p>
+<p>The problem is going backwards. It’s tedious to edit the program to
+change the control flow.</p>
+<p>The solution to this was “structured programming”. We’ll talk about
+it soon.</p>
+<hr />
+<h1 id="punchcards">Punchcards</h1>
+<p>Quick note: both FORTRAN and COBOL are associated with punchcards</p>
+<p>You might be imagining someone punching holes in them manually.</p>
+<p>In actuality they were just a way of storing text.</p>
+<p>You would type your program on a terminal, hit the print button, and
+the punchcards would be printed out.</p>
+<p>You would hand that stack to an operator.</p>
+<p>Don’t drop it!</p>
+<hr />
+<h1 id="questions-4">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="the-procedure">The procedure</h1>
+<p>A major development in programming languages around this era was the
+concept of a “procedure”</p>
+<p>If you’re familiar with C functions, you already know about
+procedures (because a C function is a kind of one).</p>
+<p>A procedure is just a block of code that can be re-used by “calling”
+it.</p>
+<p>Procedures aren’t exactly the same thing as functions in some
+languages though: procedures have side effects. They change memory or
+input/output when you call them.</p>
+<p>Some language differentiate between procedures and functions (e.g.,
+BASIC). Procedures have no return value.</p>
+<hr />
+<h1 id="procedures">Procedures</h1>
+<p>Procedures are a basic unit of program “composition”</p>
+<p>Composition means building a complex program from simpler ones.</p>
+<p>It’s hard to imagine writing code by copy-pasting to re-use (although
+I do know programmers who make this work, even in a professional
+environment. Snippet managers are a thing.)</p>
+<p>In assembly, where “functions” do not exist, you can re-use a block
+of code by saving your current location, moving arguments to a
+pre-defined place, jumping to the code, and then having that code jump
+back when it’s done.</p>
+<hr />
+<h1 id="procedures-2">Procedures (2)</h1>
+<p>The challenging part here is negotiating between the code being
+called and the calling code.</p>
+<p>They both need to agree on a “calling convention”, which is a set of
+rules about where arguments and the return location are stored.</p>
+<p>The calling convention is an important part of the “Application
+Binary Interface” (ABI), which describes how binary code modules
+interact with one another.</p>
+<p>This is surprisingly complex, and you can see why the earliest
+programming languages didn’t really break a lot of ground here.</p>
+<hr />
+<h1 id="non-zero-cost-of-abstractions">Non-zero cost of
+abstractions</h1>
+<p>Procedures are also an interesting case in the cost of
+abstraction</p>
+<p>“Abstraction” means making code more general. A procedure is more
+abstract than a random blob of code, because the procedure is more
+likely to be useable from anywhere (whereas the blob of code might need
+to have variables pre-defined for it, etc.).</p>
+<p>Abstraction also means simpler, and less specific. A function is just
+a mapping between input and output values. It lets you ignore what’s
+inside.</p>
+<p>However, to call a procedure, there’s a bunch of work we have to do
+that may be unnecessary (moving arguments to specified locations might
+force us to duplicate data redundantly for example)</p>
+<hr />
+<h1 id="structured-programming">Structured Programming</h1>
+<p>One of the major innovations that started to take place around the
+1960s was the use of structures in code.</p>
+<p>What are structures?</p>
+<p>Well, in C, all structures have curly braces after them (there are a
+couple of structures that <em>don’t</em> such as the ternary operator,
+but we’ll focus on the big ones).</p>
+<p>That is, functions, if-statements, and loops are all structures.</p>
+<p>Why does that matter?</p>
+<hr />
+<h1 id="structured-programming-2">Structured Programming (2)</h1>
+<p>The original idea behind structured programming was that each
+structure had only one entrance and one exit.</p>
+<p>That means each structure had to be entered from the top: - You
+cannot jump from outside of a function into the middle of a function. -
+You cannot into a random branch of an if-statement without running the
+condition. - You cannot jump <em>into</em> a loop from outside the loop
+without first checking the guarded condition at the top.</p>
+<hr />
+<h1 id="structured-programming-3">Structured Programming (3)</h1>
+<p>These may seem like common sense now, but they were absolutely not
+required in assembly. A jump/goto can go <em>anywhere</em>, including
+into the middle of a function.</p>
+<p>Originally, structures were supposed to only have one exit as well.
+So there was no “early return” idea.</p>
+<p>Over time, structured programmers became comfortable with the idea of
+early returns and ifs with no elses (mostly), so this stopped being seen
+as a problem.</p>
+<p>Only <em>entering</em> at one point was non-negotiable, however.</p>
+<hr />
+<h1 id="structured-programming-4">Structured Programming (4)</h1>
+<p>It may seems like common sense to not allow someone to jump into a
+random part of a function, but really think about why…</p>
+<p>One reason is that it could violate the ABI. What if we remove 16
+bytes from the stack at the end of the function, but the jumper didn’t
+push 16 bytes? Big problem.</p>
+<p>But we can be careful and just not do that. The real issue is that
+random jumps mean that we cannot, just by looking at the code, establish
+invariants that let us know exactly which properties about it are
+true.</p>
+<p>For example, if a function requires that arguments not be negative,
+it can check, at compile time or run time that this is the case. If we
+can jump into the function, we would bypass that check. So inside the
+function we lose the ability to know what’s true. We don’t know the
+state of the program.</p>
+<hr />
+<h1 id="state">State</h1>
+<p>This is a big word, we’ll be hearing it again and again.</p>
+<p>State means, basically, the values in memory/registers. It can also
+include the values stored in external devices, like GPUs and hard
+drices.</p>
+<p>The “state” of a program is the map of values to
+variables/registers/IO that are all relevant.</p>
+<p>So if I change the value in a variable, I change that variable’s
+state.</p>
+<p>Classic imperative programming allowed state to be changed in an
+unrestricted way. Different paradigms have different ways of managing
+it.</p>
+<hr />
+<h1 id="structured-programming-5">Structured Programming (5)</h1>
+<p>Structured programming was heavily motivated by dislike for
+GOTO/Jump</p>
+<p>The famous Dijkstra essay <a
+href="https://www.cs.utexas.edu/users/EWD/ewd02xx/EWD215.PDF">“Go-to
+statement considered harmful”</a> had a major impact on public
+perception.</p>
+<p>Opening quote: “Since a number of years I am familiar with the
+observation that the quality of programmers is a decreasing function of
+the density of go to statements in the programs they produce.”</p>
+<p>One of Dijkstra’s points is that humans are better at understanding
+static relationships than dynamic ones. And the complexity of a dynamic
+(code) process can be related to asking the question: suppose we stop at
+a random point in time. How much would we have to undo to reach a point
+where we could restart the program from that point?</p>
+<hr />
+<h1 id="structured-programming-6">Structured Programming (6)</h1>
+<p>That Lisp language we saw earlier does support structures. It has an
+equivalent to if, while, etc. However, it also supports unrestricted
+variable changes.</p>
+<p>Here’s a language that is widely considered to have popularized the
+structured programming paradigm: <a
+href="https://en.wikipedia.org/wiki/ALGOL_60">ALGOL</a></p>
+<p>The language was highly anticipated, but its committee had trouble
+agreeing on many things, and its implementations were delayed. However,
+its ideas were influential. See if you can recognize its syntax…</p>
+<hr />
+<h1 id="algol-60-code">Algol 60 code</h1>
+<pre class="algol"><code>procedure Absmax(a) Size:(n, m) Result:(y) Subscripts:(i, k);
+    value n, m; array a; integer n, m, i, k; real y;
+comment The absolute greatest element of the matrix a, of size n by m,
+    is copied to y, and the subscripts of this element to i and k;
+begin
+    integer p, q;
+    y := 0; i := k := 1;
+    for p := 1 step 1 until n do
+        for q := 1 step 1 until m do
+            if abs(a[p, q]) &gt; y then
+                begin y := abs(a[p, q]);
+                    i := p; k := q
+                end
+end Absmax</code></pre>
+<hr />
+<h1 id="its-actually-readable">It’s actually readable</h1>
+<p>You can probably read that code without knowing the language.</p>
+<p>ALGOL is probably the first langauge that “looks modern”.</p>
+<p>We are very used to structured programming. It is so fundamental that
+we think of “if statements” and “while loops” as being the basic units
+of programming. It’s strange to think that they had to be invented.</p>
+<p>But the real key to structured programming is more subtle than that:
+it’s those “begin” and “end” blocks.</p>
+<hr />
+<h1 id="blocks-of-code">Blocks of code</h1>
+<p>The key behind structured programming is the idea that we can break
+code up into sequences of statements, called “blocks”, and use those as
+atomic units.</p>
+<p>It’s not that we can’t jump into the middle of a function, a branch,
+or a loop. Its that all of those things require a block, and we cannot
+jump into a block.</p>
+<p>In C, a block is between curly braces:
+<code>{ a(); b(); c(); }</code></p>
+<p>Blocks can be nested:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>something<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    a<span class="op">();</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>something <span class="cf">else</span><span class="op">)</span> <span class="op">{</span> b<span class="op">();</span> c<span class="op">();</span> d<span class="op">();</span> <span class="op">}</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>In Algol, blocks were between “begin” and “end”, but it’s the same
+idea.</p>
+<hr />
+<h1 id="the-tree-structure">The tree structure</h1>
+<p>Blocks can be nested.</p>
+<p>We could think of the whole program as a kind of super-block. It
+might have function definitions inside of it.</p>
+<p>Each function body is a block, which can have blocks inside of it:
+maybe loops, ifs, or local functions.</p>
+<p>This tree-like organization, where each block “contains” child
+blocks, is often easier to understand than a giant list of instructions
+with little labels inserted every so often.</p>
+<hr />
+<h1 id="structured-languages">Structured Languages</h1>
+<p>Nowadays, structured programming is so pervasive, we don’t really
+call a language a “structured programming language”.</p>
+<p>However, probably all your favorite languages are structured (unless
+you love assembly language: no judgement for that).</p>
+<p>C, C++, Java, Python, JavaScript, TypeScript, Rust, etc. are all
+structured</p>
+<p>Interestingly, C supports non-structured programming with goto and
+set/longjmp. Goto is still useful in C for resource management.</p>
+<p>However, other non-structured C features have been criticized (e.g.,
+switch statements with fall through, unhygenic macros)</p>
+<hr />
+<h1 id="imperative-languages">Imperative languages</h1>
+<p>It’s also almost certain that the languages you know so far are
+<em>imperative</em>.</p>
+<p>That means that programs are seen as being lists of instructions on
+how to <em>change</em> the current state.</p>
+<p>This seems so fundamental that there is no alternative, but I assure
+you, there are alternatives.</p>
+<hr />
+<h1 id="the-functional-paradigm">The functional paradigm</h1>
+<p>This class will introduce you to several “strange” ways to think
+about programming. In particular, we’ll be learning Lisp (a list/macro
+paradigm language), and we’ll learn about Prolog (a logical
+language).</p>
+<p>However, the main paradigm we’ll be learning is “Functional”
+programming.</p>
+<p>This paradigm is <em>fundamentally</em> different from the imperative
+paradigm. It doesn’t even have “variables” (in the sense that they
+aren’t allowed to change)</p>
+<p>And yet, it’s <em>just as powerful</em> as the imperative paradigm.
+This may seem shocking, but there’s nothing you can’t do in a functional
+language (besides change a variable, obviously, but there are ways to do
+make things happen without doing that in the language).</p>
+<hr />
+<h1 id="questions-5">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="programming-paradigms">Programming paradigms</h1>
+<p>Paradigm (in general) is a way of viewing the world. For example, if
+we believe that all physical behavior is explained by collisions between
+particles, it would be a “new paradigm” to discover electromagnetic
+waves.</p>
+<p>We would now see the world differently, and it would give us ideas on
+new hypotheses to test.</p>
+<p>When it comes to programming, there are different paradigms too. A
+programming paradigm is a “way of looking at programming”</p>
+<hr />
+<h1 id="the-four-kinds-of-english-sentence">The four kinds of English
+sentence</h1>
+<p>Can anyone recall the four kinds of English sentence?</p>
+<hr />
+<h1 id="the-four-kinds-of-english-sentence-1">The four kinds of English
+sentence</h1>
+<ul>
+<li>Declarative: “I went to the store.”</li>
+<li>Imperative: “Go to the store.”</li>
+<li>Interrogative: “Did you go to the store?”</li>
+<li>Exclamatory: “AHHHHH!!!! I went to the store!!!!”</li>
+</ul>
+<p>All of these (except exclamatory) have a corresponding programming
+paradigm.</p>
+<p>There are more besides, but this is a good starting point.</p>
+<hr />
+<h1 id="the-imperative-paradigm">The imperative paradigm</h1>
+<p>We’ve already seen the imperative paradigm. Your favorite languages
+are mostly going to be imperative.</p>
+<p>The fundamental idea behind it is that “every program is a list of
+imperatives”.</p>
+<p>What’s an imperative? An order. When you give someone an order, you
+issue an imperative.</p>
+<p>In programming, an imperative is an order to change the world in some
+way: - Change a variable - Output something - Change modes, etc.</p>
+<hr />
+<h1 id="the-imperative-paradigm-2">The imperative paradigm (2)</h1>
+<p>The CPU fundamentally works this way, so it’s not surprising that
+it’s kind of the “default” paradigm.</p>
+<p>There are dozens/hundreds of instructions. Each one takes registers,
+memory addresses, or immediate values, and modifies a register or memory
+state according to the instruction.</p>
+<p>Each instruction is an imperative.</p>
+<hr />
+<h1 id="imperative-hlls">Imperative HLLs</h1>
+<p>An imperative high level langauge uses “statements”.</p>
+<p>A statement modifies memory in some way. It changes state.</p>
+<p>In c: <code>4 + 2</code> by itself is <em>not</em> a statement. If
+you just write:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> whatever<span class="op">(</span><span class="dt">void</span><span class="op">)</span> <span class="op">{</span> <span class="dv">4</span> <span class="op">+</span> <span class="dv">2</span><span class="op">;</span> <span class="op">}</span></span></code></pre></div>
+<p>You’ve turned it into a statement by adding a semicolon, but this has
+no effect on the program. The resulting <code>6</code> just
+dissappears.</p>
+<p>However, this <em>is</em> a statement. It changes the value of
+<code>x</code>: <code>x = 4 + 2;</code></p>
+<p>Imperative languages allow you to come up with elegant ways of
+arranging statements and running them conditionally. But the core object
+of the language is the statement.</p>
+<hr />
+<h1 id="declarative-programming">Declarative programming</h1>
+<p>It might seem weird that other options exist, but consider this:
+instead of <em>telling</em> the computer what to <em>do</em>, instead
+<em>describe</em> what you <em>want</em>.</p>
+<p>Consider this webpage:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode html"><code class="sourceCode html"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>Awesome page<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Welcome to my awesome page!<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div>
+<p>What does this page do?</p>
+<hr />
+<h1 id="declarative-programming-2">Declarative programming (2)</h1>
+<p>That depends on the browser. It’s supposed to have the title “Awesome
+page” and show a paragraph of text that says “Welcome to my awesome
+page!”, but it’s up to the browser to actually render the text and print
+it out.</p>
+<p>Notice that we aren’t telling the browser how to do its job. There is
+no code like: if user is on page, then render text “Welcome to my
+awesome page!”, then copy that text to the visible framebuffer, etc.</p>
+<p>We are simply describing what we want.</p>
+<p>This is the essence of declarative programming.</p>
+<hr />
+<h1 id="declarative-programming-3">Declarative programming (3)</h1>
+<p>At first glace, declarative programming can seem kind of like a
+toy.</p>
+<p>“Cool, I can draw a paragraph of text, but only if you let me by
+providing the <code>p</code> tag.”</p>
+<p>But consider this: mathematical functions are also declarative.</p>
+<p>When we write <code>f(x) = x + 9</code>, we are describing something.
+We are describing how to compute <code>f(x)</code>.</p>
+<p>What if we could treat a program as a description of how to take
+input values into values that get printed? Suddenly, we’re simply
+describing the wires that connect input to output, rather than ordering
+that anything happen.</p>
+<hr />
+<h1 id="functional-programming">Functional programming</h1>
+<p>This might seem to be a strange distinction, but I promise it’s
+not.</p>
+<p>Treating our program as a function from inputs to outputs has many
+benefits: - It’s easier to prove things about it because it’s mostly
+static. - It is typically easier to parallelize (for reasons we will
+discuss) - It is often shorter. - It is often easier to test.</p>
+<p>This is the programming paradigm that we will use the most in this
+course.</p>
+<hr />
+<h1 id="functional-programming-2">Functional programming (2)</h1>
+<p>In a <em>pure</em> functional language, we don’t even permit
+statements. That is, nothing is permitted to change state.</p>
+<p>If we say, mathetmatically <code>x = 7</code>, and then later write
+<code>x = 8</code>, that is either a redefinition or an error. We said
+<code>x = 7</code>, so either we want a new <code>x</code> or we made a
+mistake. It makes no sense to <em>change</em> it.</p>
+<p>Following this discipline of never changing variables sounds
+impossible at first, but it’s not, and it leads to some interesting
+benefits.</p>
+<p>The Haskell programming language is a <em>pure</em> functional
+language. It is very strict about following this paradigm. This is the
+language we will use for this class primarily.</p>
+<hr />
+<h1 id="query-based-programming">Query-based programming</h1>
+<p>What about interrogative sentences?</p>
+<p>Well, this might look familiar:
+<code>SELECT * FROM Students WHERE Grade &gt;= 80 ORDER BY Grade DESC</code></p>
+<p>Here, the language is built around asking questions. Who are the
+students with at least a B-?</p>
+<p>There’s a declaration here too: we want the result to be ordered by
+grade.</p>
+<p>And how does data get into the table to begin with? We need some
+<code>INSERT INTO</code> statements.</p>
+<p>So query-based programming kind of touches all three: imperatives,
+declarations, and interrogation.</p>
+<hr />
+<h1 id="more-paradigms">More paradigms</h1>
+<p>These aren’t the only paradigms.</p>
+<p>There is the list/macro paradigm that Lisp uses. We will become very
+familiar with it.</p>
+<p>There is also the paradigm of “parallel programming”, which is kind
+of a cross-cutting super paradigm.</p>
+<p>Many modern languages deal with it: you’ve learned/are learning about
+mutexes and semaphores in your systems programming class.</p>
+<p>Functional languages can do parallel programming effortlessly,
+something that will be exciting to explore</p>
+<hr />
+<h1 id="more-paradigms-2">More paradigms (2)</h1>
+<p>So far, you’ve done a lot of programming in imperative langauges.</p>
+<p>It’s fairly easy to learn a new one now. You kind of know what to do:
+“How do I make variables? How do I write loops? How do I define
+procedures?”</p>
+<p>But that’s only imperative languages. Functional languages can be
+<em>radically</em> different.</p>
+<p>Consider <a
+href="https://griffsgraphs.wordpress.com/wp-content/uploads/2012/07/programming-languages_label.png">this
+graph</a>…</p>
+<hr />
+<h1 id="more-paradigms-3">More paradigms (3)</h1>
+<p>With an imperative background, we can learn about half that graph
+fairly straightforwardly.</p>
+<p>But the other half of the graph will seem completely opaque.</p>
+<p>The purpose of this class is so that no programming paradigm will
+feel completely out there.</p>
+<p>Which is good, because it’s actually common for programming lanugages
+to borrow features from other paradigms.</p>
+<hr />
+<h1 id="questions-6">Questions</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="key-takeaways">Key takeaways</h1>
+<p>Make sure you understand these concepts: - High-level vs. low-level
+langauges - What structured programming is - What a programming paradigm
+is</p>
+<hr />
+<h1 id="before-next-time">Before next time:</h1>
+<p>Work through (meaning, follow along and do all the exercises for)
+these chapters: - <a
+href="https://en.wikibooks.org/wiki/Haskell/Getting_set_up">Getting set
+up</a> - <a
+href="https://en.wikibooks.org/wiki/Haskell/Variables_and_functions">Variables
+and functions</a></p>
+<p>After installing Haskell with GHCup, try saving this hello world
+program as <code>main.hs</code>:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello, world!&quot;</span></span></code></pre></div>
+<p>Compile and run with <code>ghc main.hs</code> and then
+<code>main.exe</code> on windows or <code>./main</code> on *nix.</p>
+<p>We’ll talk more next time about the strange functional paradigm. It’s
+not a coincidence that we write <code>main =</code> instead of
+<code>main() {...}</code> or <code>main: ...</code></p>
+<hr />
+<h1 id="before-next-time-2">Before next time (2):</h1>
+<p>Also make sure to familiarize yourself with the Haskell REPL.</p>
+<p>REPL stands for “read evaluate print loop”. It’s when you
+interactively write code one line at a time and it evaluates the line
+you typed in. Python has this too.</p>
+<p>For us, the REPL will be called “GHCI”. The I stands for
+“interactive”. You can write :t <expression> to print the type of the
+given expression, which is very useful.</p>
+<hr />
+<h1 id="questions-7">Questions?</h1>
+<!-- _class: invert questions -->
+</body>
+</html>

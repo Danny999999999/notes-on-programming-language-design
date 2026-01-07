@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>module_09_typeclasses</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="programming-language-design">Programming Language Design</h1>
+<h2 id="module-9-typeclasses">Module 9: Typeclasses</h2>
+<p><br> <br></p>
+<p>Slides © Grant Williams, <a
+href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+4.0</a>.</p>
+<p><br></p>
+<p>This is an open educational resource. Feel free to submit fixes,
+improvements, and new material <a
+href="https://github.com/grantwill74/notes-on-programming-language-design">here</a>.</p>
+<hr />
+<h1 id="last-module">Last module</h1>
+<p>We learned about records.</p>
+<p>Finally, something that looks like a struct.</p>
+<p>There were some weird wrinkles about field names though [can anyone
+recall?].</p>
+<hr />
+<h1 id="this-module">This module</h1>
+<p>We’re going to learn about typeclasses</p>
+<p>This is a strange topic, because you already know a lot about them,
+but don’t realize it.</p>
+<p>However, you will hear the word “class” and think that it involves
+classes, and it doesn’t.</p>
+<p>So what you think you know, you don’t know, but you actually know a
+lot about this subject that you don’t know that you know.</p>
+<hr />
+<h1 id="what-is-a-class">What is a class?</h1>
+<p>Let’s talk about classes.</p>
+<p>The regular kind. The ones that Java and C++ have.</p>
+<p><a href="#what-is-a-class">What is a class?</a></p>
+<hr />
+<h1 id="some-valid-answers">Some valid answers:</h1>
+<ol type="1">
+<li>A set of methods that are bundled with data that only they are
+allowed to modify</li>
+<li>A “blueprint” for constructing instances that have certain fields
+and methods.</li>
+<li>A way of separating public data or methods from private data or
+methods</li>
+<li>A way of grouping data fields together (basically a struct with
+functions)</li>
+</ol>
+<hr />
+<h1 id="why-havent-we-seen-these-in-haskell">Why haven’t we seen these
+in Haskell?</h1>
+<p>Classes are actually uncommon in functional languages.</p>
+<p>They exist, but usually are only used when interacting with
+non-functional code.</p>
+<p>In functional code, we don’t really benefit from them.</p>
+<p>Why?</p>
+<hr />
+<h1 id="the-3-pillars-of-oo">The 3 “pillars” of OO</h1>
+<p>In several early OO-textbooks, there were three key ideas that often
+defined OO programming: 1. Encapsulation 2. Inheritance (alternatively,
+“Abstraction”) 3. Polymorphism</p>
+<p>[What do these mean?]</p>
+<p>People started calling these “the three pillars of OO” for some
+reason. In my opinion, only encapsulation and polymorphism seem
+necessary for a language to “feel” OO. “Abstraction” is a vague term,
+and as a concept is common to all programming languages and
+paradigms.</p>
+<hr />
+<h1 id="the-3-pillars-of-oo-2">The 3 “pillars” of OO (2)</h1>
+<p>Classes end up being a tool that satisfies all three features: 1.
+Classes serve as “encapsulation boundaries”. They are allowed to declare
+that certain data is off-limits to everyone but them. 2. Classes are the
+things which perform inheritance. The object of inheritance was
+originally envisioned (by early OO language designers) as a way to reuse
+code. All the fields and methods of the parent class are now usable
+on/by the child class. (ignoring C++’s private/protected inheritance
+which is more akin to composition) 3. Classes can have “overridable”
+(aka “virtual”) methods, that do different things when called on
+instance of inheriting classes. This enables a form of polymorphism.</p>
+<hr />
+<h1 id="with-me-so-far">With me so far?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="one-tool-for-3-features">One tool for 3 features?</h1>
+<p>Is that really good?</p>
+<p>On the one hand, it’s kind of cool that one language tool can satisfy
+so many requirements and enable so many abilities.</p>
+<p>On the other hand, it kind of makes classes feel “overloaded”. They
+do all these different things and it might be the case that we could
+fulfill the other requirements better if we had specific language tools
+for each one. (I have an example of this)</p>
+<p>Let’s start with encapsulation. What is it for? Do we still need
+it?</p>
+<hr />
+<h1 id="encapsulation">Encapsulation</h1>
+<p>Encapsulation means keeping data hidden away with clear boundaries on
+how and when it can be accessed. Imagine the data in a “capsule”.</p>
+<p><em>Why</em> do we want to hide data away? Why do we want to stop it
+from being accessed? Why do we want to stop it from being modified?</p>
+<p>[Thoughts]</p>
+<hr />
+<h1 id="two-reasons">Two reasons</h1>
+<p>There are two main benefits of encapsulation: 1. To reduce coupling.
+I.e., external code shouldn’t need to know the type or encoding of
+internal fields, so you can freely change them without breaking
+anything. 2. To reduce the danger of shared, mutable data being changed
+unexpectantly and violating invariants.</p>
+<hr />
+<h1 id="coupling">Coupling</h1>
+<p>The coupling issue is still something we have to worry about, even
+though we don’t have OO classes in Haskell.</p>
+<p>For example, I can write pi as a constant:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pi</span><span class="ot"> ::</span> <span class="dt">Float</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pi</span> <span class="ot">=</span> <span class="fl">3.1415926</span></span></code></pre></div>
+<p>And I can write trig functions that might be used with it:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sin</span><span class="ot"> ::</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Float</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sin</span> <span class="op">...</span> <span class="ot">=</span> <span class="op">...</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">print</span> <span class="op">$</span> <span class="fu">sin</span> <span class="op">$</span> <span class="fu">pi</span> <span class="op">/</span> <span class="fl">4.0</span></span></code></pre></div>
+<hr />
+<h1 id="coupling-2">Coupling (2)</h1>
+<p>But a 32-bit Float is not really enough room to store more than 6-9
+significant figures. Maybe we want a more accurate approximation of
+pi.</p>
+<p>If we replace <code>pi :: Float</code> with
+<code>pi :: Double</code>, we create type errors. We can no longer pass
+<code>pi / 4.0</code> to the <code>sin</code> function, because that
+function takes a <code>Float</code>, not a <code>Double</code>.</p>
+<p>The <code>sin $ pi / 4.0</code> expression and the <code>pi</code>
+constant are <em>coupled</em>, meaning that changing one of them can
+require the other to change.</p>
+<hr />
+<h1 id="coupling-3">Coupling (3)</h1>
+<p>Pi is such a fundamental constant, that lots of things are coupled
+with it.</p>
+<p>This isn’t really a problem: it’s a constant, so it doesn’t really
+change. We can just give enough digits for most problems and if someone
+actually needs more they can <a
+href="https://web.archive.org/web/20120310205303/http://www.math.hmc.edu/funfacts/ffiles/20010.5.shtml">compute
+the extra digits they need</a> using a function, forcing a different
+kind of type error.</p>
+<p>But what about an internal value that no one else needs?</p>
+<hr />
+<h1 id="coupling-4">Coupling (4)</h1>
+<p>Consider making a C++ class to store data for a video game
+character:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Character <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">private</span><span class="op">:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> hp<span class="op">;</span> <span class="co">// &quot;hit points&quot;. how much damage can be taken.</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> mp<span class="op">;</span> <span class="co">// &quot;magic points&quot;. how many spells can be casted.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<p>If we later want to change <code>hp</code> and <code>mp</code> to be
+floats to allow fractional values, we can.</p>
+<p>We made these fields private. No one else can use them.</p>
+<p>We might still need getters so we can, e.g., draw a health bar. This
+isn’t perfect. We can’t remove all forms of coupling, but encapsulation
+lets us reduce it.</p>
+<hr />
+<h1 id="does-haskell-have-coupling">Does Haskell have coupling?</h1>
+<p>Haskell still has this issue. Changing code also forces changes to
+coupled code.</p>
+<p>However, there is a feature we talked about briefly: <a
+href="https://en.wikibooks.org/wiki/Haskell/Modules">modules</a>.</p>
+<p>This feature allows function definitions to be hidden inside a
+module. Modules end up acting kind of like classes, except only
+containing static methods/fields.</p>
+<p>Therefore, hidden definitions can be changed, and external code
+(outside the module) won’t break as long as the exported module
+definitions don’t change.</p>
+<p>But what about the other reason for encapsulation? Shared mutable
+state?</p>
+<hr />
+<h1 id="shared-mutable-state">Shared mutable state</h1>
+<p>Let’s break down this term: “shared mutable state” - State: data that
+determines what the program will do. - Mutable: changeable. I.e., not
+constant. - Shared: multiple functions/procedures/modules have access to
+it.</p>
+<p>This kind of data is very dangerous. Consider a variable that stores
+whether the missle cruiser is ready to launch the missiles. It would be
+very problematic if that variable suddenly changed because one procedure
+thought it should be ready but another was currently running (e.g.,
+missiles ignited before the missile bays opened).</p>
+<hr />
+<h1 id="shared-mutable-state-1">Shared mutable state</h1>
+<p>Huge numbers of bugs are caused by unexpected state changes.</p>
+<p>Some language delicately tease out the different kinds of state. For
+example, Rust makes it easy to have shared immutable state, and
+non-shared mutable state, but requires safeguards for shared mutable
+state.</p>
+<p>Haskell takes a different approach: there is no mutability.</p>
+<p>So shared mutable state is impossible, because Haskell does not allow
+anything to change. Problem solved.</p>
+<hr />
+<h1 id="the-result">The result</h1>
+<p>Therefore, we don’t really need the same encapsulation techniques,
+like classes.</p>
+<p>If all we want to do is hide data to reduce coupling, we can use a
+module, which is much simpler than a class.</p>
+<p>We don’t need an encapsulation mechanism beyond that because if
+nothing can change anywhere, there is no need to have a special
+mechanism for change.</p>
+<p>As a result, the language is just simpler.</p>
+<hr />
+<h1 id="questions">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="something-is-missing">Something is missing</h1>
+<p>There is, however, an important facility that we haven’t talked
+about. Something where, if Haskell didn’t have it, it would be notably
+less ergonomic than even Java.</p>
+<p>I’m talking about subtype polymorphism.</p>
+<p>Note the term <em>subtype</em> here. We’ve been seeing a lot of
+polymorphism in Haskell, but not this specific kind of it.</p>
+<hr />
+<h1 id="what-even-is-polymorphism">What even is polymorphism?</h1>
+<p>Yeah, title, good question.</p>
+<p>[What is it?]</p>
+<hr />
+<h1 id="the-roots-of-the-term-polymorphism">The roots of the term
+“polymorphism”</h1>
+<p>If you’re familiar with Greek etymologies (or if you play a lot of
+RPGs) you probably know that it means “many forms (ism)”.</p>
+<p>But many forms of what?</p>
+<p>Many forms of code. Of function definitions.</p>
+<p>Polymorphism means that a function or operator will be different
+depending on the types of the underlying values.</p>
+<p>This is a vague definition, and there are actually many different
+kinds of polymorphism, so let’s take a look at some more concrete
+examples.</p>
+<hr />
+<h1 id="parametric-polymorphism">Parametric polymorphism</h1>
+<p>We’ve been seeing polymorphism a lot. It’s how we can write function
+types like:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(.) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> c</span></code></pre></div>
+<p>This is a kind of polymorphism: <em>parametric polymorphism</em></p>
+<p>The idea here is that the composition operator <code>.</code> will
+generate a different kind of function depending on the types of the
+functions it is given as arguments.</p>
+<p><code>a</code>, <code>b</code>, and <code>c</code> are <em>type
+parameters</em>. Basically variables that are filled in with types.</p>
+<hr />
+<h1 id="why-do-this">Why do this?</h1>
+<p>Normally, when you search for examples polymorphism in computer
+science, you end up with descriptions of how it enables code that is
+more <em>flexible</em>. This is kind of misleading in my opinion.</p>
+<p>For example, in this Java code, the <code>+</code> operator is
+polymorphic:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">var</span> i <span class="op">=</span> <span class="dv">7</span> <span class="op">+</span> <span class="dv">3</span><span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">var</span> s <span class="op">=</span> <span class="st">&quot;hello &quot;</span> <span class="op">+</span> <span class="st">&quot;world&quot;</span><span class="op">;</span></span></code></pre></div>
+<p>It’s true that this is a kind of polymorphism. Specifically,
+<em>ad-hoc</em> polymorphism. The operator has two different meanings:
+addition for number types and concatenation for strings. It only has
+those meanings and they are completely different. It’s polymorphic, but
+we can’t really extend it.</p>
+<hr />
+<h1 id="why-do-this-2">Why do this? (2)</h1>
+<p>Back to <em>parametric</em> polymorphism, why do this?</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(.) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> c</span></code></pre></div>
+<p>If we wanted flexibility, why wouldn’t the language just do this?</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(.) ::</span> (<span class="dt">Anything</span> <span class="ot">-&gt;</span> <span class="dt">Anything</span>) <span class="ot">-&gt;</span> (<span class="dt">Anything</span> <span class="ot">-&gt;</span> <span class="dt">Anything</span>) <span class="ot">-&gt;</span> <span class="dt">Anything</span> <span class="ot">-&gt;</span> <span class="dt">Anything</span></span></code></pre></div>
+<p>The reason: this kind of polymorphism makes the code <em>less</em>
+flexible. We specifically want to exclude certain kinds of types.</p>
+<p>We want the return type of the first function to <em>have</em> to be
+the same as the input type of the second function. We don’t want the
+user to have a choice, because they might compose two incompatible
+functions.</p>
+<hr />
+<h1 id="so-what-is-polymorphism-really">So what is polymorphism
+really?</h1>
+<p>For this reason, I don’t like to define polymorphism in terms of what
+a function <em>does</em>.</p>
+<p>Instead, I prefer to define it in terms of its <em>type</em>.</p>
+<p>Therefore, my definition of polymorphism is this: <em>When a function
+changes its concrete type depending on the types of its
+operands.</em></p>
+<p>By concrete type, I mean the most specific type. For example, in
+<code>"hello " + "world"</code> in Java, <code>+</code> becomes a
+function from a pair of strings to a string.</p>
+<p>This definition covers all the different kinds of polymorphism we’ve
+seen.</p>
+<hr />
+<h1 id="questions-1">Questions</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="different-kinds-of-polymorphism">Different kinds of
+polymorphism</h1>
+<p>Now let’s revisit the different kinds of polymorphism and introduce
+the one we care about for this lecture:</p>
+<hr />
+<h2 id="ad-hoc-polymorphism">1. Ad-hoc polymorphism</h2>
+<p>This is when an operator or function changes its type depending on
+the type of its arguments, but in a way that is specific to that exact
+combination of types.</p>
+<p>For example, <code>1 + 2.5</code> in C is interpreted as a
+<code>double</code> because of the specific type coercion rules in C.
+The <code>1</code> ends up getting converted to <code>1.0</code>.</p>
+<p>Other languages have different rules. For example, in Rust the
+operands all have to have the same type. You can’t add a float to an
+integer without converting one of the argumetns.</p>
+<hr />
+<h2 id="ad-hoc-polymorphism-2">1. Ad-hoc polymorphism (2)</h2>
+<p>This kind of polymorphism doesn’t have to be hardcoded.</p>
+<p>C++ allows operators to be overloaded in an ad-hoc way. You can say
+“whenever we add a Foo to a Bar, use this definition of <code>+</code>
+instead.”</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>Foo <span class="kw">operator</span> <span class="op">+</span> <span class="op">(</span>Bar a<span class="op">,</span> Baz b<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This says “whenever we add a <code>Bar</code> to a <code>Baz</code>,
+call this function and the result it returns will be a
+<code>Foo</code>.”</p>
+<p>This seems incredible flexible, but the types have to be known at
+compile time. Otherwise the compiler will select the wrong overload.</p>
+<hr />
+<h2 id="parametric-polymorphism-1">2. Parametric polymorphism</h2>
+<p>This is the kind of polymorphism where types can be parameters:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">someParametriclyPolymorphicFunction ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c <span class="ot">-&gt;</span> d</span></code></pre></div>
+<p>We’ve talked about this, but please don’t think it only happens in
+Haskell.</p>
+<p>In Java and C++, type parameters appear in angle brackets:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">var</span> l <span class="op">=</span> <span class="kw">new</span> <span class="bu">ArrayList</span><span class="op">&lt;</span><span class="bu">String</span><span class="op">&gt;();</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>l<span class="op">.</span><span class="fu">add</span><span class="op">(</span><span class="st">&quot;hello&quot;</span><span class="op">);</span></span></code></pre></div>
+<p>Parametric types are called <em>generics</em> and Java and
+<em>templates</em> in C++.</p>
+<p>Here, the <code>ArrayList</code> class uses parametric polymorphism.
+It’s not just an <code>ArrayList</code>, it’s an <code>ArrayList</code>
+<em>of</em> <code>String</code>s.</p>
+<hr />
+<h2 id="parameteric-polymorphism">2. Parameteric polymorphism</h2>
+<p>This ability makes it so that the <code>add</code> method can only
+take a particular type.</p>
+<p>In this case, it takes <code>String</code>s, because we defined our
+<code>ArrayList</code> to be of that type.</p>
+<p>However, if we had made an <code>ArrayList&lt;Integer&gt;</code>,
+then the <code>add</code> method would take an <code>Integer</code>
+instead.</p>
+<p>We use parametric polymorphism to allow type rules to be connected
+between different variables. Here, we’re saying the input type of the
+<code>add</code> function has to be the same as the type of data stored
+in the array list.</p>
+<p>Before parametric polymorphism was added to Java,
+<code>ArrayLists</code> could store anything, and the <code>add</code>
+method took only an <code>Object</code>. This meant that you couldn’t
+rely on the array only having a particular type in it, and you had to
+cast whenever you got something out of the array, which increased type
+errors.</p>
+<hr />
+<h2 id="subtype-polymorphism">3. Subtype polymorphism</h2>
+<p>Now we get to the primary subject of this module.</p>
+<p>Subtype polymorphism is when a function can be called on a bunch of
+different types, but it does something different for each one.</p>
+<p>This is how interfaces work in Java (or typescript for my CS 220
+students). Let’s remind ourself about interfaces first, then see how
+there’s a similar concept in Haskell.</p>
+<hr />
+<h2 id="subtype-polymorphism-interfaces">3. Subtype polymorphism
+(Interfaces)</h2>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> Barkable <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> <span class="fu">bark</span><span class="op">();</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>What does this mean?</p>
+<p><code>Barkable</code> is an interface. You cannot <em>create</em> a
+borkable like this:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="dt">var</span> something <span class="op">=</span> <span class="kw">new</span> <span class="fu">Barkable</span><span class="op">();</span> <span class="co">// wrong, this is an error</span></span></code></pre></div>
+<p>Why? Because <code>Barkable</code> just means “something that can
+<code>bark</code>”. We have not defined what barking means, only that it
+is some kind of thing that we might want to do. So Java wouldn’t know
+what would happen if we wrote <code>something.bark()</code>. We haven’t
+defined that yet.</p>
+<hr />
+<h2 id="subtype-polymorphism-interfaces-2">3. Subtype polymorphism
+(Interfaces 2)</h2>
+<p>In order to use the interface, we have to implement it, which in
+Java, is something that only a class can do:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Labrador <span class="kw">implements</span> Barkable <span class="op">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">bark</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span><span class="st">&quot;woof!&quot;</span><span class="op">);</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code>Labrador</code> is something that we can create. This is
+permitted:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dt">var</span> sparky <span class="op">=</span> <span class="kw">new</span> <span class="fu">Labrador</span><span class="op">();</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sparky<span class="op">.</span><span class="fu">bark</span><span class="op">();</span></span></code></pre></div>
+<hr />
+<h2 id="subtype-polymorphism-interfaces-3">3. Subtype polymorphism
+(Interfaces 3)</h2>
+<p>Where this gets interesting is when we have multiple options:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Chihuahua <span class="kw">implements</span> Barkable <span class="op">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">bark</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">System</span><span class="op">.</span><span class="fu">out</span><span class="op">.</span><span class="fu">println</span><span class="op">(</span><span class="st">&quot;yarp!&quot;</span><span class="op">);</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Now, there are two different functions (technically methods, but
+let’s keep using the term <em>function</em>): one of them belongs to
+<code>Labrador</code>, and the other to <code>Chihuahua</code>.</p>
+<p>Both do different things. They print different messages. But they
+have the same type, so one can be substituted for another.</p>
+<hr />
+<h1 id="questions-2">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="why-the-big-deal">Why the big deal?</h1>
+<p>You might wonder why this would be such a big deal as to get a
+special name.</p>
+<p>It’s because this feature requires a lot more language support than
+you might think.</p>
+<p>Consider this snippet:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>Barkable sparky <span class="op">=</span> <span class="kw">new</span> <span class="fu">Labrador</span><span class="op">();</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>Barkable princess <span class="op">=</span> <span class="kw">new</span> <span class="fu">Chihuahua</span><span class="op">();</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>sparky<span class="op">.</span><span class="fu">bark</span><span class="op">();</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>princess<span class="op">.</span><span class="fu">bark</span><span class="op">();</span></span></code></pre></div>
+<p>This will print:</p>
+<pre><code>woof!
+yarp!</code></pre>
+<hr />
+<h1 id="why-the-big-deal-2">Why the big deal? (2)</h1>
+<p>Here’s the big question I want to ask: how does Java know what to do
+when we write <code>whatever.bark();</code>?</p>
+<p>That is, [how does it know which specific method to call]?</p>
+<hr />
+<h1 id="not-quite-what-you-think">Not quite what you think</h1>
+<p>You might think “oh, it sees that you wrote
+<code>sparky = new Labrador()</code>, so it knows that
+<code>sparky</code> is a labrador.</p>
+<p>That is probably true in this particular case. There is an
+optimization called <em>devirtualization</em> where the compiler will
+try to trace the flow of execution so it can know for sure which method
+to call.</p>
+<p>But it can’t always work that way. What about here?</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>Barkable barker<span class="op">;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>Coin<span class="op">.</span><span class="fu">flip</span><span class="op">()</span> <span class="op">==</span> Coin<span class="op">.</span><span class="fu">HEADS</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    barker <span class="op">=</span> <span class="kw">new</span> <span class="fu">Labrador</span><span class="op">();</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    barker <span class="op">=</span> <span class="kw">new</span> <span class="fu">Chihuahua</span><span class="op">();</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>barker<span class="op">.</span><span class="fu">bark</span><span class="op">();</span> <span class="co">// which one gets called? </span></span></code></pre></div>
+<hr />
+<h1 id="not-quite-what-you-think-2">Not quite what you think (2)</h1>
+<p>Don’t say “oh, it’s not a true random number generator, so the
+compiler can know what’s going to happen”. We usually seed the RNG based
+on the current time.</p>
+<p>Imagine we hooked the RNG up to a geiger counter next to a smoke
+detector or something. It’s <em>random</em>. How can it know which
+function to call?</p>
+<p>Answer: a special language feature that operates behind the scenes.
+In Java this is a VTable (virtual table), a table of function pointers.
+So barker is pointing to a particular set of function pointers that get
+called for each abstract method.</p>
+<p>This is called <em>dynamic dispatch</em>. It means
+<em>dynamically</em> (meaning, at runtime) <em>dispatching</em>
+(calling) a function call to the correct definition.</p>
+<hr />
+<h1 id="dynamic-dispatch">Dynamic dispatch</h1>
+<p>Dynamic dispatch is required, because Java allows things like
+mutation.</p>
+<p>If a <code>Barkable</code> can be changed from a
+<code>Chihuahua</code> to a <code>Labrador</code>, we need the ability
+for the method to get routed to the right implementation.</p>
+<p>But if things are guaranteed not to change (or be generated
+randomly), then most of the time, the compiler can figure out what’s
+going to happen, and resolve to a static method.</p>
+<p>This is the case in Haskell. The language doesn’t need dynamic
+dispatch because nothing is dynamic. As a result, polymorphism is much
+simpler.</p>
+<hr />
+<h1 id="questions-3">Questions?</h1>
+<!-- _class: questions invert -->
+<hr />
+<h1 id="what-about-haskell">What about Haskell</h1>
+<p>Now we get to the main point: Haskell has this feature, too, but it’s
+not called an interface. In fact, it’s a bit more powerful and flexible
+than an interface.</p>
+<p>The equivalent feature in Haskell is called a <em>typeclass</em>.</p>
+<p><strong>HUGE IMPORTANT NOTE: <code>typeclass</code> in Haskell is
+similar to <code>interface</code> in Java</strong> <strong>it is NOT
+similar to <code>class</code></strong></p>
+<hr />
+<h1 id="a-few-repititions">A few repititions</h1>
+<p>Typeclasses are interfaces, not classes</p>
+<p>Typeclasses are interfaces, not classes</p>
+<p>Typeclasses are interfaces, not classes</p>
+<p>Haskell does not have classes. It doesn’t need them. It <em>does</em>
+need interfaces, and they are confusingly called
+<em>typeclasses</em>.</p>
+<p>Typeclasses are how Haskell implements <em>subtype polymorphism</em>.
+Think of it as letting you implement an interface to allow types to be
+used in new ways, just like in Java.</p>
+<hr />
+<h1 id="making-one">Making one</h1>
+<p>With that important background out of the way, let’s finlaly make a
+typeclass in Haskell:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Barkable</span> a <span class="kw">where</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    bark ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span></span></code></pre></div>
+<p><em>Please</em> ignore the fact that the keyword is
+<code>class</code>. It’s a trick! Typeclasses are like interfaces!</p>
+<p>This code says “an <code>a</code> can be a <code>Barkable</code> if
+we can call <code>bark</code> on it giving a <code>String</code>.</p>
+<p>And just like an <code>interface</code>, a typeclass is not very
+useful unless it has some data to apply do. But Haskell doesn’t have
+classes, so what implements typeclasses?</p>
+<hr />
+<h1 id="ordinary-data-types">Ordinary data types</h1>
+<p>Instead, we just have ordinary data types implement type classes:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Labrador</span> <span class="ot">=</span> <span class="dt">Labrador</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Chihuahua</span> <span class="ot">=</span> <span class="dt">Chihuahua</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Barkable</span> <span class="dt">Labrador</span> <span class="kw">where</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    bark _ <span class="ot">=</span> <span class="st">&quot;woof!&quot;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Barkable</span> <span class="dt">Chihuahua</span> <span class="kw">where</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    bark _ <span class="ot">=</span> <span class="st">&quot;yarp!&quot;</span></span></code></pre></div>
+<p>So now, if we call the function bark, the string depends on what we
+pass into it:</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>bark <span class="dt">Labrador</span> <span class="op">==</span> <span class="st">&quot;woof!&quot;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>bark <span class="dt">Chihuahua</span> <span class="op">==</span> <span class="st">&quot;yarp!&quot;</span></span></code></pre></div>
+<p>But that raises an immediate question…</p>
+<hr />
+<h1 id="how-is-that-different-from-pattern-matching">How is that
+different from pattern matching?</h1>
+<p>Couldn’t we just do this?</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Dog</span> <span class="ot">=</span> <span class="dt">Labrador</span> <span class="op">|</span> <span class="dt">Chihuahua</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="ot">bark ::</span> <span class="dt">Dog</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>bark <span class="dt">Labrador</span> <span class="ot">=</span> <span class="st">&quot;woof!&quot;</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>bark <span class="dt">Chihuahua</span> <span class="ot">=</span> <span class="st">&quot;yarp!&quot;</span></span></code></pre></div>
+<p>Yes…we could do that.</p>
+<p>But there’s one thing we can’t do if we do things this way.</p>
+<p>What does subtype polymorphism let us do that basic
+pattern-matching/case-statements don’t let us do? [Anyone?]</p>
+<hr />
+<h1 id="we-cant-add-more">We can’t add more</h1>
+<p>Pattern matching requires us to know, in advance, all the possible
+cases.</p>
+<p>We have to have a data type with exactly two constructors:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Dog</span> <span class="ot">=</span> <span class="dt">Labrador</span> <span class="op">|</span> <span class="dt">Chihuahua</span></span></code></pre></div>
+<p>If we add a new constructor later, we have to modify every case
+statement to handle that case.</p>
+<p>This is honestly not that big a deal, especially for software
+maintained by one team.</p>
+<p>However, typeclasses allow us to add new data types to the family
+later, without breaking any code we’ve already written. This is just
+like interfaces.</p>
+<hr />
+<h1 id="questions-4">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="typeclasses-in-type-expressions">Typeclasses in type
+expressions</h1>
+<p>If we inspect the type of <code>bark</code> in GHCI, we can finally
+see that wide arrow notation that we’ve probably been seeing a lot in
+error messages:</p>
+<pre><code>ghci&gt; :t bark
+bark :: Barkable a =&gt; a -&gt; String</code></pre>
+<p>This notation says <em>“given a <code>Barkable</code> type we’ll call
+<code>a</code>, this function will take an instance of that type and
+turn it into a string”</em></p>
+<p>This is very similar to <code>a -&gt; String</code>, but that type
+would accept any type for <code>a</code>. The wide arrow specifies that
+<code>a</code> must be a type instance (what we call an “implementor”)
+of <code>Barkable</code>.</p>
+<hr />
+<h1 id="lets-see-real-examples-show-and-read">Let’s see real examples:
+Show and Read</h1>
+<p>In your reading, you’ve already seen the functions <code>show</code>
+and <code>read</code>.</p>
+<p><code>show</code> converts things to string. For example
+<code>show 7 == "7"</code></p>
+<p><code>read</code> does the opposite. It converts strings into other
+things. <code>read "7" :: Int == 7</code> (we needed the type so it
+would know what to convert it to)</p>
+<p>But what is the type of <code>show</code> and <code>read</code>?</p>
+<hr />
+<h1 id="their-type">Their type</h1>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">show</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span><span class="ot"> ::</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="op">:</span>t <span class="fu">read</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">read</span><span class="ot"> ::</span> <span class="dt">Read</span> a <span class="ot">=&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p>These types imply that there are typeclasses named <code>Show</code>
+and <code>Read</code> that <code>a</code> must be an instance of in
+order for us to call these functions on it.</p>
+<p>Typeclasses are open sets. We can create new types and add them to
+the typeclass. Then, we’ll be able to call <code>show</code> and
+<code>read</code> on our new type.</p>
+<p>Let’s see an example from an older lecture…</p>
+<hr />
+<h1 id="remember-this-type">Remember this type</h1>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Character</span> <span class="ot">=</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Hero</span> {<span class="ot"> name ::</span> <span class="dt">String</span>,<span class="ot"> health ::</span> <span class="dt">Int</span>,<span class="ot"> mana ::</span> <span class="dt">Int</span> } <span class="op">|</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Monster</span> {<span class="ot"> health ::</span> <span class="dt">Int</span>,<span class="ot"> mana ::</span> <span class="dt">Int</span> }</span></code></pre></div>
+<p>Suppose this is a game. It would be nice to be able to convert a
+character to a string to save, and read it in from one to load.</p>
+<p>You <em>could</em> make functions for that:</p>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ot">serializeCharacter ::</span> <span class="dt">Character</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="ot">desearializeCharacter ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Character</span> </span></code></pre></div>
+<p>However, how should <code>ghci</code> know that we want to run
+<code>serializeCharacter</code> when it’s time to print a character? And
+what if someone else already wrote a function that can write things to
+files as long as they can be converted to strings?</p>
+<hr />
+<h1 id="instancing-show">Instancing <code>Show</code></h1>
+<p>Instead, let’s use the already existing typeclass <code>Show</code>,
+which represents things that can be turned into strings.</p>
+<p>By using the already existing typeclass, we make our type instantly
+compatible with all other functions that work on instances of
+<code>Show</code>.</p>
+<p>So if someone wrote a function
+<code>saveToFile :: Show a =&gt; a -&gt; IO ()</code>, we could use it
+even though the person who made that function had never heard of our
+<code>Character</code> data type.</p>
+<p>(don’t worry about <code>IO ()</code> yet. That’s a monad; we’ll talk
+about those)</p>
+<hr />
+<h1 id="shows-definition">Show’s definition</h1>
+<p>The <code>Show</code> typeclass is defined like this:</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Show</span> a <span class="kw">where</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    show ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span></span></code></pre></div>
+<p>So, to make our type an instance of it, we give an instance
+definition like this…</p>
+<hr />
+<h1 id="an-instance-of-show">An instance of Show</h1>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Show</span> <span class="dt">Character</span> <span class="kw">where</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">show</span> (<span class="dt">Hero</span> {name<span class="ot">=</span>n, health<span class="ot">=</span>hp, mana<span class="ot">=</span>mp}) <span class="ot">=</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Hero {name=&quot;</span> <span class="op">++</span> <span class="fu">show</span> n <span class="op">++</span> <span class="st">&quot;, health=&quot;</span> <span class="op">++</span> </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>            <span class="fu">show</span> hp <span class="op">++</span> <span class="st">&quot;, mana=&quot;</span> <span class="op">++</span> <span class="fu">show</span> mp <span class="op">++</span> <span class="st">&quot;}&quot;</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- as an exercise, do show (Monster ...)</span></span></code></pre></div>
+<p>This makes it so that if we call <code>show bob</code> on our friend
+<code>bob</code> from the last lecture, we get this kind of string:
+<code>"Hero {name = \"Bob\", health = 100, mana = 20}"</code></p>
+<p>Notice, because we used <code>show</code> on all the values inside
+<code>bob</code>, they got converted to strings for us. Using
+<code>show</code> on a string escapes it for us, too, so even that
+works.</p>
+<hr />
+<h1 id="what-about-read">What about <code>Read</code>?</h1>
+<p>So if <code>Show</code> is the typeclass for things that can be
+converted into strings, <code>Read</code> is the typeclass for things
+that can be constructed from strings.</p>
+<p>See if you can implement <code>Read</code> for a simpler type. Like
+this one:</p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">IntPair</span> <span class="ot">=</span> <span class="dt">Pair</span> <span class="dt">Int</span> <span class="dt">Int</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Instance</span> <span class="dt">Show</span> <span class="dt">IntPair</span> <span class="kw">where</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">show</span> (<span class="dt">IntPair</span> x y) <span class="op">==</span> <span class="fu">show</span> x <span class="op">++</span> <span class="st">&quot;, &quot;</span> <span class="op">++</span> <span class="fu">show</span> y</span></code></pre></div>
+<p>Here, I’ve implemented <code>Show</code> so that you can see how it
+gets turned into a string.</p>
+<p>Try implementing <code>Read</code> so you can turn that string back
+into an <code>IntPair</code>.</p>
+<hr />
+<h1 id="what-about-parametric-types">What about parametric types?</h1>
+<p>That’s cool, but it only works for pairs of integers.</p>
+<p>Are we supposed to implement <code>Show</code> for every kind of
+pair?</p>
+<p>No. Let’s make a parametric <code>Pair</code> that works for any
+type:</p>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Pair</span> a <span class="ot">=</span> <span class="dt">Pair</span> a a</span></code></pre></div>
+<p>That is, <code>Pair 10 20</code> is a <code>Pair Int</code>. We’ve
+seen this a bunch of times now, but it bears repreating that Haskell
+lets us name a constructor with the same name as a type, and it figures
+out whether an expression is a value or a type from context (i.e.,
+whether it comes after a <code>::</code>)</p>
+<hr />
+<h1 id="what-about-parametric-types-2">What about parametric types?
+(2)</h1>
+<p>For <code>Pair 10 20</code>, we’d like the result to be
+<code>"10, 20"</code>. Ideally, we’d like it to work for any “showable”
+type.</p>
+<p>So <code>Pair 10.0 20.0</code> would also work:
+<code>"10.0, 20.0"</code></p>
+<p>For this, we need “inheritance”:</p>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> <span class="dt">Show</span> (<span class="dt">Pair</span> a) <span class="kw">where</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">show</span> (<span class="dt">Pair</span> x y) <span class="ot">=</span> <span class="fu">show</span> x <span class="op">++</span> <span class="st">&quot;, &quot;</span> <span class="op">++</span> <span class="fu">show</span> y</span></code></pre></div>
+<p>Here, we’re saying “given some type <code>a</code> which
+is”showable”, a pair of that <code>a</code> will also be “showable”.
+First, show the first element of it, then insert a comma and space, and
+then show the second element of it.</p>
+<p>The only requirement is that we be able to call <code>show</code> on
+the things inside the pair.</p>
+<hr />
+<h1 id="this-isnt-the-same-as-oo-inheritance">This isn’t the same as OO
+inheritance</h1>
+<p>You might think “oh, inheritance, I remember that.”</p>
+<p>This is different. In OO inheritance, we pull all the data fields in
+from the parent class, and all its methods, too. We can then override
+the methods we want to override.</p>
+<p>In Haskell, typeclasses have <em>no data</em>. They are only a list
+of functions. This is by design. By having only functions and no data,
+you avoid the so-called “deadly diamond” [we can remind ourselves of
+what this is if there’s time].</p>
+<p>Instead, typeclass inheritance is more like a constraint. We’re
+saying “<code>Pair</code> is only a <code>Show</code> if the type inside
+of it is also a <code>Show</code>.</p>
+<p>Because we know that <code>a</code> is a <code>Show</code>, we know
+that it’s safe to call <code>show x</code> and <code>show y</code>, and
+Haskell allows the code to compile.</p>
+<hr />
+<h1 id="questions-5">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="having-this-done-automatically">Having this done
+automatically</h1>
+<p>Converting things into strings is such a common thing to need to do,
+Haskell has a standard way to do it that doesn’t require you to think
+about what the string will look like.</p>
+<p>Just do this:</p>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Character</span> <span class="ot">=</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Hero</span> {<span class="ot"> name ::</span> <span class="dt">String</span>,<span class="ot"> health ::</span> <span class="dt">Int</span>,<span class="ot"> mana ::</span> <span class="dt">Int</span> } <span class="op">|</span> </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Monster</span> {<span class="ot"> health ::</span> <span class="dt">Int</span>,<span class="ot"> mana ::</span> <span class="dt">Int</span> }</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> <span class="dt">Show</span></span></code></pre></div>
+<p>The key is the <em>deriving clause</em> at the end. That says “go
+ahead and generate a show instance for me, automatically”</p>
+<hr />
+<h1 id="testing-it-out">Testing it out</h1>
+<p>Let’s see if it works:</p>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- (remember that records are just ordered pairs behind the scenes)</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">show</span> (<span class="dt">Hero</span> <span class="st">&quot;Bob&quot;</span> <span class="dv">100</span> <span class="dv">20</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Hero {name = \&quot;Bob\&quot;, health = 100, mana = 20}&quot;</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">show</span> (<span class="dt">Monster</span> {health <span class="ot">=</span> <span class="dv">20</span>, mana <span class="ot">=</span> <span class="dv">20</span>})</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Monster {health = 20, mana = 20}&quot;</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">show</span> (<span class="dt">Pair</span> <span class="dv">10</span> <span class="dv">20</span>)</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Pair 10 20&quot;</span></span></code></pre></div>
+<p>Haskell was automatically able to generate a <code>Show</code>
+implementation for us by using simple rules.</p>
+<p>What are the rules? For ordinary data types, print the name of the
+constructor, then call show on each of the fields. For records, do that
+same thing, but include the braces and field names.</p>
+<hr />
+<h1 id="deriving">“deriving”</h1>
+<p>This convenient feature can be used on more than just
+<code>Show</code>.</p>
+<p>For example, we can also do deriving read:</p>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Pair</span> a <span class="ot">=</span> <span class="dt">Pair</span> a a <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Read</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- we can put it on one line. Useful in GHCI.</span></span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">show</span> <span class="op">$</span> <span class="dt">Pair</span> <span class="dv">10</span> <span class="dv">20</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Pair 10 20&quot;</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="fu">read</span> <span class="st">&quot;Pair 10 20&quot;</span><span class="ot"> ::</span> <span class="dt">Pair</span> <span class="dt">Int</span> <span class="co">-- need to say what it&#39;s going to become</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Pair</span> <span class="dv">10</span> <span class="dv">20</span></span></code></pre></div>
+<hr />
+<h1 id="show-and-read-rules"><code>Show</code> and <code>Read</code>
+rules</h1>
+<p>It should be clear that <code>Show</code> and <code>Read</code> are
+inverses of one another.</p>
+<p>That is, we expect <code>read . show == id</code>. That is, calling
+<code>show</code> on some showable data, and then calling
+<code>read</code> on the result should be the same as doing nothing (the
+identity function <code>id</code>)</p>
+<p>Haskell doesn’t check this anywhere. There are some programming
+languages where making something an instance of a typeclass also
+requires you to provide a proof that it follows the rule (e.g., Coq,
+Lean, Idris), but Haskell isn’t quite that sophisticated.</p>
+<p>Therefore, it’s on you to make sure your typeclass instances make
+sense.</p>
+<hr />
+<h1 id="other-useful-typeclasses-we-can-derive">Other useful typeclasses
+we can “derive”</h1>
+<p><code>Eq</code> is the typeclass for things that support
+equality.</p>
+<p>If you implement this typeclass for a type, it supports
+<code>==</code>.</p>
+<p>We could do it ourselves:</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Eq</span> a <span class="ot">=&gt;</span> <span class="dt">Eq</span> (<span class="dt">Pair</span> a) <span class="kw">where</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">Pair</span> a b) <span class="op">==</span> (<span class="dt">Pair</span> x y) <span class="ot">=</span> a <span class="op">==</span> x <span class="op">&amp;&amp;</span> b <span class="op">==</span> y</span></code></pre></div>
+<p>Here we’re saying “A <code>Pair</code> of two values <code>a</code>
+and <code>b</code> is equal to a another <code>Pair</code> of
+<code>x</code> and <code>y</code> if <code>a</code> equals
+<code>x</code> and <code>b</code> equals <code>y</code>.</p>
+<hr />
+<h1 id="deriving-eq">Deriving <code>Eq</code></h1>
+<p>This situation (where we want equality to mean “all the fields are
+equal”) is so common, Haskell lets us just derive it:</p>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Pair</span> a <span class="ot">=</span> <span class="dt">Pair</span> a a</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> <span class="dt">Show</span>, <span class="dt">Read</span>, <span class="dt">Eq</span></span></code></pre></div>
+<p>Now we can compare pairs:</p>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> a <span class="ot">=</span> <span class="dt">Pair</span> <span class="dv">10</span> <span class="dv">20</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    b <span class="ot">=</span> <span class="dt">Pair</span> <span class="dv">10</span> <span class="dv">20</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span>  <span class="fu">print</span> <span class="op">$</span> a <span class="op">==</span> b <span class="co">-- prints &quot;True&quot;</span></span></code></pre></div>
+<hr />
+<h1 id="deriving-ord">Deriving <code>Ord</code></h1>
+<p>What about inequalities? <code>Ord</code> is the typeclass for things
+that can be ordered (with <code>&gt;</code>, <code>&gt;=</code>,
+<code>&lt;</code>, and <code>&lt;=</code>)</p>
+<p>When we <code>derive</code> it, Haskell assumes we want to first
+compare by the first field, and if they’re equal, to then compare by the
+second field as a tiebreaker, and so on.</p>
+<p>So if we <code>deriving (Eq, Ord)</code> on <code>Pair</code>, we
+get</p>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (<span class="dt">Pair</span> <span class="dv">10</span> <span class="dv">20</span>) <span class="op">&lt;</span> (<span class="dt">Pair</span> <span class="dv">11</span> <span class="dv">20</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="dt">True</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> (<span class="dt">Pair</span> <span class="dv">10</span> <span class="dv">19</span>) <span class="op">&lt;</span> (<span class="dt">Pair</span> <span class="dv">10</span> <span class="dv">20</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="dt">True</span></span></code></pre></div>
+<p>Important note: <code>Ord</code> inherits from <code>Eq</code>. That
+is, a type cannot be <code>Ord</code> without also being
+<code>Eq</code>. You will get an error when <code>deriving Ord</code>
+without also listing <code>Eq</code>.</p>
+<hr />
+<h1 id="deriving-ord-2">Deriving <code>Ord</code> (2)</h1>
+<p>What if your type doesn’t have numbers? It still works:</p>
+<div class="sourceCode" id="cb41"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Rgb</span> <span class="ot">=</span> <span class="dt">Red</span> <span class="op">|</span> <span class="dt">Green</span> <span class="op">|</span> <span class="dt">Blue</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Read</span>, <span class="dt">Eq</span>, <span class="dt">Ord</span>)</span></code></pre></div>
+<p>The order goes based on the order of constructors.</p>
+<p>Examples:</p>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="op">$</span> <span class="dt">Red</span> <span class="op">&lt;</span> <span class="dt">Green</span> <span class="co">-- True</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="op">$</span> <span class="dt">Red</span> <span class="op">&lt;</span> <span class="dt">Blue</span>  <span class="co">-- True</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="op">$</span> <span class="dt">Green</span> <span class="op">&lt;</span> <span class="dt">Blue</span>  <span class="co">-- True</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="op">$</span> <span class="dt">Green</span> <span class="op">&lt;</span> <span class="dt">Red</span>  <span class="co">-- False</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="op">$</span> <span class="dt">Blue</span> <span class="op">&lt;</span> <span class="dt">Red</span>  <span class="co">-- False</span></span></code></pre></div>
+<hr />
+<h1 id="deriving-enum">Deriving <code>Enum</code></h1>
+<p>Lastly, it’s useful to have classes that can be converted to and from
+integers.</p>
+<p>This typeclass has the <code>toEnum</code> and <code>fromEnum</code>
+functions, which provide conversions to, and from, an
+<code>Int</code>.</p>
+<p><code>Bool</code> is an instance of this typeclass: we can convert
+<code>0</code> and <code>1</code> into <code>False</code> and
+<code>True</code></p>
+<p>The <code>Enum</code> typeclass also requires 2 more functions:
+<code>succ</code> and <code>pred</code> for the successor and
+predecessor. This is equivalent to incrementing or decrementing the
+value.</p>
+<p>Normally <code>succ</code> crashes if you call it on the last
+constructor and <code>pred</code> likewise on the first (i.e., don’t
+write <code>succ Blue</code> or <code>pred Red</code>). However, you
+could implement your own to make it wrap instead, for modular
+arithmetic.</p>
+<p>Practice: Implement <code>Enum</code> for <code>Rgb</code> without
+<code>deriving</code> but make <code>succ</code> and <code>pred</code>
+wrap.</p>
+<hr />
+<h1 id="more-useful-typeclasses-to-be-familiar-with">More useful
+typeclasses to be familiar with</h1>
+<ul>
+<li><code>Num</code>, the class of types that support numeric
+operations. This is the default assumption for any arithmetic without
+types. <code>f x = x + 2 :: Num a =&gt; a -&gt; a</code></li>
+<li><code>Integral</code>, the class of types that are “integer-like”
+and can be converted to <code>Integer</code></li>
+<li><code>Floating</code>, the class of types that are “float-like”. You
+can use this to write code that works with both <code>Float</code> and
+<code>Double</code> without needing to assume one or the other.</li>
+<li><code>Foldable</code>, the class of data structures that can be
+folded with <code>foldl</code> and <code>foldr</code>. These are all
+useful, but they don’t have <code>derive</code> recipes. You can’t
+magically interpret a random data type as a floating point number with
+<code>deriving Floating</code>.</li>
+</ul>
+<hr />
+<h1 id="questions-6">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="lets-make-a-custom-number">Let’s make a custom number</h1>
+<p>We’re used to arithmetic on fix-sized integers. We know, e.g., that
+if we increment an integer too many times, it wraps around to the most
+negative integer (overflow).</p>
+<p>We also know that if we subtract too much, most integers will wrap
+around to a big number. This is called negative overflow.</p>
+<p>(this is not underflow–underflow is something that happens to
+floating point numbers that round toward zero. people get this term
+wrong so frequently that its meaning might actually change)</p>
+<p>(in C, signed overflow is technically undefined, but this is often
+what ends up happening)</p>
+<hr />
+<h1 id="lets-make-a-custom-number-2">Let’s make a custom number (2)</h1>
+<p>However, sometimes we don’t want the number to wrap around.</p>
+<p>This situation is very frequent when doing digital signal
+processing.</p>
+<p>For example, if I add two sound waves together to mix them, I don’t
+want the wavefunctions to wrap around. That would make it sound
+unintelligible.</p>
+<p>Also, if I’m doing additive blending of light values (common in 3D
+graphics), I don’t want adding two bright lights together to somehow
+result in a dim light.</p>
+<p>Let’s use our knowledge of typeclasses to create a new kind of
+saturating integer.</p>
+<hr />
+<h1 id="the-num-typeclass">The <code>Num</code> typeclass</h1>
+<p>First, what is required for something to be a <code>Num</code>?</p>
+<p>Here is the typeclass definition (<a
+href="https://hackage.haskell.org/package/base-4.21.0.0/docs/GHC-Num.html">source</a>):</p>
+<div class="sourceCode" id="cb43"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Num</span> a <span class="kw">where</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    (+) ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    (-) ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a  <span class="co">-- not required: default is a - b = a + negate b</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="ot">    (*) ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="ot">    negate ::</span> a <span class="ot">-&gt;</span> a    <span class="co">-- not required: default is negate x = 0 - x</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="ot">    abs ::</span> a <span class="ot">-&gt;</span> a       <span class="co">-- absolute value</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="ot">    signum ::</span> a <span class="ot">-&gt;</span> a    <span class="co">-- get the sign: signum -7 == -1</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="ot">    fromInteger ::</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> a <span class="co">-- might overflow</span></span></code></pre></div>
+<p>Notice, <code>-</code> and <code>negate</code> are both marked as not
+required. In fact <em>one</em> of them is required, but then the other
+can be defined in terms of the one we provided.</p>
+<p>Math enjoyers: why do you think division is not defined in the type
+class?</p>
+<hr />
+<h1 id="default-implementations">Default implementations</h1>
+<p>Normally, typeclasses list functions that need to be defined later.
+Like <code>+</code> here is for the person who implements the typeclass
+to figure out.</p>
+<p>Adding integers is easy, but adding ratios requires making their
+denominators the same before doing the addition.</p>
+<p>We are supposed to fill in a different implementation for
+<code>+</code> for ratios (and this has been done for us for the
+<code>Ratio</code> data type)</p>
+<p>However, typeclasses can also come with <em>default
+implementations</em>. Which are functions that are already provided and
+that get copied over every time you define a new instance.</p>
+<hr />
+<h1 id="default-implementations-2">Default implementations (2)</h1>
+<p>In this case, <code>-</code> and <code>negate</code> have default
+implementations that are defined in terms of each other.</p>
+<p>This means we only need to define one, and we get the other for
+free.</p>
+<p>To define a default implementation, just add some function
+definitions after the types. <a
+href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Num.html#Num">Here’s
+an example from <code>Num</code></a> for <code>-</code> and
+<code>negate</code>.</p>
+<p>Of course, nothing stops us from providing <em>both</em> functions.
+We might have optimized code for both of them, which could be faster
+than defining one in terms of the other.</p>
+<hr />
+<h1 id="the-gameplan">The gameplan</h1>
+<p>Our ultimate goal is to make a new type that is an instance of the
+<code>Num</code> typeclass</p>
+<p>This will make it so that we can use standard operators like
+<code>+</code> with our type, instead of having to define new operators
+that only work with saturating integers.</p>
+<p>The plan is as follows: 1. Define a new datatype to store our integer
+2. Make it an instance of the <code>Num</code> datatype by providing the
+minimum required set of functions.</p>
+<hr />
+<h1 id="making-a-new-datatype">Making a new datatype</h1>
+<p>Here is a simple one:</p>
+<div class="sourceCode" id="cb44"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">newtype</span> <span class="dt">SatInt</span> <span class="ot">=</span> <span class="dt">SatInt</span> <span class="dt">Int</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> (<span class="dt">Show</span>, <span class="dt">Eq</span>, <span class="dt">Ord</span>)</span></code></pre></div>
+<p>We’re using <code>newtype</code> because we only need one constructor
+and one data field, and using <code>data</code> would introduce overhead
+for the “tag” field that would be unecessary.</p>
+<p>We’re deriving <code>Show</code> so we can easily print our new type,
+and <code>Eq</code> and <code>Ord</code> for comparisons.</p>
+<p>“Saturated” ints are just like regular <code>Int</code>s, but they
+won’t wrap around their bounds. So, what are those bounds?</p>
+<hr />
+<h1 id="getting-the-bounds">Getting the bounds</h1>
+<p>Here is how we get the maximum and minimum values for the int inside
+the <code>SatInt</code>:</p>
+<div class="sourceCode" id="cb45"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="ot">intMax ::</span> <span class="dt">Int</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>intMax <span class="ot">=</span> <span class="fu">maxBound</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="ot">intMin ::</span> <span class="dt">Int</span> </span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>intMin <span class="ot">=</span> <span class="fu">minBound</span></span></code></pre></div>
+<p>What’s going on here? Let’s look at those functions:</p>
+<div class="sourceCode" id="cb46"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">minBound</span><span class="ot"> ::</span> <span class="dt">Bounded</span> a <span class="ot">=&gt;</span> a</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">maxBound</span><span class="ot"> ::</span> <span class="dt">Bounded</span> a <span class="ot">=&gt;</span> a</span></code></pre></div>
+<p><code>Bounded</code> is a typeclass. Any data type that is bounded
+must implement these two constant functions: <code>minBound</code> and
+<code>maxBound</code>.</p>
+<hr />
+<h1 id="they-arent-constants">They aren’t constants</h1>
+<p>Those are functions, not constants.</p>
+<p>They dispatch based on the <em>return type</em>, not based on their
+input (which they lack)</p>
+<p>That is, if I do something like this:</p>
+<div class="sourceCode" id="cb47"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Int</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="ot">x ::</span> <span class="dt">Int8</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">minBound</span></span></code></pre></div>
+<p>x will be <code>-128</code>. Haskell looks at the type of the scope
+that we call <code>minBound</code> from, sees that it’s an
+<code>Int8</code>, and calls the <code>minBound</code> function from the
+<code>Int8</code> instance of <code>Bounded</code>.</p>
+<hr />
+<h1 id="with-me-so-far-1">With me so far?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="saturating">Saturating</h1>
+<p>In order to make our arithmetic functions saturate, let’s define a
+helper function</p>
+<div class="sourceCode" id="cb48"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="ot">boundInteger ::</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>boundInteger x</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> x <span class="op">&lt;</span> <span class="fu">toInteger</span> intMin <span class="ot">=</span> intMin  <span class="co">-- too small, replace with intMin</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> x <span class="op">&gt;</span> <span class="fu">toInteger</span> intMax <span class="ot">=</span> intMax  <span class="co">-- too big, replace with intMax</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="fu">fromInteger</span> x      <span class="co">-- just right: pass it through</span></span></code></pre></div>
+<p>This function takes an unboundedly-sized <code>Integer</code> and
+binds it to the range of a regular <code>Int</code>, using our
+<code>intMin</code> and <code>intMax</code> constants.</p>
+<p>This is not very efficient: it would probably be faster to anticipate
+when we will saturate ahead of time, but it makes the code simple for
+our purposes.</p>
+<hr />
+<h1 id="implementing-num">Implementing <code>Num</code></h1>
+<p>Now it’s time to make <code>SatInt</code> an instance of
+<code>Num</code>.</p>
+<div class="sourceCode" id="cb49"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Num</span> <span class="dt">SatInt</span> <span class="kw">where</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">SatInt</span> x) <span class="op">+</span> (<span class="dt">SatInt</span> y) <span class="ot">=</span> </span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">SatInt</span> <span class="op">$</span> boundInteger <span class="op">$</span> <span class="fu">toInteger</span> x <span class="op">+</span> <span class="fu">toInteger</span> y</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>    (<span class="dt">SatInt</span> x) <span class="op">*</span> (<span class="dt">SatInt</span> y) <span class="ot">=</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">SatInt</span> <span class="op">$</span> boundInteger <span class="op">$</span> <span class="fu">toInteger</span> x <span class="op">*</span> <span class="fu">toInteger</span> y</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">abs</span> (<span class="dt">SatInt</span> x) <span class="ot">=</span> </span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">SatInt</span> <span class="op">$</span> boundInteger <span class="op">$</span> <span class="fu">abs</span> <span class="op">$</span> <span class="fu">toInteger</span> x</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">signum</span> (<span class="dt">SatInt</span> x) <span class="ot">=</span> <span class="dt">SatInt</span> <span class="op">$</span> <span class="fu">signum</span> x</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">negate</span> (<span class="dt">SatInt</span> x) <span class="ot">=</span> <span class="dt">SatInt</span> <span class="op">$</span> boundInteger <span class="op">$</span> <span class="fu">negate</span> <span class="op">$</span> <span class="fu">toInteger</span> x </span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fromInteger</span> <span class="ot">=</span> <span class="dt">SatInt</span> <span class="op">.</span> boundInteger</span></code></pre></div>
+<hr />
+<h1 id="implementing-num-2">Implementing <code>Num</code> (2)</h1>
+<p>The most interesting lines are for <code>+</code> and <code>*</code>.
+We use pattern matching to pull the <code>Int</code> out of the
+<code>SatInt</code>. Then we convert the <code>x</code> and
+<code>y</code> values into unbounded <code>Integers</code>. We perform
+the operation.</p>
+<p>After the operation, if the result is out of bounds, we replace it
+with either the max or min value as appropriate.</p>
+<p>For signum, we just project the signum function inside the SatInt
+structure.</p>
+<hr />
+<h1 id="implementing-num-3">Implementing <code>Num</code> (3)</h1>
+<p>You might think we could do that for <code>abs</code>, too, but we
+can’t. Suppose we’re working with 8 bit integers. The range is
+<code>[-128, 127]</code>. If we take <code>abs -128</code>, we would
+expect <code>128</code>, but that’s too big! We need to bound it,
+therefore.</p>
+<p>Same deal with <code>negate</code>. We want
+<code>negate intMin</code> to give <code>intMax</code>, not wrap around
+to <code>intMin</code> again.</p>
+<p>Lastly, we use point-free notation for <code>fromInteger</code>. We
+apply the <code>SatInt</code> constructor of the result of calling
+<code>fromInteger</code> on the input value.</p>
+<hr />
+<h1 id="showing-it-off">Showing it off</h1>
+<pre><code>main :: IO ()
+main = do
+    let x = SatInt 7
+    let y = SatInt 9
+    let z = SatInt 99
+    
+    print $ x + y -- Prints SatInt 16
+    print $ x - y -- SatInt (-2)
+    print $ x * y -- SatInt 63
+    print $ abs $ x * negate y -- SatInt 63
+    print (-100000000000000000000 :: SatInt) -- SatInt (-9223372036854775807)
+    print (100000000000000000000 :: SatInt) -- SatInt 9223372036854775807
+    print $ abs (-100000000000000000000 :: SatInt) -- SatInt 9223372036854775807
+    print $ z*z*z*z*z*z*z*z*z*z*z*z*z*z*z*z*z*z  -- SatInt 9223372036854775807</code></pre>
+<p>Notice the saturation being demonstrated on all the last values.
+Haskell has a weird length of <code>Int</code> on my platform, but it’s
+clearly limited.</p>
+<hr />
+<h1 id="practice">Practice</h1>
+<p>Create a custom integer type, <code>Int4</code> that ranges from -8
+to +7.</p>
+<p>Implement <code>Bounded</code> for it.</p>
+<p>Then, implement <code>Num</code> for it, too.</p>
+<p>Don’t make it saturate, it should wrap. You can use the modulus to
+make it do that.</p>
+<p>Demonstrate that your integer type works by doing some arithmetic on
+it.</p>
+<hr />
+<h1 id="questions-7">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="other-typeclasses">Other typeclasses</h1>
+<p>Now that you understand <code>Num</code>, you have a good grounding
+for how typeclasses work and why they’re useful.</p>
+<p>We can add any new numeric type and have it work with the operators
+we’re used to.</p>
+<p>We can even support higher operators like <code>^</code> if we also
+want to implement <code>Integral</code> (which requires
+<code>Real</code> and <code>Enum</code>).</p>
+<hr />
+<h1 id="other-typeclasses-1">Other typeclasses</h1>
+<p>Next module, we’ll look at some extremely important typeclasses with
+have weird names: <code>Functor</code>, <code>Applicative</code>, and
+<code>Monoid</code>.</p>
+<p>This will set us up to discuss one of the most important typeclasses
+of all: <code>Monad</code>!</p>
+<hr />
+<h1 id="one-last-thing-dynamic-dispatch-on-which-arg">One last thing:
+dynamic dispatch on which arg?</h1>
+<p>One random thing I wanted to point out but couldn’t find a good place
+to do it.</p>
+<p>In Java (and most OO languages), when we write
+<code>instance.method(1, 2, 3)</code>, if the type of instance is
+abstract (i.e., an interface or abstract class), then we’re doing
+dynamic dispatch.</p>
+<p>That is, assume <code>method</code> is the 3rd method in the
+interface. We’ll looking up the 3rd value in <code>instance</code>’s
+VTable and calling it with <code>1, 2, 3</code>. This happens at run
+time.</p>
+<p>But that means that only the thing before the <code>.</code> can be
+used in the look up.</p>
+<hr />
+<h1 id="what-if">What if?</h1>
+<p>What if we want to have the dynamic dispatch happen to another value.
+For example, a non-object-oriented function like this product between a
+scalar and a vector: <code>scale 5 (Vec3 2 3 4)</code></p>
+<p>I might want to dispatch this function depending on whether I’m
+scaling a <code>Vec3</code>, a <code>Vec4</code>, a matrix, etc.</p>
+<p>In most OO languages, we can’t do this:
+<code>5.scale(Vec3(2, 3, 4))</code> would dispatch based on the 5. That
+would mean that all integers would have the same <code>scale</code>
+function. We couldn’t have it change at runtime depending on what kind
+of thing we’re scaling except manually (i.e., an if-statement or some
+kind of table of function pointers).</p>
+<p>The value before the <code>.</code> is <em>special</em>. It is the
+only one allowed to cause dispatch to occur.</p>
+<hr />
+<h1 id="in-haskell-we-can">In Haskell, we can</h1>
+<div class="sourceCode" id="cb51"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Scalable</span> a <span class="kw">where</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    scale ::</span> <span class="dt">Num</span> b <span class="ot">=&gt;</span> b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a </span></code></pre></div>
+<p>Notice the difference, the <code>Scalable</code> thing
+(<code>a</code>) is the <em>second</em> argument to <code>scale</code>.
+The first argument is just a <code>Num</code>.</p>
+<p>This means that we’re doing dispatch-based on the second argument
+rather than the first. We can scale a different way for
+<code>&lt;1, 2, 3&gt;</code> and
+<code>&lt;&lt;1, 2,&gt;, &lt;3, 4&gt;&gt;</code> (pretend that’s a 2x2
+matrix)</p>
+<hr />
+<h1 id="return-type-dispatch">Return type dispatch</h1>
+<p>We can even dispatch based on the return type.</p>
+<p>That’s how <code>minBound</code> and <code>maxBound</code> work.</p>
+<p>In Java, you cannot overload based on return type.</p>
+<p>This ends up being very useful in Haskell when dealing with monads,
+which use this feature along with <code>do</code> notation to let you
+extend the language in cool ways.</p>
+<hr />
+<h1 id="what-about-multiple-dispatch">What about multiple dispatch</h1>
+<p>What if we want to dispatch based on <em>more than one</em>
+argument?</p>
+<p>We’ve been assuming that we only ever want to use one argument to
+dispatch based on.</p>
+<p>But what if we want different combinations of types to go to
+different methods?</p>
+<p>When on earth could we ever need that?</p>
+<hr />
+<h1 id="multiple-dispatch-example">Multiple dispatch example:</h1>
+<p>Collision detection is a good example.</p>
+<p>There are custom math formula for detecting a rectangle-rectangle,
+rectangle-circle, circle-triangle, etc. collision.</p>
+<p>So we need to consider combinations.</p>
+<p>Haskell lets us do this with multi-parameter typeclasses:</p>
+<div class="sourceCode" id="cb52"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">Collider</span> a b <span class="kw">where</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    collides ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> <span class="dt">Bool</span></span></code></pre></div>
+<p>Here, we can define a <code>Collider</code> instance for every pair
+we support. Like:</p>
+<div class="sourceCode" id="cb53"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Collider</span> <span class="dt">Circle</span> <span class="dt">Square</span> <span class="kw">where</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>    collides circle square <span class="ot">=</span> <span class="op">...</span></span></code></pre></div>
+<hr />
+<h1 id="why-have-i-never-heard-of-this">Why have I never heard of
+this?</h1>
+<p>If a language requires dynamic-dispatch, multiple dispatch is pretty
+rare.</p>
+<p>The <a
+href="https://opendylan.org/intro-dylan/multiple-dispatch.html">Dylan</a>
+language supports it… …as does <a
+href="https://docs.julialang.org/en/v1/manual/methods/">Julia</a>.</p>
+<p>However, C++ doesn’t have it. It has ad-hoc polymorphism, so you can
+define it on a case-by-case basis, but you have to have your definitions
+up-front. You can’t let someone add new collisions later for
+example.</p>
+<p>Java doesn’t have it either. Neither does C#.</p>
+<hr />
+<h1 id="blub-strikes-again">Blub strikes again</h1>
+<p>Now that you’ve seen it, it probably seems like the easiest way to
+define collisions.</p>
+<p>But if you had never heard of multiple dispatch, it might have never
+even occurred to you to ask for that feature.</p>
+<p>This is the curse of Blub, and why it’s so useful to learn new
+languages.</p>
+<hr />
+<h1 id="dispatch-in-haskell-is-static">Dispatch in Haskell is
+static</h1>
+<p>Can Haskell be blub? Yes. Here’s an example.</p>
+<p>In Haskell, dispatch is always static. We never dynamically dispatch
+based on the type. The compiler can always figure out which function to
+call at compilation, so there are no lookup tables.</p>
+<p>However, that means we can do a particular thing in Java and not as
+easily in Haskell:</p>
+<div class="sourceCode" id="cb54"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> GuiWidget <span class="op">{</span> </span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> <span class="fu">onClick</span><span class="op">();</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GuiInterface <span class="op">{</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">static</span> GuiWidget<span class="op">[]</span> widgets <span class="op">=</span> <span class="kw">new</span> GuiWidget<span class="op">[</span><span class="dv">100</span><span class="op">];</span></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<hr />
+<h1 id="dispatch-in-haskell-is-static-1">Dispatch in Haskell is
+static</h1>
+<p>In Haskell, the equivalent code would be this:</p>
+<div class="sourceCode" id="cb55"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">GuiWidget</span> a <span class="kw">where</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    onClick ::</span> a <span class="ot">-&gt;</span> <span class="dt">IO</span> () <span class="co">-- IO () is for &quot;actions&quot;, we&#39;ll cover it later</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="ot">widgets ::</span> <span class="dt">Widget</span> a <span class="ot">=&gt;</span> [a] <span class="co">-- this seems to work</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>widgets <span class="ot">=</span> [<span class="dt">Button</span> <span class="st">&quot;load&quot;</span>, <span class="dt">Button</span> <span class="st">&quot;quit&quot;</span>] <span class="co">-- but this fails</span></span></code></pre></div>
+<p>You get an error stating that <code>a</code> is a <em>rigid type
+variable</em>. There are two ways to explain why this fails…</p>
+<hr />
+<h1 id="dispatch-in-haskell-is-static-2">Dispatch in Haskell is static
+(2)</h1>
+<ol type="1">
+<li><p>Because the type <code>widget :: Widget a =&gt; [a]</code> really
+means <code>widget :: forall a. Widget a =&gt; [a]</code>. That is, it’s
+a nonsense type that claims to be a list of every kind of Widget, not a
+specific kind. It is impossible to fulfill, because there is no bound on
+the kinds of Widget (we can define more at any time, even in external
+modules).</p></li>
+<li><p>Because it requires dynamic dispatch. If each element of the list
+can be a different type, we have to, at run time, descide what to do.
+Therefore we need a lookup table.</p></li>
+</ol>
+<hr />
+<h1 id="dispatch-in-haskell-is-static-3">Dispatch in Haskell is static
+(3)</h1>
+<p>So is Java just better than Haskell? At least for GUIs?</p>
+<p>No, there are easy ways to fix this: 1. There’s a language extension
+called <code>existentialQuantification</code> that lets you define the
+type of the list as “a list of <em>some</em> widget” instead of “a list
+of <em>any</em> widget”. 2. There’s a better way to design this
+software.</p>
+<p>Let’s focus on number 2: [can anyone think of a way to redesign our
+system to not rely on fancy hidden dispatch mechanisms?]</p>
+<hr />
+<h1 id="different-designs">Different designs</h1>
+<p>If the main difference between widgets is what they do when you click
+them, why not just bake that directly into the data type as a
+function?</p>
+<div class="sourceCode" id="cb56"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Widget</span> <span class="ot">=</span> <span class="dt">Widget</span> (<span class="dt">Widget</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ())</span></code></pre></div>
+<p>Now, a <code>Widget</code> is anything that does <code>IO</code> when
+you click it. We can easily have a list of <code>Widget</code>s now.</p>
+<p>We could even do this instead:</p>
+<div class="sourceCode" id="cb57"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Widget</span> <span class="ot">=</span> <span class="dt">Button</span> <span class="op">|</span> <span class="dt">Scrollbar</span> <span class="op">|</span> <span class="dt">Window</span> <span class="op">|</span> <span class="op">...</span></span></code></pre></div>
+<p>We can use sum-types to list every kind of widget.</p>
+<hr />
+<h1 id="different-designs-2">Different designs (2)</h1>
+<p>The second design is not very OO, but it avoids requiring a dispatch
+mechanism. The first design is almost exactly equivalent to the OO, but
+avoids the extra level of indirection.</p>
+<p>Either way, we get a nice, simple design that doesn’t require the
+language to secretly build lookup-tables for us.</p>
+<hr />
+<h1 id="questions-8">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="classs-being-overly-overloaded">Class’s being overly
+overloaded</h1>
+<p>I promised earlier that I had an example of how the design of classes
+needing to enable 3 different language features could cause them to not
+fulfill each one as well as a purpose-built solution.</p>
+<p>Here is an example</p>
+<hr />
+<h1 id="class-layout">Class layout</h1>
+<p>Classes are used for encapsulation. They act as boundaries for
+modifying data.</p>
+<p>However, in most OO languages, all the data in an instance is
+co-located.</p>
+<p>That is, in this Java class, when we instantiate it, <code>x</code>,
+<code>y</code>, and <code>z</code> will be next to each other in
+memory:</p>
+<div class="sourceCode" id="cb58"><pre
+class="sourceCode java"><code class="sourceCode java"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Foo <span class="op">{</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> x<span class="op">;</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> y<span class="op">;</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> z<span class="op">;</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<hr />
+<h1 id="whats-wrong-with-that">What’s wrong with that?</h1>
+<p>Nothing is wrong with that. It’s what we want most of the time.</p>
+<p>However, sometimes some subsets of fields are never used at the same
+time.</p>
+<p>Consider this example:</p>
+<div class="sourceCode" id="cb59"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GameObject <span class="op">{</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="kw">private</span><span class="op">:</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>    Position pos<span class="op">;</span></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>    Sprite sprite<span class="op">;</span></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>    SoundEffect collisionSound<span class="op">;</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span> <span class="op">...</span></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<p>The graphics drawing routine is probably completely unrelated to the
+sound processing, and yet those two pieces of data are right next to
+each other.</p>
+<hr />
+<h1 id="whats-wrong-with-that-2">What’s wrong with that? (2)</h1>
+<p>The problem with that is that it’s cache-inefficient.</p>
+<p>Having sound data in our cache when we’re doing sprite drawing just
+reduces the amount of data that can fit in Cache.</p>
+<p>We’re probably doing a for-loop over all the sprites to draw them,
+then maybe a for-loop over all the sounds later to play them if a
+collision happened.</p>
+<p>Therefore, we should probably store them in two separate places:</p>
+<div class="sourceCode" id="cb60"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>SoundEffect<span class="op">*</span> effects<span class="op">;</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>Sprite<span class="op">*</span> sprites<span class="op">;</span></span></code></pre></div>
+<p>If each game object has a unique id, we can maybe treat it as an
+index into these arrays.</p>
+<hr />
+<h1 id="whats-wrong-with-that-3">What’s wrong with that? (3)</h1>
+<p>The issue is: this is a radical re-orginization of data. We aren’t
+using the class anymore.</p>
+<p>We could have a class with pointers to its data, but that defeats the
+purpose. We really only need the class to be an id.</p>
+<p>At this point, most game programmers switch to using an entity
+component system, which is based on this principle.</p>
+<hr />
+<h1 id="fundamentally">Fundamentally…</h1>
+<p>This is a distinction between an array of structures (or classes) and
+a structure of arrays.</p>
+<p>We call this AOS vs. SOA. Sometimes one is more performant or
+convenient than the other.</p>
+<p>Classes are built around an SOA assumption, which is a good
+assumption most of the time, but not always.</p>
+<p>On the other hand, what if you were never using classes to begin
+with? Your module may have used handles for game objects with totally
+independent data structures.</p>
+<p>If so, congratulations, you probably didn’t break any external code
+when you refactored.</p>
+<hr />
+<h1 id="the-point">The point</h1>
+<p>The reason I’m mentioning this is that when we use the same feature
+for data-hiding as we do for controlled mutation, we may run into
+problems where it’s not great at either.</p>
+<p>Here, because in Haskell we don’t need a feature for controlled
+mutation, we can just use our data-hiding tool, which is a module.</p>
+<p>And modules are very simple. We end up with easier software
+design.</p>
+<hr />
+<h1 id="questions-9">Questions?</h1>
+<!-- _class: invert questions -->
+</body>
+</html>

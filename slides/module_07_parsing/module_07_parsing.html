@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>module_07_parsing</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="programming-language-design">Programming Language Design</h1>
+<h2 id="module-7-parsing">Module 7: Parsing</h2>
+<p><br> <br></p>
+<p>Slides © Grant Williams, <a
+href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+4.0</a>.</p>
+<p><br></p>
+<p>This is an open educational resource. Feel free to submit fixes,
+improvements, and new material <a
+href="https://github.com/grantwill74/notes-on-programming-language-design">here</a>.</p>
+<hr />
+<h1 id="last-time">Last time</h1>
+<p>We got more comfortable with practical coding in Haskell using
+functional operators.</p>
+<p>A lot of operators… (but we <em>love</em> that, right?)</p>
+<hr />
+<h1 id="this-time">This time</h1>
+<p>We’re going to learn to parse.</p>
+<p>This is incredibly important, and once you understand it, you will be
+most of the way to making your own toy language (i.e., our lisp
+dialect)</p>
+<p>We’ve seen the term before, but what does it mean? [What is parsing
+in computer science?]</p>
+<hr />
+<h1 id="to-parse">To parse</h1>
+<p>In computer science, “to parse” means “to convert a string into a
+value, tree, or other data structure” (my definition)</p>
+<p>So <code>parseInt</code> in javascript converts a string to an
+int.</p>
+<p>But we don’t want to just stop with simple values, we want to parse
+<em>programs</em>.</p>
+<p>That means we need to parse a more complex datastructure. How can we
+represent a <em>program</em>?</p>
+<hr />
+<h1 id="programs-are-trees">Programs are trees</h1>
+<p>The most common datastructure we use to represent a program is a
+tree.</p>
+<p>Why? Consider some C code:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> blort<span class="op">(</span><span class="dt">int</span> a<span class="op">,</span> <span class="dt">int</span> b<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">3</span> <span class="op">*</span> a <span class="op">+</span> <span class="dv">4</span> <span class="op">*</span> b<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">int</span> argc<span class="op">,</span> <span class="dt">char</span><span class="op">**</span> argv<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>argc <span class="op">!=</span> <span class="dv">3</span><span class="op">)</span> <span class="op">{</span> </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        puts <span class="op">(</span><span class="st">&quot;usage: blort &lt;a&gt; &lt;b&gt;&quot;</span><span class="op">);</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;blort is: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> blort<span class="op">(</span>atoi<span class="op">(</span>argv<span class="op">[</span><span class="dv">1</span><span class="op">]),</span> atoi<span class="op">(</span>argv<span class="op">[</span><span class="dv">2</span><span class="op">])));</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<hr />
+<h1 id="is-that-a-tree">Is that a tree?</h1>
+<p>It doesn’t look like it at first glance, but a parser is turning that
+code into a tree.</p>
+<p>The parser is part of the compiler. The compiler runs in several
+phases: - Pre-processing (expanding <code>#include</code> and friends) -
+Lexing (i.e., <em>lexical analysis</em>) - Parsing (what we’re going to
+cover today) - Semantic analysis (i.e., checking types and other rules
+and finding errors) - Optimization (happens in several places) - Codegen
+(i.e., actually generating the lower-level code, such as assembly or
+llvm or machine code. We don’t do this in this class: take the course in
+Compilers!)</p>
+<hr />
+<h1 id="compilation-units">Compilation units</h1>
+<p>In C, the basic unit of compilation is the…uh…<em>compilation
+unit</em>.</p>
+<p>When we run the compiler, it interprets its input as a giant text
+file (after all the preprocessor stuff has been included) that describes
+a bunch of functions and variables that need to be compiled
+together.</p>
+<p>The (normal) <em>output</em> of a C compiler is an object file. That
+is, a <code>.o</code> file.</p>
+<p>[Whats in an <code>.o</code> file?]</p>
+<hr />
+<h1 id="object-files">Object files</h1>
+<p>You can see for yourself with the <a
+href="https://linux.die.net/man/1/objdump"><code>objdump</code></a>
+comand on <em>unixey</em> platforms. Or check the <a
+href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format">file
+format</a> (it’s similar on Windows but ).</p>
+<p>But basically, it’s broken into “sections” of binary data: - All the
+data known at compilation time goes in the <code>.data</code> section. -
+All the code goes in the <code>.text</code> section. (why not call it
+<code>.code</code>? I don’t know) - All the data that has space reserved
+at compilation time but whose size we don’t know goes in the
+<code>.bss</code> section. (another strange name) - A string table
+<code>.strtab</code>, which holds a list of exported function names
+(like “main”) - A symbol table <code>.symtab</code> which maps the
+string table strings to virtual addresses (i.e., the virtual address of
+the function <code>main</code>)</p>
+<hr />
+<h1 id="where-is-the-tree">Where is the tree?</h1>
+<p>Buried between the input (C code) and the output (an <code>.o</code>
+file) is the parsing step.</p>
+<p>We actually represent the compilation unit as some kind of tree (or
+forest).</p>
+<p>Why? Because even though a C program is just a string of code, it is
+conceptually “structured”. Specifically, structured like a tree.</p>
+<p>Here’s how our C program above could be represented as a forest…</p>
+<hr />
+<h1 id="our-program-from-earlier-as-a-prefix-ordered-tree">Our program
+from earlier (as a prefix ordered tree)</h1>
+<p>Leaving out types:</p>
+<pre><code>compilation-unit [
+    &lt;stuff from header files&gt;;
+    function blort [
+        params: a, b
+        body: [
+            return [ 
+                + [ * [3; a]; * [4; b] ]
+            ]
+        ]
+    ];
+    function main [ ... ]; etc.
+]</code></pre>
+<hr />
+<h1 id="why">Why?</h1>
+<p>Every function is itself a tree.</p>
+<p>In fact, individual expressions are trees. Notice how we represent
+<code>3 * a + 4 * b</code>:</p>
+<pre><code>+ [
+    * [ 3, a ];
+    * [ 4, b ]
+]</code></pre>
+<p>The root is <code>+</code>, the two inner nodes are <code>*</code>,
+and the leaves are 3, <code>a</code>, 4, and <code>b</code>.</p>
+<p>By using trees, we can quickly answer questions like “I want to add
+here, but what am I adding? Oh, it’s 3 and <code>a</code>”</p>
+<p>By turning expressions into trees, we can either execute them (i.e.,
+interpret them), or turn them into machine code easier.</p>
+<hr />
+<h1 id="example">Example</h1>
+<p>Suppose we want to execute <code>+ [ * [3; a]; * ][4; b] ]</code></p>
+<p>We can recursively execute its children and add them.</p>
+<p>We execute <code>* [3, a]</code> and get a result. We execute
+<code>* [4, b]</code> and get another result. We add those results
+together.</p>
+<p>What about generating code? It’s more complicated, but it’s similar.
+We emit code to compute <code>3 * a</code> and, e.g., push the result.
+We emit code to compute <code>4 * b</code> and push the result. Then we
+emit code to add the top two stack elements together. (in practice we
+would probably not use the stack here, but this is just conceptual)</p>
+<hr />
+<h1 id="knowledge-check-1">Knowledge check 1</h1>
+<ol type="1">
+<li>Generate a tree using our goofy notation for the expression
+<code>2 + 2</code></li>
+<li>Now generate a tree for <code>2 + 2 + 2</code></li>
+<li>Now generate a tree for <code>2 + 2 * 3</code> but use order of
+operations (so the <code>*</code> would need to happen first)</li>
+</ol>
+<hr />
+<h1 id="kc-1-answers">KC 1 answers</h1>
+<ol type="1">
+<li><code>+ [2; 2]</code></li>
+<li>Several answers: <code>+ [2; 2; 2]</code>,
+<code>+[ +[ 2; 2]; 2]</code>, and
+<code>+[2; +[2; 2]].</code>+<code>is associative, so we don't need to consider</code>2
++ 2 + 2<code>distinct from</code>(2 + 2) + 2<code>or</code>2 + (2 + 2)`.
+All are the same expression.</li>
+<li>This one only has one answer: <code>+[2; *[2; 3]]</code></li>
+</ol>
+<hr />
+<h1 id="questions">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="how-to-parse">How to parse</h1>
+<p>Assume you accept my premise that code is easier to work with
+(meaning execute or compile) when it is structured as a tree.</p>
+<p>How do we actually build one of these trees?</p>
+<p>There are a ton of ways to do it, but there is a particularly elegant
+way that works perfectly in Haskell called <em>Recursive
+Descent</em>.</p>
+<p>Let’s learn how it works…</p>
+<hr />
+<h1 id="parsing-arithmetic-expressions">Parsing arithmetic
+expressions</h1>
+<p>Let’s say I want to parse an arithmetic expression like
+<code>2 + 3 * x - 1</code></p>
+<p>There are a couple of things that make it harder: 1. We need to
+handle in-order operations. It’s not in a convenient form for turning
+into a tree. 2. We need to handle precedence. We want the expression to
+parse the same as this: <code>2 + (3 * x) - 1</code>.</p>
+<p>First, let’s look at what our input will actually look like…</p>
+<hr />
+<h1 id="it-will-be-tokenized">It will be tokenized</h1>
+<p>We already talked about tokenization, so let’s assume that we have
+tokenized this expression. It will look something like this:</p>
+<p><code>[IntLit 2, Plus, IntLit 3, Times, Var "x", Minus, IntLit 1]</code></p>
+<p>Assuming we have a token datatype that looks like this:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Token</span> <span class="ot">=</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">IntLit</span> <span class="dt">Integer</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Plus</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Minus</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Times</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Var</span> <span class="dt">String</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   etc<span class="op">.</span></span></code></pre></div>
+<hr />
+<h1 id="the-goal">The goal</h1>
+<p>The goal (here) is to parse a single expression. So some string of
+operators and operands that will end up being evaluated.</p>
+<p>In our example, the type is simple: it’s either addition,
+subtraction, or multiplication:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Expr</span> <span class="ot">=</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Add</span> <span class="dt">Expr</span> <span class="dt">Expr</span> <span class="co">-- a sum (e.g., a + b)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Sub</span> <span class="dt">Expr</span> <span class="dt">Expr</span> <span class="co">-- a difference (e.g., a - b)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Mul</span> <span class="dt">Expr</span> <span class="dt">Expr</span> <span class="co">-- a product (e.g., a * b)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Val</span> <span class="dt">Integer</span> <span class="co">-- a value by itself (e.g., 7)</span></span></code></pre></div>
+<p>This datatype is actually a tree. <code>Val</code> is a constructor
+for leaves. Otherwise, the other constructors take two expressions. This
+will be the result of our parsing.</p>
+<p><code>Add Expr Expr</code> means “this expression is the sum of two
+smaller expressions.”, etc.</p>
+<hr />
+<h1 id="the-goal-2">The goal (2)</h1>
+<p>We will start with some string like <code>2 + 3 * x - 1</code>, and
+we want to turn it into an <code>Expr</code>.</p>
+<p>Why do we need to do that? Why not just turn it into a single integer
+like <code>7</code>?</p>
+<p>Because of the <code>x</code>. We don’t actually know what value this
+expression is going to have until we decide what <code>x</code> is.</p>
+<p>Therefore, we have to store the whole expression, we can’t just
+reduce it down to a single value (although if you could, feel free to
+try; it’s a good optimization when it’s available!)</p>
+<hr />
+<h1 id="the-goal-3">The goal (3)</h1>
+<p>Therefore, we are writing this function:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">parseExpr ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> <span class="dt">Expr</span></span></code></pre></div>
+<p>That’s it. We take a string and return an expression.</p>
+<p>The technique we use will be useful for parsing most things,
+including programs, not just expressions, but let’s start there.</p>
+<hr />
+<h1 id="questions-before-we-get-started">Questions before we get
+started?</h1>
+<!-- _class: questions invert -->
+<hr />
+<h1 id="the-starting-point">The starting point</h1>
+<p>Okay, to start with, what <em>is</em> an expression?</p>
+<p>Well, it could be a sum, a difference, a product, a variable, or a
+value.</p>
+<p>Let’s consider this as a list ordered by <em>precedence</em>:</p>
+<pre><code>expr ::= expr + term
+expr ::= expr - term
+expr ::= term
+expr ::= term * factor
+term ::= factor
+factor ::= Variable
+factor ::= Value</code></pre>
+<hr />
+<h1 id="backus-naur-form">Backus-Naur form</h1>
+<p>That is a language that is used to define grammars called
+“Backus-Naur form” or (BNF).</p>
+<p>You’ve probably seen it in your automata class, but here’s a
+refresher:</p>
+<p>BNF works like this: <code>production ::= rules</code></p>
+<p>This says that we can replace a list of <code>rules</code> with a
+production named <code>production</code>.</p>
+<p>So if we have an expression, followed by a <code>+</code> and then a
+term, we can invoke this rule to combine them all into an expression:
+<code>expr ::= expr + term</code></p>
+<hr />
+<h1 id="backus-naur-warnings">Backus-Naur warnings</h1>
+<p>We have to be careful when we write our grammar.</p>
+<p>This is not the right grammar:</p>
+<pre><code>expr ::= expr + expr
+expr ::= expr - expr
+expr ::= expr * expr
+expr ::= Variable
+expr ::= Value</code></pre>
+<p>[What’s wrong with it?]</p>
+<hr />
+<h1 id="its-ambiguous">It’s ambiguous</h1>
+<p>The first issue with that grammar is that it’s ambiguous.</p>
+<p>We don’t just care <em>whether</em> a string is an expression, but
+<em>how</em>.</p>
+<p>For example, which tree is correct for <code>1 + 2 * 3</code>: 1.
+<code>1 + (2 * 3)</code> which results in <code>Add 1 (Mul 2 3)</code>
+2. <code>(1 + 2) * 3</code> which results in
+<code>Mul (Add 1 2) 3</code></p>
+<p>We know that we want to follow normal order of operations, which
+means #1. But the grammar doesn’t require that, it’s possible to apply
+rules in either order…</p>
+<hr />
+<h1 id="its-ambiguous-2">It’s ambiguous (2)</h1>
+<p>When we see <code>1 + 2 * 3</code>,</p>
+<p>We can apply the <code>expr ::= value</code> rule to get this:
+<code>Value 1 + Value 2 * 3</code>. Then we apply
+<code>expr ::= expr + expr</code> to get this:
+<code>(Add (Value 1) (Value 2)) * 3</code> Then we apply the
+<code>expr :: value</code> rule again…
+<code>(Add (Value 1) (Value 2)) (Value 3)</code> Finally,
+<code>Mul (Add (Value 1) (Value 2)) (Value 3)</code></p>
+<p>But, this is what we <em>want</em>: Apply <code>expr ::= value</code>
+to <code>2</code> and <code>3</code>: <code>1 + Value 2 * Value 3</code>
+Then <code>Value 2 + (Mul (Value 2) (Value 3))</code> Then
+<code>Add 2 (Mul (Value 2) (Value 3))</code></p>
+<p>So we need to make sure there’s only one way to parse it.</p>
+<hr />
+<h1 id="fixing-it">Fixing it</h1>
+<p>We need to create intermediate categories like <em>term</em> and
+<em>factor</em>:</p>
+<pre><code>expr ::= expr + term
+expr ::= term
+term ::= term * factor
+term ::= factor
+factor ::= variable
+factor :: value</code></pre>
+<p>Now we only have one way to parse: <code>1 + 2 * 3</code>. What rules
+can we apply?</p>
+<p>Previously we went bottom-up, replacing words as quickly as
+possible.</p>
+<p>Instead, let’s start from <code>expr</code>…</p>
+<hr />
+<h1 id="top-down-parsing">Top-down parsing</h1>
+<p><code>1 + 2 * 3</code></p>
+<p>There are two ways to build an expression. Either from a
+<code>+</code> expression, or from a term. We see a <code>+</code>, so
+let’s try that: <code>expr 1 + term (2 * 3)</code></p>
+<p>We need to parse 1 as an expression and <code>2 * 3</code> as a
+term.</p>
+<p>The only way to parse 1 as an expression, is to treat it like a term,
+which means to treat it as a factor, and then to make it a value.</p>
+<p>To parse <code>2 * 3</code>, we invoke <code>term * factor</code>,
+and then parse <code>2</code> as a factor and then a value.
+<code>3</code> is already a factor, so we treat it as a value.</p>
+<p>So we end up with
+<code>Add (Value 1) (Mul (Value 2) (Value 3))</code></p>
+<p>And importantly: we can’t get anything else. Any other parse fails
+(end up with a non expression)</p>
+<hr />
+<h1 id="associativity-is-fixed-too">Associativity is fixed, too</h1>
+<p>Notice how we have this in our language:</p>
+<pre><code>expr ::= expr + term
+expr ::= expr - term 
+...</code></pre>
+<p>These are left-recursive rules. What would change if we did this?</p>
+<pre><code>expr ::= term + expr
+expr ::= term - expr
+...</code></pre>
+<p>[?]</p>
+<hr />
+<h1 id="the-associativity-would-change">The associativity would
+change</h1>
+<p>If we did that, we would end up parsing <code>1 + 2 + 3</code> as
+<code>1 + (2 + 3)</code> instead of <code>(1 + 2) + 3</code>. Is that a
+problem?</p>
+<p>Not for <code>+</code>, but it is for <code>-</code>:
+<code>1 - 2 - 3</code> should be 4, not
+<code>1 - (2 - 3) == 1 - (-1) == 2</code></p>
+<p>So we can’t do <code>expr ::= expr + expr</code> because we get
+ambiguous parses We can’t do <code>expr ::= term + expr</code> because
+the parentheses go around the recursive parse, and we want
+<code>+</code> (and <code>-</code>) to be left recursive.</p>
+<p>Instead, we do <code>expr ::= expr + term</code> to get the right
+associativity, and to also ensure that multiplication happens before
+addition, even if it’s on the right of a <code>+</code>.</p>
+<hr />
+<h1 id="knowledge-check-2">Knowledge check 2</h1>
+<ol type="1">
+<li>Parse 1 + 2 * x * 3 - 9 - 2 by hand. What Haskell <code>Expr</code>
+do you end up with?</li>
+<li>Extend the grammar by adding <code>^</code> to it (exponentiation).
+Make it be right associative.</li>
+</ol>
+<p>If you’re wondering how we extend our intuition about how to do this
+to Haskell, don’t worry. That’s coming up.</p>
+<hr />
+<h1 id="kc-2-answers">KC 2 answers</h1>
+<ol type="1">
+<li>I like to start by putting in parentheses:
+<code>((1 + ((2 * x) * 3)) - 9) - 2</code> Now start putting in
+constructors: <code>((Add 1 ((2 * 4) * 3)) - 9) - 2</code>
+<code>((Add 1 ((Mul 2 4) * 3)) - 9) - 2</code>
+<code>((Add 1 (Mul (Mul 2 4) 3)) - 9) - 2</code>
+<code>(Sub (Add 1 (Mul (Mul 2 4) 3)) 9) - 2</code>
+<code>Sub (Sub (Add 1 (Mul (Mul 2 4) 3)) 9) 2</code> Lastly, fill in the
+values and variables:
+<code>Sub (Sub (Add (Value 1) (Mul (Mul (Value 2) (Var "x")) (Value 3))) (Value 9)) (Value 2)</code></li>
+</ol>
+<p>This is what <code>parseExpr</code> would return.</p>
+<hr />
+<h1 id="kc-2-answers-2">KC 2 answers (2)</h1>
+<pre><code>expr ::= expr + term
+expr ::= expr - term
+expr ::= term
+term ::= term * factor
+term ::= factor
+factor ::= factor ^ exp
+factor ::= exp
+exp ::= Variable
+exp ::= Value</code></pre>
+<hr />
+<h1 id="questions-1">Questions?</h1>
+<!-- _class: questions invert -->
+<hr />
+<h1 id="putting-this-into-haskell">Putting this into Haskell</h1>
+<p>Now that we have refreshed on how to use grammars, let’s turn this
+into Haskell.</p>
+<p>Our goal is to write this function</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">parseExpr ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> <span class="dt">Expr</span></span></code></pre></div>
+<p>However, that function is going to need to parse terms, and terms
+will need factors. So let’s show the whole family:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">parseExpr ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> <span class="dt">Expr</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ot">parseTerm ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> ([<span class="dt">Token</span>], <span class="dt">Expr</span>) <span class="co">-- the tuple has the left-over string</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ot">parseFactor ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> ([<span class="dt">Token</span>], <span class="dt">Expr</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ot">parseVariable ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> ([<span class="dt">Token</span>], <span class="dt">Expr</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ot">parseValue ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> ([<span class="dt">Token</span>], <span class="dt">Expr</span>) </span></code></pre></div>
+<hr />
+<h1 id="variables-and-values">Variables and values</h1>
+<p>Let’s start with the easiest ones, <code>parseVariable</code> and
+<code>parseValue</code>.</p>
+<p>We just take a Value token and wrap it in a <code>Val</code>
+<code>Expr</code>:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>parseVariable (<span class="dt">Sym</span> name) <span class="op">:</span> remainder <span class="ot">=</span> (remainder, <span class="dt">Variable</span> name)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>parseVariable _ <span class="ot">=</span> <span class="fu">error</span> <span class="st">&quot;expected a symbol&quot;</span></span></code></pre></div>
+<p>This is why so many error messages say “expected ‘blah’”. It’s
+because once we’ve decided we need a variable, if there isn’t one there,
+that’s an informative thing to say (it tells the user what state the
+parser was in).</p>
+<p>[do <code>parseValue</code>]</p>
+<hr />
+<h1 id="parsing-factors">Parsing factors</h1>
+<p>Parsing factor is a little more complex, but not really.</p>
+<p>Remember the rules look like this:</p>
+<pre><code>factor ::= variable
+factor ::= value </code></pre>
+<p>So the function just has two definitions, one for a symbol and one
+for a literal:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ot">parseFactor ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> ([<span class="dt">Token</span>], <span class="dt">Expr</span>) </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>parseFactor (<span class="dt">Sym</span> s) <span class="op">:</span> <span class="fu">rem</span> <span class="ot">=</span> parseVariable <span class="op">$</span> (<span class="dt">Sym</span> s) <span class="op">:</span> <span class="fu">rem</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>parseFactor (<span class="dt">IntLit</span> i) <span class="op">:</span> <span class="fu">rem</span> <span class="ot">=</span> parseValue <span class="op">$</span> (<span class="dt">IntLit</span> i) <span class="op">:</span> <span class="fu">rem</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>parseFactor _ <span class="ot">=</span> <span class="fu">error</span> <span class="st">&quot;parsing factor: expected symbol or literal.&quot;</span></span></code></pre></div>
+<hr />
+<h1 id="what-to-notice-so-far">What to notice so far</h1>
+<p>So far, notice that for each rule, we have a function definition.</p>
+<p><code>factor ::= Variable</code> becomes
+<code>parseFactor (Sym s) : rem = ...</code>
+<code>factor ::= Value</code> becomes
+<code>parseFactor (IntLit i) : rem = ...</code></p>
+<p>We’re effectively treating our grammar rules as functions.</p>
+<p>It’s worked so far, let’s keep going…</p>
+<hr />
+<h1 id="parsing-terms">Parsing terms</h1>
+<p>The first tricky one is when parsing a term. We have two
+possibilities: 1. The term is just a factor (i.e., there is no
+<code>*</code>) 2. The term is an actual multiplication of two
+operands.</p>
+<p>Let’s apply the grammar and see what happens:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>parseTerm tokens <span class="ot">=</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (remaining, first) <span class="ot">=</span> parseTerm tokens</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span>  <span class="kw">if</span> <span class="fu">null</span> remaining <span class="kw">then</span> ([], first) <span class="co">-- no operator</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">else</span> <span class="kw">let</span> (remaining&#39;, second) <span class="ot">=</span> parseTerm&#39; remaining</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>             <span class="kw">in</span> <span class="dt">Mul</span> first second</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">where</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        parseTerm&#39; (<span class="dt">Times</span> <span class="op">:</span> remaining) <span class="ot">=</span> parseFactor remaining </span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        parseTerm&#39; _ <span class="ot">=</span> <span class="fu">error</span> <span class="st">&quot;expected &#39;*&#39;&quot;</span>  </span></code></pre></div>
+<p>Let’s understand this first, and then try to see a problem…</p>
+<hr />
+<h1 id="parsing-terms-1">Parsing terms</h1>
+<p>We are attempting to apply the parsing rule
+<code>term ::= term * factor</code> directly</p>
+<p>That means, we first parse a term recursively. Then we check for a
+<code>*</code>. If we find one, we parse the remaining factor.</p>
+<p>The result is either a <code>Term</code> or a
+<code>Mul (Term ...) (Factor ...)</code> Either way, we return it and
+the rest of the tokens.</p>
+<p>But there’s a problem here. This code won’t work.</p>
+<p>[What’s wrong?]</p>
+<hr />
+<h1 id="left-recursive-grammar">Left-recursive grammar</h1>
+<p>The problem is that the grammar is left-recursive.</p>
+<p>So our first recursive call is unguarded.</p>
+<p>It will therefore run forever.</p>
+<p>This part…</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>parseTerm tokens <span class="ot">=</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (remaining, first) <span class="ot">=</span> parseTerm tokens</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span> <span class="op">...</span> </span></code></pre></div>
+<p>…is the issue. Specifically that parseTerm call.</p>
+<hr />
+<h1 id="whats-the-problem">What’s the problem?</h1>
+<p>Suppose it were right-recursive:
+<code>term ::= factor * term</code></p>
+<p>This would no longer have the associativity we want, and it would
+pose a problem if we added division to the language, but let’s just
+pretend that was the rule.</p>
+<p>Then, our function would look like this:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>parseTerm tokens <span class="ot">=</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (remaining, first) <span class="ot">=</span> parseFactor tokens</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>        h <span class="op">:</span> remaining&#39; <span class="ot">=</span> remaining</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span> <span class="kw">if</span> h <span class="op">==</span> <span class="ch">&#39;*&#39;</span> <span class="kw">then</span> </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>            <span class="kw">let</span> (remaining&#39;&#39;, second) <span class="ot">=</span> parseTerm tokens</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>            <span class="kw">in</span> (remaining&#39;&#39;, <span class="dt">Mul</span> first second)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">else</span> (remaining&#39;, first)</span></code></pre></div>
+<p>This version does not have the problem.</p>
+<hr />
+<h1 id="how-can-we-fix-it">How can we fix it?</h1>
+<p>We have a few options: 1. Change the grammar to eliminate the
+recursion 2. Modify the behavior (the semantics) so that the math works
+out with right recursion.</p>
+<p>Let’s consider both options.</p>
+<hr />
+<h1 id="changing-the-grammar">Changing the grammar</h1>
+<p>If we remove the recursive term by expanding it in the grammar
+(meaning, replace it with equivalent things that aren’t recursive), we
+can get around this.</p>
+<p>So instead of this:</p>
+<pre><code>term ::= term * factor
+term ::= factor</code></pre>
+<p>We replace the “some kind of term and a star” with this regular
+expression style term:</p>
+<pre><code>term ::= (factor &#39;*&#39;)* factor
+or 
+term ::= factor (&#39;*&#39; factor)*</code></pre>
+<hr />
+<h1 id="whats-that">What’s that?</h1>
+<p>That first star ’*’ is just the star symbol for multiplication.</p>
+<p>That second star is a Kleene star. Just like a regular expression, it
+means “zero or more of the thing before me”.</p>
+<p>This modification of Backus-Naur form is called <a
+href="https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form">Extended
+Backus-Naur form</a>.</p>
+<p>Why is it better? Well, let’s revisit what it looks like to parse a
+term…</p>
+<hr />
+<h1 id="parsing-a-term">Parsing a term</h1>
+<pre><code>term ::= factor (&#39;*&#39; factor)*</code></pre>
+<p>Now we just parse a factor, and then, if there’s a star, we parse it,
+and then keep parsing factors as long as there’s more.</p>
+<p>One way of coding this is to make a recursive function that parses
+the rest of the term (the part starting with the first ’*’)…</p>
+<p>(consider this as psuedo code to illustrate the concept: the real
+parsing code you’ll need to use is later in this module)</p>
+<hr />
+<h1 id="parsing-a-term-2">Parsing a term (2)</h1>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- parse a (factor &#39;*&#39;)* into a multiply expression</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>parseTerm tokens <span class="ot">=</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (rest&#39;, factor) <span class="ot">=</span> parseFactor token</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>        (<span class="fu">head</span> <span class="op">:</span> rest&#39;&#39;) <span class="ot">=</span> rest&#39;</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span> <span class="kw">if</span> <span class="fu">not</span> (<span class="fu">null</span> rest&#39;) <span class="op">&amp;&amp;</span> <span class="fu">head</span> <span class="op">==</span> <span class="dt">Times</span> <span class="kw">then</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> (rest&#39;&#39;&#39;, factors) <span class="ot">=</span> parseTerm rest&#39;&#39;</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span>  (rest&#39;&#39;&#39;, <span class="dt">Mul</span> factor factors)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>       <span class="kw">else</span> (rest&#39;, factor)</span></code></pre></div>
+<p>Here, we parse a factor (which we “know” needs to be there if we want
+to parse a term)</p>
+<p>Then we check to see if there’s any tokens left. If see, if there’s
+also a “*” there, we keep parsing whatever comes after it.</p>
+<p>Note: the reason it’s safe to destructure the list with
+<code>(head : rest'') = rest</code> before we know if it’s empty or not
+is because of lazy evaluation.</p>
+<hr />
+<h1 id="the-basic-pattern">The basic pattern</h1>
+<p>The basic pattern here is that we call a function whenever we want to
+match a particular grammar rule.</p>
+<p>So there’s a <code>parseFactor</code>, a <code>parseTerm</code>, and
+a <code>parseExpr</code>. I’ll leave <code>parseExpr</code> up to you,
+or we can do it together if there’s time.</p>
+<p>Do we understand how we can represent rules in a grammar as
+functions?</p>
+<p>This technique is called recursive descent.</p>
+<hr />
+<h1 id="questions-2">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="parsing-lisp">Parsing lisp</h1>
+<p>Now we get to the part that’s relevant for our project.</p>
+<p>We want to parse a Lisp program (technically our little toy version
+of Lisp, called “slisp”).</p>
+<p>What does the grammar look like?</p>
+<p>Let’s look at the building blocks of our language and see if we can
+guess the rules…</p>
+<hr />
+<h1 id="lists">Lists</h1>
+<p>The most important datatype in Lisp is the list.</p>
+<p>But a list of what? It can’t just be lists all the way down. (I mean,
+lambda calculus is functions all the way down but that’s
+<em>weird</em>)</p>
+<p>Like, at some point it needs to be a list <em>of</em> something,
+right?</p>
+<p>We call the smallest something an <em>atom</em>.</p>
+<hr />
+<h1 id="atoms">Atoms</h1>
+<p>In a traditional lisp, there are many kinds of atoms. We will
+consider exactly two: 1. Symbols: some word that can be a variable name
+or something 2. Integers: literally an integer</p>
+<p>So <code>hello</code> and <code>123</code> are both atoms.</p>
+<p>What does <code>hello</code> mean? Well, it could be variable, or it
+could just be a random symbol. Symbols are like strings, but we don’t
+consider them to have “characters”. They are only equal to
+themselves.</p>
+<p>The purpose of symbols is to represent things.</p>
+<hr />
+<h1 id="values">Values</h1>
+<p>Therefore, in our simple version of list, there are actually two
+kinds of values 1. Atoms 3. Lists of some number (including zero) of
+values</p>
+<p>So there are basically 3 data-types in the whole language: symbols,
+integers, or lists of anything (including lists of lists of
+anything)</p>
+<p>A list is delimited by parentheses <code>()</code> and the values
+inside are whitespace separated if they are atoms.</p>
+<hr />
+<h1 id="representing-values">Representing values</h1>
+<p>What is a value as a data type? Well, something like this makes
+sense:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Value</span> <span class="ot">=</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">VSym</span> <span class="dt">String</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">VInt</span> <span class="dt">Integer</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">VList</span> [<span class="dt">Value</span>]</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> <span class="dt">Show</span></span></code></pre></div>
+<p>I’m adding ‘V’ before the constructors to distinguish them from token
+constructors.</p>
+<p>Notice the <code>deriving Show</code> which we learned about from our
+required reading. This makes it so that we can convert our values into
+strings, which is useful for debugging.</p>
+<hr />
+<h1 id="list-examples">List examples</h1>
+<p>The following are all valid lists</p>
+<pre><code>()
+(a b c)
+(1 2 3)
+(a b c 1 2 3)
+(a 1 b 2 c 3)
+(a (b c) 1 2 (3))</code></pre>
+<p>The symbols will eventually be interpreted as variables.</p>
+<p>Given these examples, can we come up with a grammar that will
+recognize these lists?</p>
+<hr />
+<h1 id="list-grammar">List grammar</h1>
+<pre><code>value ::= atom | list
+list ::= &#39;(&#39; value* &#39;)&#39;
+atom ::= Symbol | IntLit</code></pre>
+<p>So a value is either a list or an atom.</p>
+<p>A list is some sequence of values within a pair of parentheses.</p>
+<p>An atom is either a symbol or an integer literal</p>
+<p>We handle symbols and integer literals with our lexer, so we stop
+there (no need to distinguish which is which; it’s already done for
+us).</p>
+<p>Note, lisp expressions are entirely prefix, so there’s no need to
+deal with precedence or associativity. It’s quite nice to parse.</p>
+<hr />
+<h1 id="parsing-that">Parsing that</h1>
+<p>With that grammar, let’s imagine how to complete our project:</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ot">parseValue ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> ([<span class="dt">Token</span>], <span class="dt">Value</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="ot">parseList ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> ([<span class="dt">Token</span>], <span class="dt">Value</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="ot">parseAtom ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> ([<span class="dt">Token</span>], <span class="dt">Value</span>)</span></code></pre></div>
+<p>Your job will be to implement these functions.</p>
+<p>Think about how to do it: * Parsing a value means determining if
+there’s a list there (how?). * If there is, parse the list * Otherwise,
+it’s some kind of atom. Those are easy to parse.</p>
+<hr />
+<h1 id="suggestions">Suggestions</h1>
+<p>I recommend starting with <code>parseAtom</code>. You will need to
+either return a symbol or an integer. This can be done easily by looking
+at the token you’ve gotten and considering if it’s an IntLit, a Sym, or
+something else.</p>
+<p>Then <code>parseList</code> is a good next choice. It can first
+expect a <code>(</code>, then keep calling <code>parseValue</code> until
+there is a <code>)</code> token.</p>
+<p><code>parseValue</code> can just check if there is a <code>(</code>,
+and if so, call <code>parseList</code>, and if not, call
+<code>parseAtom</code>.</p>
+<p>But wait, we hadn’t defined <code>parseValue</code> before calling it
+inside <code>parseList</code>. How is it okay for <code>parseList</code>
+to call <code>parseValue</code>?</p>
+<hr />
+<h1 id="mutual-recursion">Mutual recursion</h1>
+<p>This is an example of <a
+href="https://en.wikipedia.org/wiki/Mutual_recursion">mutual
+recursion</a>.</p>
+<p>You’re used to regular recursion: make the function call itself.</p>
+<p>Mutual recursion is when function A calls function B, but function B
+calls function A.</p>
+<p>For example, consider a forest of trees, but the trees can have
+multiple children (so the children of a tree is a forest).</p>
+<hr />
+<h1 id="forests-and-trees">Forests and trees</h1>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Tree</span> a <span class="ot">=</span> <span class="dt">Empty</span> <span class="op">|</span> <span class="dt">InnerNode</span> (<span class="dt">Forest</span> a)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Forest</span> a <span class="ot">=</span> <span class="dt">ForestOf</span> [<span class="dt">Tree</span> a]</span></code></pre></div>
+<p>A tree is either empty, or it’s an inner node which has a forest for
+its children.</p>
+<p>A forest is a list of trees.</p>
+<p>They both refer to each other. This is fine. This is mutual
+recursion.</p>
+<hr />
+<h1 id="practice">Practice</h1>
+<p>Back to parsing lists and atoms, What if strings were in our
+language? What would change about our grammar?</p>
+<p>A single program is just a list. What if we allowed multiple lists
+side by side. How would the grammar change? That is:</p>
+<pre><code>((a 1 2) (b 3 4)) ; permitted
+(a 1 2) (b 3 4) ; currently not permitted. What would need to change?</code></pre>
+<p>What would change if we wanted a program to be a single atom in
+addition to a list?</p>
+<hr />
+<h1 id="more-practice">More practice</h1>
+<p>Write a function that counts the number of nodes in our tree
+above.</p>
+<p>What about forest?</p>
+<p>Should these functions be mutually recursive?</p>
+<hr />
+<h1 id="knowledge-check-on-recursive-descent">Knowledge check on
+recursive descent</h1>
+<p>Consider this language, call it “Florp”:</p>
+<pre><code>program ::= (statement)*
+statement ::= printStatement | assignment
+printStatement ::= &#39;print&#39; sum
+assignment ::= Name &#39;=&#39; sum
+sum ::= value (&#39;+&#39; sum)*
+value ::= Int | Name</code></pre>
+<p>First, what are some example programs in “florp”?</p>
+<hr />
+<h1 id="rd-knowledge-check-answers-1">RD Knowledge check answers
+(1)</h1>
+<p>Here’s one:</p>
+<pre><code>x = 2
+y = x + 2 + 2
+z = 1 + x + y + z
+print z
+print x + y</code></pre>
+<p>Uh…and here’s another one. Its <em>syntax</em> (order of string) is
+correct, but its <em>semantics</em> (what it actually means) is
+wrong:</p>
+<pre><code>print x
+x = 2</code></pre>
+<p>Next, what should the data types be that stores the tree?</p>
+<hr />
+<h1 id="rd-knowledge-check-answers-2">RD Knowledge check answers
+(2)</h1>
+<p>There are many ways to do this. One is to give each rule its own
+datatype.</p>
+<p>We didn’t do this for our lisp dialect because we didn’t need to, but
+let’s see what it looks like when we do:</p>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">FlorpProgram</span> <span class="ot">=</span> <span class="dt">FlorpProgram</span> [<span class="dt">FlorpStatement</span>]</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">FlorpStatement</span> <span class="ot">=</span> </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">StatPrint</span> <span class="dt">FlorpPrint</span> <span class="op">|</span> <span class="dt">StatAssign</span> <span class="dt">FlorpAssignment</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">FlorpPrint</span> <span class="ot">=</span> <span class="dt">FlorpPrint</span> <span class="dt">FlorpSum</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">FlorpAssignment</span> <span class="ot">=</span> <span class="dt">FlorpAssignment</span> <span class="dt">String</span> <span class="dt">FlorpSum</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">FlorpSum</span> <span class="ot">=</span> <span class="dt">FlorpSum</span> [<span class="dt">FlorpVal</span>]</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">FlorpVal</span> <span class="ot">=</span> <span class="dt">FlorpInt</span> <span class="dt">Integer</span> <span class="op">|</span> <span class="dt">FlorpName</span> <span class="dt">String</span></span></code></pre></div>
+<p>With this data type, we can compile an entire “florp” program into a
+FlorpProgram value. Then, later we can execute it. What should tokens
+look like?</p>
+<hr />
+<h1 id="rd-knowledge-check-answers-3">RD Knowledge check answers
+(3)</h1>
+<p>Here are the important tokens:</p>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">FlorpToken</span> <span class="ot">=</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Print</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Eq</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Plus</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">TInt</span> <span class="dt">Integer</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Name</span> <span class="dt">String</span></span></code></pre></div>
+<p>Practice: how would you write the tokenization routine?</p>
+<p>What about the recursive descent functions? What would they look
+like?</p>
+<hr />
+<h1 id="rd-knowledge-check-answers-4">RD Knowledge check answers
+(4)</h1>
+<p>Well, every florp program is a list of statements</p>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="ot">parseProg ::</span> [<span class="dt">Token</span>] <span class="ot">-&gt;</span> ([<span class="dt">Tokens</span>], [<span class="dt">FlorpStatement</span>])</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>parseProg (<span class="dt">Print</span> <span class="op">:</span> toks) <span class="ot">=</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (rest, printStatement) <span class="ot">=</span> parsePrint (<span class="dt">Print</span> <span class="op">:</span> toks)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>        (rest&#39;, otherStatements) <span class="ot">=</span> parseProg rest</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span>  (rest&#39;, printStatement <span class="op">:</span> otherStatements)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>parseProg (name <span class="op">:</span> <span class="dt">Eq</span> <span class="op">:</span> toks) <span class="ot">=</span> <span class="co">-- an assignment statement</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (rest, assignmentStatement) <span class="ot">=</span> parseAssign (name <span class="op">:</span> <span class="dt">Eq</span> <span class="op">:</span> toks)</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>        (rest&#39;, otherStatements) <span class="ot">=</span> parseProg rest</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span>  (rest&#39;, assignmentStatement <span class="op">:</span> otherStatements)</span></code></pre></div>
+<p>If you’d like some more practice, try the others. We have a program
+here, what does <code>parsePrint</code> or <code>parseProg</code> look
+like?</p>
+<hr />
+<h1 id="questions-3">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="what-is-the-point-of-parsing-lists">What is the point of parsing
+lists?</h1>
+<p>You might be wondering what the point is. Why are we parsing lists?
+What’s so special about them?</p>
+<p>We actually interpret the lists to be commands. The first element of
+the list is a function to call, the rest of the values are
+arguments.</p>
+<p>So a typical hello-world program could look something like this
+<code>(print "hello world")</code></p>
+<p>Of course, that would require strings, which we don’t have, but it’s
+not hard to imagine.</p>
+<p>Why on earth would a programming language work like this, though?</p>
+<hr />
+<h1 id="the-program-is-an-ast">The program is an AST</h1>
+<p>Our goal with parsing is to build an abstract syntax tree, or
+AST.</p>
+<p>With lisp, that is very easy, becuase the program itself is an
+AST.</p>
+<p>Normally, we’d have to turn <code>print (1 + 2)</code> into
+<code>(print (+ 1 2))</code>, but with lisp, the programmer does that
+for us.</p>
+<p>Once we have the AST fully turned into a Haskell tree, we can
+<em>execute</em> it.</p>
+<hr />
+<h1 id="executing-the-ast">Executing the AST</h1>
+<p>How does execution work?</p>
+<p>This will be for a future lecture, but basically, our program will be
+a list.</p>
+<p>We will lookup the first element of the list. If it’s a
+<code>+</code>, we’ll sum the rest of the list.</p>
+<p>If there are any nested lists, we’ll execute those.</p>
+<p>This is how we’ll make a lisp interpretor. It’s a strategy that works
+for almost any programming language.</p>
+<hr />
+<h1 id="questions-4">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="other-parsing-techniques">Other parsing techniques</h1>
+<p>We’ve seen recursive descent parsing now. It’s an elegant
+technique.</p>
+<p>However, it can be a pain to deal with many common situations: *
+Left-associative operators are annoying. * We need to be able to
+differentiate nodes. For example, for the <em>florp</em> language
+parser, we had to check if it was a print statement or an assignment
+statement by looking for the <code>Print</code> token.</p>
+<p>The last point is important. It becomes challenging when our language
+has rules that look almost the same except for a token that appears much
+later.</p>
+<hr />
+<h1 id="other-parsing-techniques-2">Other parsing techniques (2)</h1>
+<p>C compilers typically use some variant of <a
+href="https://en.wikipedia.org/wiki/LR_parser">LR parser</a>.</p>
+<p>LR Parsers are <em>bottom-up</em> parsers instead of top-down ones
+like recursive decent.</p>
+<p>They <em>shift</em> tokens into a stack until the tokens match one of
+the rules. Then they <em>reduce</em> the tokens into a single node
+matching that rule.</p>
+<p>Consider</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> x <span class="op">=</span> <span class="dv">2</span> <span class="op">+</span> <span class="dv">2</span><span class="op">;</span></span></code></pre></div>
+<hr />
+<h1 id="other-parsing-techniques-3">Other parsing techniques (3)</h1>
+<p>Here, we could shift all the tokens on the stack:
+<code>[int, x, =, 2, +, 2]</code> until we see the <code>;</code> That’s
+a sign that we have a complete statement.</p>
+<p>So now we reduce <code>2 + 2</code> into <code>(+ 2 2)</code>
+<code>[int, x, =, (+ 2 2)]</code></p>
+<p>At this point, we have enough information to describe a
+definition.</p>
+<p>This technique is nice because it’s fast. It can be “compiled” into a
+giant turning machine <code>goto</code> table based on a description of
+grammar rules. This is what tools like <a
+href="https://ftp.gnu.org/old-gnu/Manuals/flex-2.5.4/html_mono/flex.html">Flex</a>
+and <a href="https://www.gnu.org/software/bison/">Bison</a> do.</p>
+<hr />
+<h1 id="other-parsing-techniques-4">Other parsing techniques (4)</h1>
+<p>So what does Haskell use?</p>
+<p>Haskell uses a still-different technique, called an <a
+href="https://en.wikipedia.org/wiki/Operator-precedence_parser">operator-precedence
+parser</a></p>
+<p>The basic technique works like this: * Read tokens as long as each
+token is either an operand or an operator that has a lower precedence
+than the last operator. * At that point, you need to reduce (meaning,
+combine the tokens into a node). * Then continue.</p>
+<hr />
+<h1 id="operator-precedence-example">Operator precedence example</h1>
+<p>Suppose we have an expression like this:
+<code>2 + 5 * 3^4 + 9</code></p>
+<p>We first shift all the tokens until we get to the second
+<code>+</code>, because that’s the first time there’s an operation with
+a lower precedence than the previous operation:
+<code>2 + 5 * 3^4</code>, <code>+ 9</code></p>
+<p>We then reduce the left expression from right to left:
+<code>(2 + (5 * (3^4)))</code></p>
+<p>Then we continue: <code>(2 + (5 * (3^4))) + 9</code></p>
+<p>Then we’re done.</p>
+<hr />
+<h1 id="operator-precedence">Operator precedence</h1>
+<p>This is an extremely simple algorithm, but it works quite well.</p>
+<p>It has problems, though. Syntax that doesn’t follow the infix
+operator rule requires special handling.</p>
+<p>Haskell ends up mixing some other parsing techniques to deal with
+that. For example, recursive descent can be used to deal with
+keywords.</p>
+<p>It works great for infix operators, but struggles with mixing prefix
+and postfix. Haskell deals with this by making all prefix operations
+have the highest level of precedence and not using postfix
+operations.</p>
+<p>If you are willing to abide by these strict rules, it’s a great
+system. It also has a side benefit…</p>
+<hr />
+<h1 id="adding-operators">Adding operators</h1>
+<p>Haskell’s precedence parser allows you to add new operators to the
+language.</p>
+<p>You can literally just define a new operator any time:</p>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ot">(&lt;-=-&gt;) ::</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">&lt;-=-&gt;</span> b <span class="ot">=</span> a <span class="op">*</span> b <span class="op">+</span> a</span></code></pre></div>
+<p>Now:</p>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span> <span class="op">&lt;-=-&gt;</span> <span class="dv">30</span> <span class="op">==</span> <span class="dv">620</span></span></code></pre></div>
+<hr />
+<h1 id="adding-operators-2">Adding operators (2)</h1>
+<p>You can even change its precedence:</p>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">infixl</span> <span class="dv">6</span> <span class="op">&lt;-=-&gt;</span> <span class="co">-- put this after the type declaration, before the definition</span></span></code></pre></div>
+<p>Now our goofy space-ship-looking operator has precedence level 6, the
+same as <code>+</code> and <code>++</code>. <code>*</code> is 7.
+<code>^</code> is 8.</p>
+<p>The lowest precedence are <code>$</code>, <code>$!</code> and
+<code>seq</code>. This is why <code>$</code> is a useful substitute for
+parentheses (because we can guarantee everything to the right of it runs
+first).</p>
+<p><a
+href="https://hackage.haskell.org/package/base-prelude-1.6.1/docs/BasePrelude-Operators.html">Here’s
+the list</a>. The reason this is all possible is that operator
+precedence parsers only require a table that maps operators to their
+precedence. This table isn’t static, unlike the way LR parsers usually
+work.</p>
+<hr />
+<h1 id="parser-combinators">Parser combinators</h1>
+<p>One last technique. Haskell is a pretty flexible language, more
+flexible than we’ve seen.</p>
+<p>It’s annoying to have to bind every parse in a <code>let</code>
+expression that pulls out the remaining tokens and the thing we just
+parsed.</p>
+<p>There are combinators for parsing, just like for lambda expressions.
+These combinators are functions that allow you to say “expect this token
+followed by any number of these other rules”.</p>
+<p><a
+href="https://github.com/lettier/parsing-with-haskell-parser-combinators">Here
+are some examples</a>. Don’t expect to understand the ideas until we get
+to monads later, but it’s nice to know that parsing can be as clean as
+basically putting the grammar into a Haskell program.</p>
+<hr />
+<h1 id="required-reading">Required reading</h1>
+<p><a
+href="https://en.wikibooks.org/wiki/Haskell/Classes_and_types">Classes
+and Types</a> (Very important!)</p>
+<p><a href="https://en.wikibooks.org/wiki/Haskell/The_Functor_class">The
+Functor Class</a> (Also very important!)</p>
+<hr />
+<h1 id="questions-5">Questions?</h1>
+<!-- _class: invert questions -->
+</body>
+</html>

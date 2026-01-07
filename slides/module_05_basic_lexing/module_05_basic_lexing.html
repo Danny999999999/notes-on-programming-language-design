@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>module_05_basic_lexing</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="programming-language-design">Programming Language Design</h1>
+<h2 id="module-5-lisp-lexing-and-functional-operators">Module 5: Lisp,
+Lexing and Functional Operators</h2>
+<p><br> <br></p>
+<p>Slides © Grant Williams, <a
+href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+4.0</a>.</p>
+<p><br></p>
+<p>This is an open educational resource. Feel free to submit fixes,
+improvements, and new material <a
+href="https://github.com/grantwill74/notes-on-programming-language-design">here</a>.</p>
+<hr />
+<h1 id="lets-make-a-programming-language">Let’s make a programming
+language</h1>
+<p>This class isn’t “learning a weird language”, it’s “programming
+language design”. Let’s start designing!</p>
+<p>We’re going to make a simple version of the Lisp programming
+language.</p>
+<p>But how do we do that? What does it even mean to design a programming
+language?</p>
+<hr />
+<h1 id="designing-a-programming-language">Designing a programming
+language</h1>
+<p>A programming language is a formal language. It has rules that
+describe its grammar.</p>
+<p>We could specify a formal grammar (and we will), but for now, let’s
+get a “feel” for this language.</p>
+<p>The language we’ll be working with is called <a
+href="https://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a>,
+which stands for “List Processor”, but sometimes detractors say it
+stands for “lots of irritating, superfluous parentheses”.</p>
+<p>Lisp is an extremely influential language, and is still widely used
+today, mainly as a scripting language (used in <a
+href="https://en.wikipedia.org/wiki/Emacs_Lisp">Emacs</a>, <a
+href="https://en.wikipedia.org/wiki/AutoLISP">AutoCAD</a>, and <a
+href="https://en.wikipedia.org/wiki/Audacity_(audio_editor)#Customizability_and_extensibility">Audacity</a>),
+but also as a full-on programming language (<a
+href="https://lisp-lang.org/">Common Lisp</a>, <a
+href="https://www.scheme.org/">Scheme</a>, <a
+href="https://racket-lang.org/">Racket</a>, <a
+href="https://clojure.org/">Clojure</a>)</p>
+<hr />
+<h1 id="lisp-dialects">Lisp dialects</h1>
+<p>Lisp was released as a single language, but soon, “dialects”
+emerged.</p>
+<p>In human languages, “dialect” is a term for a language that is
+considered by some speakers to be a kind of “version” of another
+language. Often a variation that is only common in a smaller region or
+population relative to the language being compared to.</p>
+<p>Of course, which gets to be the “real” language and which is the
+“dialect” is subjective and a matter of perspective. For this reason, it
+can be controversial to refer to a language as a “dialect”, which is why
+I don’t have any examples listed here.</p>
+<p>This controversy does not extend to computer languages, and computer
+scientists who modify or extend another language will happily refer to
+their creation as a “dialect”.</p>
+<hr />
+<h1 id="lisp-dialects-2">Lisp dialects (2)</h1>
+<p>Lisp has lots of dialects. In fact, I have never seen someone program
+in actual <em>Lisp</em>. People are always using a dialect when they
+write new Lisp whenever I see it written.</p>
+<p>We will develop a simple Lisp dialect called <em>Slisp</em>, which
+just stands for “Simple Lisp”.</p>
+<p>The name is a bit of a lie. It’s really more like the language
+<em>Scheme</em>, which is a functional dialect of lisp. However,
+“SScheme” doesn’t roll off the tongue.</p>
+<hr />
+<h1 id="lisp-traits-type-system">Lisp traits: type system</h1>
+<p>As programming language designers, lets learn about some important
+Lisp attributes:</p>
+<p>Lisp dialects are <em>usually</em> dynamically typed. Exceptions
+exist, but if there are typing features, they are usually
+<em>gradual</em>, meaning that they can optionally be added later.</p>
+<p>There are a few simple value types built in, called <em>atoms</em>.
+Integers and “symbols” (meaning, actual words) are both atoms. Floats
+could be atoms, too.</p>
+<p>The basic data structure is the list, as you’d expect from the name
+of the language.</p>
+<hr />
+<h1 id="lisp-lists">Lisp lists</h1>
+<p>Lists are implemented as singly-linked lists. They are written like
+this: <code>(1 2 3 4 5)</code></p>
+<p>That’s it. Just space-separated values inside of parentheses.</p>
+<p>Lists can be nested inside of other lists:
+<code>((1 2 3) 4 5)</code>.</p>
+<p>An expression written in this syntax is called an <a
+href="https://en.wikipedia.org/wiki/S-expression">S-expression</a>.</p>
+<hr />
+<h1 id="lisp-programs">Lisp Programs</h1>
+<p>In every Lisp dialect I am aware of, a Lisp program is simply one or
+more s-expressions.</p>
+<p>These s-expressions are evaluated by default by treating the first
+element as a function, and the other elements as arguments.</p>
+<p>So we would not write <code>(1 2 3 4 5)</code> by itself in any Lisp
+dialect, because it would try to call <code>1</code> as a function on
+values <code>2 3 4 5</code>, which would be an error.</p>
+<p>If you want a list that isn’t executed like that, there’s a way to
+get it, but we’ll get there later…</p>
+<hr />
+<h1 id="hello-world">Hello world</h1>
+<p>For now, as is tradition, let’s write a simple hello world program in
+slisp:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">print</span> <span class="st">&quot;hello, world&quot;</span>)</span></code></pre></div>
+<p>Two things are important here: 1. This is a complete program. It
+consists of one s-expression. 2. The s-expression’s first and only
+argument is the string “hello, world”.</p>
+<p>How can we make it more interesting? Let’s do some math?</p>
+<hr />
+<h1 id="hello-world-math-edition">Hello world: math edition</h1>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode lisp"><code class="sourceCode commonlisp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">print</span> <span class="st">&quot;hello, world. A neat number is:&quot;</span> (<span class="op">+</span> <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span> <span class="dv">1</span>))</span></code></pre></div>
+<p>Here, <code>(+ 1 2 3 1)</code> is an expression that is interpreted
+as an argument to print. We would expect this to print:
+<code>hello, world. A neat number is: 7</code></p>
+<p>In this case <code>+</code> is a function call. The rest of the
+numbers after it are interpreted as arguments, and the result is that
+they are all summed together.</p>
+<hr />
+<h1 id="thats-enough-lisp-for-now">That’s enough Lisp for now</h1>
+<p>That’s all we’ll say about lisp for now, but we’ll spend a lot more
+time refining our implementation.</p>
+<p>By the end of the course, we’ll have implemented an interpretor for
+Slisp.</p>
+<p>That means you can feed Slisp programs to it and it will execute
+them.</p>
+<p>This interpretor will be written in Haskell. You will be using a
+language you don’t know to write an interpretor for a language you don’t
+know.</p>
+<p>In so doing you will become enlightened. Just kidding, but you will
+know a couple of obscure, cool languages, and have the tools you need to
+explore language design further.</p>
+<hr />
+<h1 id="questions">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="formal-language-processing">Formal language processing</h1>
+<p>Using a programming language in practice typically involves the
+following phases: 1. Lexical analysis (aka lexing, tokenization) 2.
+Parsing 3. Compilation (optional) 4. Execution (aka interpretation
+unless we’re using hardware)</p>
+<p>Let’s talk about the first step.</p>
+<hr />
+<h1 id="lexing">Lexing</h1>
+<p>How can we interpret
+<code>(print "hello, world. A neat number is:" (+ 1 2 3 1))</code>?</p>
+<p>Our first step is called <em>lexing</em>.</p>
+<p>Lexing means breaking a string up into <em>lexemes</em>, also called
+<em>tokens</em>, which are basically like “words”. They are kind of the
+building blocks of programs.</p>
+<p>Tokenization is another word for lexing. The term <em>token</em> has
+entered popular knowledge because tokenization is something LLMs do, and
+they typically charge per token.</p>
+<hr />
+<h1 id="lexing-in-formal-languages">Lexing in formal languages</h1>
+<p>With LLMs in English, a token is one or more letters, like “-tion”.
+Words are built out of tokens.</p>
+<p>In formal languages, we rarely break down “words” into sub-words.
+Most programming languages are highly analytic, meaning that they can be
+broken down into tiny “words” that mean very exact things, rather than
+grouping lots of related thoughts into one word.</p>
+<p>Most “words” from a programming language perspective are either
+operators, functions, or values.</p>
+<hr />
+<h1 id="example-lexing">Example lexing</h1>
+<p>For example, the program
+<code>(print "hello, world. A neat number is:" (+ 1 2 3 1))</code> can
+be lexed like this:</p>
+<p><code>[ (, print, "hello, world. A neat number is:", (, +, 1, 2, 3, 1, ), ) ]</code></p>
+<p>Here, I broke up each token with a comma.</p>
+<p>Please notice the following: - Grouping operators like <code>(</code>
+and <code>)</code> are individual tokens. - The whole string is one
+token. The programming language doesn’t know how to interpret the words
+inside the string, so the whole thing is just one value. - Integer
+literals are tokens - The <code>+</code> operator is a token. Actually
+any operator.</p>
+<hr />
+<h1 id="how-do-we-do-that">How do we do that?</h1>
+<p>Now is a good time to look at project 2.</p>
+<p>Your job is to implement a lexer.</p>
+<p>But how do you do that?</p>
+<p>Our job is to implement a function that takes a string (representing
+the program code), and returns a list of tokens.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">tokenize ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [<span class="dt">Token</span>]</span></code></pre></div>
+<hr />
+<h1 id="identifying-the-kinds-of-tokens">Identifying the kinds of
+tokens</h1>
+<p>Slisp has very few kinds of tokens. Here’s a list: - Symbols are
+names of variables or functions. For example <code>print</code> is a
+symbol. - String literals are a kind of token. For example,
+<code>"hello, world"</code> is a token. - Integer literals, too. For
+example <code>123</code> and <code>-123</code> are both tokens. -
+Parentheses are tokens. <code>(</code> and <code>)</code>. - Comments
+are not tokens, but the lexer usually strips them out, so we need to
+handle them.</p>
+<hr />
+<h1 id="what-about-other-things">What about other things?</h1>
+<p>Is that it? Those are the only things we care about?</p>
+<p>What about functions? What about loops?</p>
+<p>Those things are not tokens! The word <code>while</code> might be a
+token in C, but remember that tokens are just “interesting words”. An
+entire function or loop will require many tokens.</p>
+<p>Right now, we’re just trying to lex through a slisp program and
+return a list of tokens. That’s all a tokenizer is:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">tokenize ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [<span class="dt">Token</span>]</span></code></pre></div>
+<p>Our next slides will drop hints about how to implement this
+function.</p>
+<hr />
+<h1 id="questions-1">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="lexing-lisp-comments">Lexing lisp: comments</h1>
+<p>Lisp is a very easy language to lex.</p>
+<p>First of all, there are comments. We have already seen that line
+comments are written with <code>;</code>.*</p>
+<p>The lexer usually strips comments out. <a
+href="https://nim-lang.org/">Some languages</a> consider comments to be
+tokens, but this is rare.</p>
+<p>Comments aren’t super interesting, but it’s worth considering how we
+stripped them out. [Can anyone share?]</p>
+<div class="footnote">
+<p>* I did not make you deal with block comments because I am merciful
+(the interaction between <code>;</code> and block comments requires
+state-machine thinking which is a little tough when you’re warming up to
+Haskell)</p>
+</div>
+<hr />
+<h1 id="lexing-lisp-parentheses">Lexing lisp: parentheses</h1>
+<p>Comments we just stripped out, but lexing other tokens is more
+complicated.</p>
+<p>First, we have a simple rule: <code>(</code> and <code>)</code> are
+always tokens. So if we see one of those characters, we add it to the
+list of tokens…</p>
+<p>…unless it’s in a string. Okay, still not too bad.</p>
+<p>So we need a special rule for parsing strings. But other than that,
+parentheses are always a single token each.</p>
+<hr />
+<h1 id="lexing-in-general-literals">Lexing in general: literals</h1>
+<p>One vocabulary term we need right now: <em>literals</em>.</p>
+<p><code>123</code> is an integer literal. In C, in Haskell, and even in
+Lisp.</p>
+<p><code>"Hello, world"</code> is a string literal in those same 3
+languages.</p>
+<p>However, in this C code:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span><span class="op">*</span> s <span class="op">=</span> <span class="st">&quot;hi&quot;</span><span class="op">;</span></span></code></pre></div>
+<p><code>s</code> is a string, sure, but it is not a literal.
+<code>"hi"</code> is a literal.</p>
+<p>A literal is an actual data value inserted into a program’s source
+code, it is not a variable. [Is <code>Pi</code> a literal in Haskell?
+What about <code>3.1415926</code>?]</p>
+<hr />
+<h1 id="lexing-lisp-string-literals">Lexing lisp: string literals</h1>
+<p>A string literal starts with a quote: <code>"</code>.</p>
+<p>Inside the string, every character belongs to the string.</p>
+<p>If there is a <code>\</code>, we treat it as an escape sequence. The
+only escape sequence I will require handling is <code>\"</code> for
+quotes in a quoted string literal.</p>
+<p>Otherwise, everything is in the string until we find another pair of
+quotes.</p>
+<hr />
+<h1 id="lexing-lisp-integer-literals">Lexing lisp: integer literals</h1>
+<p>First, an integer could start with a minus sign: <code>-123</code> is
+an integer.</p>
+<p>But if we see a minus sign by itself, it’s not an integer.</p>
+<p>In <code>(- 3 2)</code>, <code>-</code> is a symbol that refers to
+subtraction.</p>
+<hr />
+<h1 id="lexing-lisp-a-combined-rule">Lexing lisp: a combined rule</h1>
+<p>So we have a slightly more complex rule we have to follow: - If we
+see, whitespace outside of any lexeme, just ignore it. - If we see a
+parenthesis, that’s a token. - If we see a minus sign, it could be an
+operator like <code>-</code> by itself, but it could also be the start
+of a negative integer. - If we see a numeral, we know it should be an
+integer (assuming the same rules as C or Haskell, where we can’t start a
+variable name with a numeral) - Otherwise, it’s a symbol (just a name
+for something, like an operator or a function)</p>
+<hr />
+<h1 id="lexing-lisp-kinds-of-token">Lexing lisp: kinds of token</h1>
+<p>So what is a <code>Token</code> in code?</p>
+<p>[How should we represent that type?]</p>
+<hr />
+<h1 id="lexing-lisp-the-datatype">Lexing lisp: the datatype</h1>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Token</span> <span class="ot">=</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Lp</span>              <span class="co">-- left paren</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Rp</span>              <span class="co">-- right paren</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">Sym</span> <span class="dt">String</span>      <span class="co">-- symbol</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">IntLit</span> <span class="dt">Integer</span>  <span class="co">-- integer literal</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span>   <span class="dt">StrLit</span> <span class="dt">String</span>   <span class="co">-- string literal</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">deriving</span> <span class="dt">Show</span></span></code></pre></div>
+<p>A sum type is perfect here. We list every possible kind of token.</p>
+<p>Some constructors take additional information. For example, if we
+have a symbol or a string literal, we also store a string that contains
+the actual text of the symbol or literal. If we have an integer literal,
+we store the integer alongside it.</p>
+<p>But if we have a parenthesis, there is nothing to store. So the
+constructor has no fields.</p>
+<hr />
+<h1 id="token-types">Token types</h1>
+<p>I’d like you to make sure you understand the previous slide, and
+please ask questions if you have any.</p>
+<p>One random thing I want to mention: in real programming languages,
+the token type is a bit more complicated.</p>
+<p>In addition to the token type and data, the token data structure
+usually stores at least the line number and the column so that error
+messages can list that information.</p>
+<p>Also, Lisp has remarkably little token variety. Normal languages have
+tokens for every keyword. But you’ll see that we don’t really need
+that.</p>
+<hr />
+<h1 id="questions-2">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="actually-lexing">Actually lexing</h1>
+<p>Now that you understand the datatypes you’ll need, let’s think about
+the function that does lexing. We call it <em>tokenize</em> (although it
+could also be called <em>lex</em>).</p>
+<p>Recall the type:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">tokenize ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [<span class="dt">Token</span>]</span></code></pre></div>
+<p>It takes a string representing the program and it returns a list of
+tokens.</p>
+<p>The same token values we enumerated in the data declaration
+earlier.</p>
+<p>For example:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>tokenize <span class="st">&quot;(print \&quot;hello\&quot; (+ 2 2))&quot;</span> <span class="op">==</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    [<span class="dt">Lp</span>, <span class="dt">StrLit</span> <span class="st">&quot;hello&quot;</span>, <span class="dt">Lp</span>, <span class="dt">Sym</span> <span class="st">&quot;+&quot;</span>, <span class="dt">IntLit</span> <span class="dv">2</span>, <span class="dt">IntLit</span> <span class="dv">2</span>, <span class="dt">Rp</span>, <span class="dt">Rp</span>]</span></code></pre></div>
+<hr />
+<h1 id="what-goes-in-that-function">What goes in that function?</h1>
+<p>That’s the question you’ll need to answer to complete the next
+project!</p>
+<p>We need some basic rules that can not only split the code into
+tokens, but also determine the correct type of function.</p>
+<p>To do this, I have some suggestions…</p>
+<hr />
+<h1 id="a-good-basic-design">A good basic design</h1>
+<p>Instead of considering how to split the entire code into tokens all
+in one step, lets apply some functional programming software design, and
+imagine some simpler functions that could be useful.</p>
+<p>I suggest this one:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">nextToken ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> (<span class="dt">String</span>, <span class="dt">Maybe</span> <span class="dt">Token</span>)</span></code></pre></div>
+<p>This function will run on a string. It will determine the next token
+if it exists, and return two things: - The remaining string -
+<code>Just</code> that token.</p>
+<p>If the token doesn’t exist, it returns <code>("", Nothing)</code></p>
+<hr />
+<h1 id="what-goes-in-nexttoken">What goes in
+<code>nextToken</code>?</h1>
+<p>I recommend some pattern matching: - If the first character of the
+string is whitespace, skip it. - If the first character is a
+parenthesis, do this: <code>nextToken ('(' : rest) = (rest, Lp)</code>
+Here, <code>Lp</code> is the constructor for the left parenthesis token.
+How do you handle <code>)</code>? - What if the character is a digit?
+Then call a <code>nextInteger</code> function. You can write this
+yourself, but I recommend using the <code>break</code> function we will
+learn. - What if the character is a <code>-</code>? Then it could be an
+integer or a symbol. You’ll need to check the next character after the
+<code>-</code> if it exists. - If the character is a <code>"</code>,
+it’s a string. You’ll need to figure out how to lex the string. - If it
+isn’t anything else, it’s a symbol.</p>
+<hr />
+<h1 id="questions-3">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="functional-operators">Functional operators</h1>
+<p>The assignment can be done purely with recursion and with functions
+we’ve seen so far.</p>
+<p>However, if you’ve been following my advice about going to
+competitive coding sites and grinding some Haskell practice, you’ve
+probably seen ridiculously tiny programs that do an unreasonable amount
+of work.</p>
+<p>This is the magic of functional programming, and what’s especially
+cool, is that once you get used to it you will find many of these
+programs to be easy to read.</p>
+<p>These programs use <em>higher order functions</em>. These are
+functions that take other functions as arguments. Some of these are so
+standard, we call them <em>functional operators</em>.</p>
+<hr />
+<h1 id="examples-upper-casing">Examples: upper casing</h1>
+<p>Suppose I want to convert a string to uppercase. I could do this:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Char</span> <span class="co">-- for toUpper</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>upperCase <span class="st">&quot;&quot;</span> <span class="ot">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>upperCase (h <span class="op">:</span> t) <span class="ot">=</span> <span class="fu">toUpper</span> h <span class="op">:</span> upperCase t</span></code></pre></div>
+<p>First, make sure you understand how it works…</p>
+<p>It’s a little wordy though.</p>
+<hr />
+<h1 id="easier-upper-casing">Easier upper casing</h1>
+<p>We can do this instead:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Data.Char</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>uppercase str <span class="ot">=</span> <span class="fu">map</span> <span class="fu">toUpper</span> str</span></code></pre></div>
+<p>Or, even nicer, point free (let’s assume <code>Data.Char</code> is
+imported from now on):</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>uppercase <span class="ot">=</span> <span class="fu">map</span> <span class="fu">toUpper</span></span></code></pre></div>
+<p><code>map</code> is one of those functional operators. It’s so
+influential, even imperative languages have it now. For example: Python
+has it. Let’s learn how it works.</p>
+<hr />
+<h1 id="how-map-works">How <code>map</code> works</h1>
+<p><code>map</code> is a higher order function.</p>
+<p>It takes a function and a list, and it runs the function on every
+element of the list.</p>
+<p>Here is its type:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span><span class="ot"> ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [b]</span></code></pre></div>
+<p>That is, it takes a function that takes us from type <code>a</code>
+to type <code>b</code>. Then it takes a list of <code>a</code>s, and it
+will run the function on all of them to produce a list of
+<code>b</code>s.</p>
+<hr />
+<h1 id="some-map-examples">Some map examples</h1>
+<p>Suppose I want to add 1 to every value in a list. There’s the awkward
+way:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ot">plus1 ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> [<span class="dt">Int</span>]</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>plus1 [] <span class="ot">=</span> [] </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plus1 (h <span class="op">:</span> t) <span class="ot">=</span> (h <span class="op">+</span> <span class="dv">1</span>) <span class="op">:</span> plus <span class="dv">1</span> t</span></code></pre></div>
+<p>And there’s the cool way:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">plus1 ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> [<span class="dt">Int</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>plus1 <span class="ot">=</span> <span class="fu">map</span> (<span class="op">+</span><span class="dv">1</span>)</span></code></pre></div>
+<p>Both functions do the same thing. But the second will get upvotes on
+CodeWars.</p>
+<hr />
+<h1 id="knowledge-check-1">Knowledge check 1</h1>
+<ol type="1">
+<li>Write a function with <code>map</code> that takes a list of integers
+and returns a new list in which each integer is doubled.</li>
+<li>Write a function with <code>map</code> that takes a list of doubles
+and squares them all.</li>
+<li>Write a function and its type: the function uses <code>map</code> to
+take a string and invert its case. So lower case letters become upper
+case, upper case letters become lowercase, and any symbol that is not a
+Latin letter is passed through without change. You will want a helper
+function that does the inverting. Use <code>isLower</code>,
+<code>isUpper</code>, <code>toLower</code>, and
+<code>toUpper</code>.</li>
+<li>(tricky) define a list, not a function, which is the list of squared
+natural numbers. (i.e., 0, 1, 4, 9, 16, etc.)</li>
+</ol>
+<hr />
+<h1 id="kc-1-answers">KC 1 answers:</h1>
+<ol type="1">
+<li><code>doubleEach = map (*2)</code></li>
+<li><code>squareEach = map (**2)</code></li>
+<li></li>
+</ol>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">invertStr ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>invertStr <span class="ot">=</span> <span class="fu">map</span> invert</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">where</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    invert c</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>     <span class="op">|</span> <span class="fu">isLower</span> c <span class="ot">=</span> <span class="fu">toUpper</span> c</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>     <span class="op">|</span> <span class="fu">isUpper</span> c <span class="ot">=</span> <span class="fu">toLower</span> c</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>     <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> c </span></code></pre></div>
+<ol start="4" type="1">
+<li><code>natSquares = map (^2) [0..]</code></li>
+</ol>
+<hr />
+<h1 id="how-does-map-work">How does map work?</h1>
+<p>So map runs a function on a list and returns the new list.</p>
+<p>But how does it work? Is it built-in to the language?</p>
+<p>No, actually. It’s a function written in Haskell.</p>
+<p>How do we write it? How do we right a function that takes another
+function and runs it on every element of a list?</p>
+<p>This is something to bear in mind about Haskell: almost all of its
+“features” are just functions, and we can easily write them and learn
+how to extend the language.</p>
+<p>So, let’s extend it. First, [remind me what the type of
+<code>map</code> is.]</p>
+<hr />
+<h1 id="maps-type-and-base-case">Map’s type and base case</h1>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span><span class="ot"> ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [b]</span></code></pre></div>
+<p>It takes a function and a list and returns a list.</p>
+<p>We can implement it using recursion. The base case makes sense:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>map&#39; _ [] <span class="ot">=</span> []</span></code></pre></div>
+<p>That is, if the list is empty, ignore the function and return the
+empty list.</p>
+<p>[What’s the recursive case?]</p>
+<hr />
+<h1 id="maps-recursive-case">Map’s recursive case</h1>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>map&#39; f (x <span class="op">:</span> xs) <span class="ot">=</span> f x <span class="op">:</span> <span class="fu">map</span> f xs</span></code></pre></div>
+<p>That’s it. We run <code>f</code> on the first element of the
+list.</p>
+<p>Then we append the result with the result of mapping the rest of the
+list.</p>
+<p>Simple, recursive, and very useful. We can extend the language by
+adding functions.</p>
+<p>Let’s add some more. But first…</p>
+<hr />
+<h1 id="questions-4">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="take">Take</h1>
+<p>Let’s consider that last knowledge check before. The one where we
+wanted the list of all the squares of natural numbers:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ot">natSquares ::</span> [<span class="dt">Integer</span>]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>natSquares <span class="ot">=</span> <span class="fu">map</span> (<span class="op">^</span><span class="dv">2</span>) [<span class="dv">0</span><span class="op">..</span>]</span></code></pre></div>
+<p>The reason this works is that Haskell is lazily evaluated. In an
+eager language without iterators, <code>map (^2) [0..]</code> would run
+forever.</p>
+<p>But that also means we can’t easily work with this list. If we print
+it, the program will run forever:
+<code>print natSquares -- &lt;-- this loops forever</code></p>
+<hr />
+<h1 id="take-2">Take (2)</h1>
+<p>Enter <code>take</code>. This is a simple functional operator that
+takes a certain number of elements from a list.</p>
+<p><code>print $ take 10 natSquares</code></p>
+<p><code>take 10 natSquares</code> results in
+<code>[0,1,4,9,16,25,36,49,64,81]</code>, which is what gets
+printed.</p>
+<p>So how does this work? How is take able to “stop” after a certain
+number of elements?</p>
+<p>First, let’s consider its type. What is the type of
+<code>take</code>?</p>
+<hr />
+<h1 id="take-3">Take (3)</h1>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">take</span><span class="ot"> ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [a]</span></code></pre></div>
+<p>Give me a number and a list of something and I will give you a list
+of that many somethings.</p>
+<p>What if there aren’t that many things? Then return as many as there
+are.</p>
+<p>Okay, now you do the rest. Please implement the <em>three</em> cases
+of <code>take</code>. Yes. it has two base-cases.</p>
+<hr />
+<h1 id="take-4">Take (4)</h1>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">take</span> <span class="dv">0</span> _ <span class="ot">=</span> []</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">take</span> _ [] <span class="ot">=</span> []</span></code></pre></div>
+<p>These are the base cases. If we take 0 elements, we get an empty
+list. If we take any number from an empty list, we get an empty
+list.</p>
+<p>Otherwise:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">take</span> n (h <span class="op">:</span> t) <span class="ot">=</span> h <span class="op">:</span> (<span class="fu">take</span> (n <span class="op">-</span> <span class="dv">1</span>) t)</span></code></pre></div>
+<p>Add the head to the result, and take one fewer from the tail.</p>
+<p>(I’ve ignored the negative case. In our case, it will just keep
+taking. How could I handle <code>take -1</code> if I wanted to?)</p>
+<hr />
+<h1 id="knowledge-check-2">Knowledge check 2</h1>
+<ol type="1">
+<li>Implement <code>drop</code> which is the opposite of take. Instead
+of taking three items, <code>drop 3</code> skips over the next three
+items and returns the rest of the list. Include its type.</li>
+<li>What would <code>drop 3 $ take 10 $ map (*2) [1..]</code>
+return?</li>
+<li>What would <code>take 10 $ drop 3 $ map (*2) [1..]</code>
+return?</li>
+<li>Why do you think <code>take</code> and <code>skip</code> use
+<code>Int</code> instead of <code>Integer</code>?</li>
+</ol>
+<hr />
+<h1 id="kc2-answers">KC2 answers</h1>
+<ol type="1">
+<li></li>
+</ol>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ot">drop&#39; ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [a]</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>drop&#39; <span class="dv">0</span> l <span class="ot">=</span> l <span class="co">-- only one base case this time</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>drop&#39; n (h <span class="op">:</span> t) <span class="ot">=</span> drop&#39; (n <span class="op">-</span> <span class="dv">1</span>) t</span></code></pre></div>
+<ol start="2" type="1">
+<li><code>[8, 10, 12, 14, 16, 18, 20]</code></li>
+<li><code>[8,10,12,14,16,18,20,22,24,26]</code></li>
+<li><code>Integer</code> would work fine, but it would add a little
+overhead every time we subtract (checking to see if the int is big or
+not before indexing into it). Maybe the <em>prelude</em> (i.e.,
+functions available by default) designers didn’t think it was worth the
+overhead. I actually can’t find a source here. Alternatively, maybe
+<code>Integer</code> wasn’t around when <code>take</code> was added, and
+they didn’t want to break code.</li>
+</ol>
+<hr />
+<h1 id="questions-5">Questions?</h1>
+<!-- _class: questions invert -->
+<hr />
+<h1 id="filter">Filter</h1>
+<p>Sometimes we want all of the members of a collection that satisfy a
+requirement.</p>
+<p>For example: take only the lowercase letters from a string:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span> <span class="fu">isLower</span> <span class="st">&quot;Hello, Friends!&quot;</span> <span class="op">==</span> <span class="st">&quot;elloriends&quot;</span></span></code></pre></div>
+<p>Or, maybe take only the non-uppercase letters. Not the same
+thing!</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span> (<span class="fu">not</span> <span class="op">.</span> <span class="fu">isUpper</span>) <span class="st">&quot;Hello, Friends!&quot;</span> <span class="op">==</span> <span class="st">&quot;ello, riends!&quot;</span></span></code></pre></div>
+<p>It’s clear that filter is “filtering”, but how does it work? What is
+its type?</p>
+<hr />
+<h1 id="filter-2">Filter (2)</h1>
+<p>Filter’s type is:</p>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span><span class="ot"> ::</span> (a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> [a]</span></code></pre></div>
+<p>That is, it takes a <em>predicate</em> that makes statements about an
+<code>a</code>. A function that returns <code>Bool</code> is called a
+<em>predicate</em>. Here, the function is telling us whether the
+<code>a</code> is one we want to keep or not.</p>
+<p>Then it takes a list of <code>a</code>s. But <em>only</em> the ones
+that the predicate returned true for.</p>
+<p>So how is it implemented?</p>
+<hr />
+<h1 id="filter-3">Filter (3)</h1>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span> _ [] <span class="ot">=</span> []</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span> f (x <span class="op">:</span> xs) <span class="ot">=</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> f x <span class="kw">then</span> x <span class="op">:</span> <span class="fu">filter</span> f xs</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>           <span class="kw">else</span> <span class="fu">filter</span> f xs </span></code></pre></div>
+<p>The base case is when the list is empty. The result is an empty
+list.</p>
+<p>When there’s at least one value in the list, we run the function on
+it. If it’s true, we keep that value by appending it to the result. If
+it’s false, we just ignore it and filter the rest of the list.</p>
+<hr />
+<h1 id="knowledge-check-3">Knowledge check 3</h1>
+<ol type="1">
+<li>Define a function that only takes even elements from a list of
+integers.</li>
+<li>Define a function that only takes floats from a list if the float in
+question is greater than <code>3.0</code>.</li>
+<li>Define a function that is the opposite of filter. That is, it only
+takes a value if the predicate <em>fails</em>.</li>
+<li>Define a function that returns the count of uppercase Latin letters
+in a string.</li>
+</ol>
+<hr />
+<h1 id="knowledge-check-3-answers">Knowledge check 3 answers</h1>
+<ol type="1">
+<li><code>filter ((== 0) . (`rem` 2))</code>, or, less fancily:
+<code>filter (\x -&gt; x `rem` 2 == 0)</code></li>
+<li><code>filter (&gt; 3.0)</code></li>
+<li><code>filterNot f = filter (not . f)</code> . You could make it
+recursive, too, but isn’t this cleaner? Just invert <code>f</code> by
+composing it with <code>not</code>.</li>
+<li><code>countUpper = length . filter isUpper</code> Here, we first
+filter out only the letters that are upper case. Then, we return the
+length of that string.</li>
+</ol>
+<hr />
+<h1 id="questions-6">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="fold-and-friends">Fold and friends</h1>
+<p>It’s nice that we can take a list and either modify each element in
+isolation, or take only certain elements.</p>
+<p>But sometimes, we want to collapse a list down into a single
+value.</p>
+<p>When? Consider these three functions…</p>
+<hr />
+<h1 id="sum-product-concat">Sum, product, concat</h1>
+<ol type="1">
+<li>I want to add a list of integers together. How do I do it?</li>
+<li>I want to multiply a list of integers together. How do I do it?</li>
+<li>I want to concatenate a list of strings together. How do I do
+it?</li>
+</ol>
+<hr />
+<h1 id="sum">Sum</h1>
+<p>Here’s a recursive solution:</p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ot">sum&#39; ::</span> [<span class="dt">Integer</span>] <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>sum&#39; [] <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>sum&#39; (x <span class="op">:</span> xs) <span class="ot">=</span> x <span class="op">+</span> sum&#39; xs</span></code></pre></div>
+<p>There’s a prime (’) after the name because this function is already
+built-in.</p>
+<p>Does this solution make sense?</p>
+<p>[How should product work?]</p>
+<hr />
+<h1 id="product">Product</h1>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ot">product&#39; ::</span> [<span class="dt">Integer</span>] <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>product&#39; [] <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>product&#39; (x <span class="op">:</span> xs) <span class="ot">=</span> x <span class="op">*</span> product&#39; xs</span></code></pre></div>
+<p>Here, I made the decision to have the empty list have product 1. If I
+made it zero, then it wouldn’t work as a base case (we would always be
+multiplying by zero).</p>
+<p>We could still have that case, but then we’d need two base cases. One
+for the empty list (0) and one for a singleton list (the value).</p>
+<p>How do we do string concatenation?</p>
+<hr />
+<h1 id="concat">Concat</h1>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ot">concat&#39; ::</span> [<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>concat&#39; [] <span class="ot">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>concat&#39; (x <span class="op">:</span> xs) <span class="ot">=</span> x <span class="op">++</span> concat&#39; xs</span></code></pre></div>
+<p>Concatenating an empty list gives us an empty string.</p>
+<p>If the list has a string in it, we paste it to the beginning of the
+result string we get from concatenating the rest.</p>
+<p>So
+<code>concat' ["hey", "there", "hi", "there"] == "heytherehithere"</code></p>
+<hr />
+<h1 id="questions-7">Questions?</h1>
+<!-- _class: invert questions -->
+<p>Did anyone notice a pattern between those three, btw?</p>
+<hr />
+<h1 id="the-pattern">The pattern</h1>
+<p>First, let’s look at the base cases:</p>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>sum&#39; [] <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>product&#39; [] <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>concat&#39; [] <span class="ot">=</span> <span class="st">&quot;&quot;</span></span></code></pre></div>
+<p>The only difference is the “base” value.</p>
+<p>What about the recursive cases?</p>
+<hr />
+<h1 id="the-pattern-2">The pattern (2)</h1>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>sum&#39; (x <span class="op">:</span> xs) <span class="ot">=</span> x <span class="op">+</span> sum&#39; xs</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>product&#39; (x <span class="op">:</span> xs) <span class="ot">=</span> x <span class="op">*</span> product&#39; xs</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>concat&#39; (x <span class="op">:</span> xs) <span class="ot">=</span> x <span class="op">++</span> concat&#39; xs</span></code></pre></div>
+<p>Here, the only difference is the function we use to simplify the
+list.</p>
+<p>For sums, we’re adding everything together with <code>+</code>. For
+products, we’re using <code>*</code>. And for concat, we’re using
+<code>++</code>.</p>
+<hr />
+<h1 id="the-pattern-3">The pattern (3)</h1>
+<p>Think of it like this: we’re just changing the operator that is
+getting inserted into the list.</p>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>sum&#39;       [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]    <span class="op">==</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>product&#39;   [<span class="dv">1</span>, <span class="dv">2</span> ,<span class="dv">3</span>]    <span class="op">==</span> <span class="dv">1</span> <span class="op">*</span> <span class="dv">2</span> <span class="op">*</span> <span class="dv">3</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>concat&#39; [<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>] <span class="op">==</span> <span class="st">&quot;1&quot;</span> <span class="op">++</span> <span class="st">&quot;2&quot;</span> <span class="op">++</span> <span class="st">&quot;3&quot;</span></span></code></pre></div>
+<p>This is an extremely common pattern. <em>Reducing</em> a list by
+inserting a binary operator into it. In some languages (like Ruby and
+Python), it is literally called “reduce”.</p>
+<p>In Haskell, this operation is called “fold”.</p>
+<p>Let’s define a fold operator that, given a base-case value and a
+binary operation, it applies that operation to the list over and over
+until it is converted into a single value.</p>
+<p>First, what type should it have?</p>
+<hr />
+<h1 id="our-fold">Our fold</h1>
+<p>This type reflects the fold operation as it was for
+<code>sum'</code>, <code>product'</code>, and <code>concat'</code>:</p>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fold ::</span> a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> a</span></code></pre></div>
+<p>It takes a base value (a value for the empty list), a <em>binary</em>
+function (in this case a function that takes two <code>a</code>s and
+returns an <code>a</code>), and a list of <code>a</code>s.</p>
+<p>It returns an <code>a</code>: the result of baking down the whole
+list into a single value.</p>
+<p>Note: the real fold’s type is a bit more flexible than this. We’ll
+develop it.</p>
+<p>How do we implement this function?</p>
+<hr />
+<h1 id="fold">Fold</h1>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>fold base _ [] <span class="ot">=</span> base</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>fold base f (x <span class="op">:</span> xs) <span class="ot">=</span> f x (fold base f xs)</span></code></pre></div>
+<p>If we fold an empty list, we get the value from the base case.</p>
+<p>If we fold a list with a head and tail, we apply the binary function
+to the head, and the result of folding the tail.</p>
+<hr />
+<h1 id="using-fold-in-our-definitions">Using fold in our
+definitions</h1>
+<p>So, now we can redefine <code>sum'</code>, <code>product'</code>, and
+<code>concat'</code> all in terms of folding: -
+<code>sum' = fold 0 (+)</code> - <code>product' = fold 1 (*)</code> -
+<code>concat' = fold [] (++)</code></p>
+<p>All we do is specify the base case and the binary operator, and we
+have enough information to reduce a list down to a single value.</p>
+<hr />
+<h1 id="questions-8">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="fold-is-a-bit-more-complex">Fold is a bit more complex</h1>
+<p>All those examples were fairly simple, but fold is a bit more
+flexible.</p>
+<p>First, if you’ve tried to call a function called “fold” in Haskell,
+you’ve probably noticed that it doesn’t exist.</p>
+<p>That’s becuase there are two versions: <code>foldl</code> and
+<code>foldr</code> that assume different associativities about the
+binary operator.</p>
+<p>Why would that matter?</p>
+<hr />
+<h1 id="not-every-operator-is-associative">Not every operator is
+associative</h1>
+<p>Suppose we want to reduce a list with the <code>-</code> operator:
+<code>100 - 9 - 8 - 7 == 91 - 8 - 7 == 83 - 7 = 76</code></p>
+<p>This makes sense, but the problem is that <code>-</code> is
+<em>not</em> an associative operator. Let’s consider what happens when
+we run fold on it: <code>fold 0 (-) [100, 9, 8, 7]</code></p>
+<p>How does this simplify? Remember that in functional programming, we
+can replace a function call with its appropriate definition.</p>
+<hr />
+<h1 id="associativity-2">Associativity (2)</h1>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>fold <span class="dv">0</span> (<span class="op">-</span>) [<span class="dv">100</span>, <span class="dv">9</span>, <span class="dv">8</span>, <span class="dv">7</span>] <span class="op">==</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="dv">100</span> <span class="op">-</span> (fold <span class="dv">0</span> (<span class="op">-</span>) [<span class="dv">9</span>, <span class="dv">8</span>, <span class="dv">7</span>]) <span class="op">==</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="dv">100</span> <span class="op">-</span> (<span class="dv">9</span> <span class="op">-</span> fold (<span class="op">-</span>) <span class="dv">0</span> [<span class="dv">8</span>, <span class="dv">7</span>] ) <span class="op">==</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="dv">100</span> <span class="op">-</span> (<span class="dv">9</span> <span class="op">-</span> (<span class="dv">8</span> <span class="op">-</span> (fold (<span class="op">-</span>) <span class="dv">0</span> [<span class="dv">7</span>]))) <span class="op">==</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="dv">100</span> <span class="op">-</span> (<span class="dv">9</span> <span class="op">-</span> (<span class="dv">8</span> <span class="op">-</span> (<span class="dv">7</span> <span class="op">-</span> fold (<span class="op">-</span>) <span class="dv">0</span> []))) <span class="op">==</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="dv">100</span> <span class="op">-</span> (<span class="dv">9</span> <span class="op">-</span> (<span class="dv">8</span> <span class="op">-</span> (<span class="dv">7</span> <span class="op">-</span> <span class="dv">0</span>))) <span class="op">==</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="dv">92</span></span></code></pre></div>
+<p>We get the wrong answer!</p>
+<p>Why? Because we associate to the right:
+<code>100 - (9 - (8 - 7))</code> But the real minus sign associates to
+the left: <code>((100 - 9) - 8) - 7</code></p>
+<p>And <code>-</code> is <em>not</em> an associative operator! [What
+does that mean?]</p>
+<hr />
+<h1 id="associativity-3">Associativity (3)</h1>
+<p>An associative operator <code>R</code> is one where this property is
+true: <code>(a R b) R c == a R (b R c)</code></p>
+<p>That is, it doesn’t matter in what order we process the
+operations.</p>
+<p>The order of the operands <em>does</em> matter. We don’t assume the
+operator is commutative.</p>
+<hr />
+<h1 id="associativity-example">Associativity example</h1>
+<p><code>++</code> (string concatenation) is an operator that is
+associative but not commutative.</p>
+<p><code>("Hello," ++ " World") ++ "!" == "Hello," ++ (" World" ++ "!")</code></p>
+<p>but
+<code>(" World," ++ "Hello,") ++ "!" != ("Hello," ++ " World") ++ "!")</code></p>
+<p>Because it is associative, it doesn’t matter what order the
+<code>++</code>s get processed when we inject them into a list of
+strings with <code>fold</code>.</p>
+<p>But back to the question: how do we fix folding with
+<code>-</code>?</p>
+<hr />
+<h1 id="foldl"><code>foldl</code></h1>
+<p>This function actually exists. <code>foldl</code> is a built-in
+function.</p>
+<p><code>foldl (-) 0 [100,9,8,7] == (100 - (9 - (8 - (7 - 0)))) ==</code></p>
+<p>Haskell puts the “starting value” second. We put it first because it
+matched the order of definition, but Haskell puts it second.</p>
+<p>This function works similarly to our <code>fold</code>, but it’s a
+bit more flexible. This is its (abridged) type:</p>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>(b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> b</span></code></pre></div>
+<p>Why is there a <code>b</code> there? Ours only had
+<code>a</code>.</p>
+<hr />
+<h1 id="foldl-example"><code>foldl</code> example</h1>
+<p>Here’s an example of where that’s useful. Suppose I want to compute
+the total number of characters in a list of strings. That is, I want to
+sum all the lengths together.</p>
+<p>In this case, my <em>starting value</em> is not a string, it’s a
+length, 0. And my function takes a size for its left argument, but a
+string for its right:</p>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">foldl</span> (\l r <span class="ot">-&gt;</span> l <span class="op">+</span> <span class="fu">length</span> r) <span class="dv">0</span> [<span class="st">&quot;hey&quot;</span>,<span class="st">&quot;there&quot;</span>,<span class="st">&quot;hi&quot;</span>,<span class="st">&quot;there&quot;</span>] <span class="op">==</span> <span class="dv">15</span></span></code></pre></div>
+<p>What’s going on here? It’s doing this:
+<code>0 + length "hey" + length "there" + length "hi" + length "there"</code></p>
+<p>For <code>foldl</code>, the starting value is the left-most value, so
+it’s the first value of <code>l</code>. Then, after adding
+<code>length "hey"</code>, that becomes the new <code>l</code>
+value…</p>
+<hr />
+<h1 id="foldl-example-2"><code>foldl</code> example (2)</h1>
+<p><code>((((0 + length "hey") + length "there") + length "hi") + length "there)</code>
+First, <code>l == 0</code> and <code>r == "hey"</code>. Then the binary
+function adds <code>l</code> to the length of <code>r</code>, and the
+new value of <code>l == 3</code>. Then we add
+<code>l + length "there" == 3 + 5 == 8</code>, and that becomes the new
+<code>l</code>. Then we add <code>8 + length "hi" == 8 + 2 == 10</code>
+and that becomes the new <code>l</code>. Finally we add
+<code>10 + length "there"</code> to finish up with <code>15</code>.</p>
+<hr />
+<h1 id="questions-9">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="foldr"><code>foldr</code>?</h1>
+<p>What about this problem?</p>
+<p>Define a function that computes <code>a ^ b ^ c ^ ...</code> for a
+given list of exponents?</p>
+<p>So, <code>exp' [2, 3, 2] == 2 ^ 3 ^ 2 == 512</code></p>
+<p>Wait, is that correct?</p>
+<p>How does exponentiation associate?</p>
+<hr />
+<h1 id="foldr-2"><code>foldr</code> (2)</h1>
+<p>Exponentiation is not associative: -
+<code>(2^3)^2 == 8^2 == 64</code> -
+<code>2^(3^2) == 2^9 == 512</code></p>
+<p>Conventionally, we consider <code>^</code> to be a right-associative
+operator in most programming languages.</p>
+<p>So here, we <em>do not</em> want to use <code>foldl</code>, we want
+to use <code>foldr</code>: <code>exp' = foldr (^) 1</code></p>
+<p><code>exp' [2,3,2] == 2^(3^(2^1)) == 512</code></p>
+<hr />
+<h1 id="foldr-3"><code>foldr</code> (3)</h1>
+<p>Notice that the “starting value” is on the right this time.</p>
+<p>This means that the first time the binary function runs, the starting
+value will be <code>r</code> instead of <code>l</code>.</p>
+<p>It also means that <code>foldr</code> has a slightly different type
+than <code>foldl</code>:</p>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">foldr</span><span class="ot"> ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> b</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">foldl</span><span class="ot"> ::</span> (b <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> b</span></code></pre></div>
+<p>Normally this doesn’t matter, but if your “accumulator” value has a
+different type than your list elements, you need to know whether the
+previous accumulator value is in the left or right operand of the binary
+function.</p>
+<hr />
+<h1 id="questions-10">Questions?</h1>
+<!-- _class: questions invert -->
+<hr />
+<h1 id="knowledge-check-4">Knowledge check 4</h1>
+<ol type="1">
+<li>Use filter and length to count how many letter <code>a</code>s a
+string has.</li>
+<li>Now do the same thing with one of the <code>fold</code>s. Does it
+matter which one?</li>
+<li>Write a reverse function. It’s likely to be quadratic time unless
+you already know tail recursion. Include its type.</li>
+<li>Now, write reverse in terms of one of the folds. Does it matter
+which one?</li>
+</ol>
+<hr />
+<h1 id="kc-4-answers">KC 4 answers</h1>
+<ol type="1">
+<li><code>countA = length . filter (=='a')</code></li>
+<li><code>countA = foldl (\count letter -&gt; count + if letter == 'a' then 1 else 0) 0</code>
+(note: it looks gnarlier, but this solution only traverses the list
+once. It doesn’t matter whether we use <code>foldl</code> or
+<code>foldr</code> for this one)</li>
+<li></li>
+</ol>
+<div class="sourceCode" id="cb41"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="ot">rev ::</span> [a] <span class="ot">-&gt;</span> [a]</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>rev [] <span class="ot">=</span> []</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>rev (x <span class="op">:</span> xs) <span class="ot">=</span> rev xs <span class="op">++</span> [x]</span></code></pre></div>
+<ol start="4" type="1">
+<li><code>rev = foldl (\acc letter -&gt; letter : acc) []</code> It
+matters here. If we used <code>foldr</code>, we’d end up not reversing
+the list, because it would push from right to left instead of left to
+right.</li>
+</ol>
+<hr />
+<h1 id="two-more-operators-span-and-break">Two more operators: span and
+break</h1>
+<p>I mentioned earlier that there was a helpful operator for doing
+lexing.</p>
+<p>Technically it’s a complimentary pair: <code>span</code> and
+<code>break</code>. Both are part of the prelude, so you don’t have to
+import anything.</p>
+<p>Both have the same type:</p>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>(a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> ([a], [a])</span></code></pre></div>
+<p>Huh…how do we interpret that type? Anyone want to tell me what this
+function takes and what it returns?</p>
+<hr />
+<h1 id="span-and-break-2">Span and break (2)</h1>
+<p><code>span</code> and <code>break</code> take a predicate (a function
+that returns a boolean) and a list.</p>
+<p>They return two lists.</p>
+<p>For <code>span</code>, it will keep running the predicate over and
+over on each value in the list. As long as the predicate is true, it
+will keep running.</p>
+<p>As soon as the predicate is false, the function stops. It returns all
+the values it took when the predicate was true as the first value of the
+tuple, and the remaining values in the second value of the tuple.</p>
+<hr />
+<h1 id="span-and-break-3">Span and break (3)</h1>
+<p>For example, let’s take numbers as long as they’re less than 10:</p>
+<div class="sourceCode" id="cb43"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">span</span> (<span class="op">&lt;</span><span class="dv">10</span>) [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">20</span>, <span class="dv">23</span>, <span class="dv">25</span>, <span class="dv">7</span>] <span class="op">==</span> ([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">6</span>], [<span class="dv">20</span>, <span class="dv">23</span>, <span class="dv">25</span>, <span class="dv">7</span>])</span></code></pre></div>
+<p>The predicate is true for the first 4 values, so they go in the first
+returned list.</p>
+<p>After that, everything else goes in the second list.</p>
+<p>Note: this is different from <code>filter</code>!</p>
+<div class="sourceCode" id="cb44"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span> (<span class="op">&lt;</span><span class="dv">10</span>) [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">20</span>,<span class="dv">23</span>,<span class="dv">25</span>,<span class="dv">7</span>] <span class="op">==</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>]</span></code></pre></div>
+<p>Filter searches through <em>all</em> the values. <code>span</code>
+only keeps values until the predicate stops being true. As soon as the
+predicate is false (e.g., for the value <code>20</code>), it stops
+immediately and returns the rest.</p>
+<hr />
+<h1 id="why-is-this-useful">Why is this useful?</h1>
+<p>Suppose I want to keep pulling values from a string as long as there
+are digits: what would <code>span isDigit "123 456 symbol"</code>
+return?</p>
+<p>This is a big hint for your project.</p>
+<p>Alternatively, you can use <code>break</code>, which is the
+complement of span. It keeps pulling values as long as the predicate is
+<em>false</em>, and then returns as soon as its true. The first value of
+the result is a list of values when it was false, and the second value
+is the remaining values.</p>
+<p>What will this return?</p>
+<div class="sourceCode" id="cb45"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">break</span> <span class="fu">isSpace</span> <span class="st">&quot;hello world&quot;</span></span></code></pre></div>
+<hr />
+<h1 id="questions-11">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="knowledge-check">Knowledge check</h1>
+<ol type="1">
+<li>Implement <code>span</code> yourself. (Challenging: consider a
+let-in along with if-expression)</li>
+<li>Implement <code>break</code> in terms of <code>span</code>.</li>
+<li>Give an example of a predicate and function in which the first
+return value of <code>span</code> will be the same as the result of
+<code>filter</code>.</li>
+</ol>
+<hr />
+<h1 id="kc-5-answer-1">KC 5 answer 1</h1>
+<div class="sourceCode" id="cb46"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="ot">span&#39; ::</span> (a <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> [a] <span class="ot">-&gt;</span> ([a], [a])</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>span&#39; _ [] <span class="ot">=</span> ([], [])</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>span&#39; f (x <span class="op">:</span> xs) <span class="ot">=</span> </span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> f x <span class="kw">then</span> </span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> (t, <span class="fu">rem</span>) <span class="ot">=</span> span&#39; f xs</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">in</span>  (x <span class="op">:</span> t, <span class="fu">rem</span>)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">else</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>        ([], x <span class="op">:</span> xs)</span></code></pre></div>
+<p>Here, we check to see if <code>f x</code> is true. If it’s not, we
+just return all the remaining values without processing them.</p>
+<p>If it is, we recursively run <code>span'</code> on the rest of the
+values, but we also add the value <code>x</code> that <code>f</code> was
+true on.</p>
+<p>Further practice: implement it using guards instead of an if
+expression.</p>
+<hr />
+<h1 id="kc-5-answers-2-and-3">KC 5 answers 2 and 3</h1>
+<ol start="2" type="1">
+<li><code>break' f = span (not . f)</code> Here, we’re saying “calling
+<code>break'</code> on some function <code>f</code> is the same as
+calling <code>span'</code> on <code>not</code> composed with that
+function. <code>break</code> just keeps runnning as long as
+<code>f</code> is false, rather than true.</li>
+<li><code>fst $ span (&lt;10) [1,2,3,10,11,12]</code> will return the
+same result as <code>filter (&lt;10) [1,2,3,10,11,12]</code>. However,
+if the list was <code>[1,2,3,10,11,12,1,2,3]</code> the results would
+not be the same.</li>
+</ol>
+<hr />
+<h1 id="questions-12">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="fun-lisp-history-fact">fun lisp history fact:</h1>
+<p>There are computer systems which were contemporary with early
+unix-based systems that used Lisp as the main shell language, and which
+had special hardware for running Lisp programs.</p>
+<p>They were called <a
+href="https://en.wikipedia.org/wiki/Lisp_machine">Lisp machines</a></p>
+<p>Imagine if you used lisp to write shell commands instead of bash or
+cmd. So like <code>(run 'some-program' arg1 arg2)</code>.</p>
+<p>Personally, I think Lisp would be a great shell language, so I find
+it dissappointing that these went away.</p>
+</body>
+</html>

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>module_08s_records</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="programming-language-design">Programming Language Design</h1>
+<h2 id="module-8-records">Module 8: Records</h2>
+<p><br> <br></p>
+<p>Slides © Grant Williams, <a
+href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+4.0</a>.</p>
+<p><br></p>
+<p>This is an open educational resource. Feel free to submit fixes,
+improvements, and new material <a
+href="https://github.com/grantwill74/notes-on-programming-language-design">here</a>.</p>
+<hr />
+<h1 id="last-time">Last time</h1>
+<p>We learned about parsing. Specifically: * BNF and EBNF * How
+recursive descent works * Info on bottom-up parsing * Info on how
+Haskell does it (precedence parsing)</p>
+<p>The grammar is a critical part of a programming language’s
+design.</p>
+<hr />
+<h1 id="this-time">This time</h1>
+<p>This is a short lecture about records.</p>
+<p>A record in Haskell is basically a struct.</p>
+<p>But the fact that it’s taken us this long to talk about them should
+indicate that there are some wrinkles.</p>
+<p>First, let’s talk about structs in C. How do they work?</p>
+<hr />
+<h1 id="structs">Structs</h1>
+<p>This is a struct in C:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span><span class="op">*</span> name<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> health<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> mana<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> Character<span class="op">;</span></span></code></pre></div>
+<p>It has a few wrinkles: - We typically start with <code>typedef</code>
+so we don’t have to write <code>struct Character</code> whenever we want
+to declare one of them. - In C, it’s not clear who owns
+<code>name</code>. Who is responsible for freeing it? Is it
+<code>malloc</code>’d memory? Static memory? Stack memory?</p>
+<hr />
+<h1 id="why-structs">Why structs?</h1>
+<p>[What is the point of structs?]</p>
+<hr />
+<h1 id="struct-benefits">Struct benefits</h1>
+<p>Cache benefits: we put data that is used together physically next to
+each other. This has cache benefits sometimes (and also drawbacks
+sometimes–you have to decide whether it’s worth it).</p>
+<p>Design benefits: it’s nice to put all the things a character needs in
+one place. Now we can pass a pointer to a character instead of 3
+separate values.</p>
+<hr />
+<h1 id="struct-benefits-2">Struct benefits (2)</h1>
+<p>The cache benefit is real, but pretty low level. Lower-level than we
+would typically think about in a functional programming language like
+Haskell.</p>
+<p>The other benefit <em>is</em> something we care about. If there’s a
+bunch of data that needs to go together, it’s nice to group it up. This
+doesn’t change just because we’re using a functional language.</p>
+<p>So let’s see how to do it…</p>
+<hr />
+<h1 id="basic-data-types">Basic data types</h1>
+<p>If you recall, a basic datatype declaration looks like this:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Character</span> <span class="ot">=</span> <span class="dt">Character</span> <span class="dt">String</span> <span class="dt">Int</span> <span class="dt">Int</span></span></code></pre></div>
+<p>And there’s nothing wrong with that, except for a small but important
+thing: what do the fields mean?</p>
+<p>There’s a string, an int, and another int, but what are they?</p>
+<p>Sure, we could document it, but it’s much easier if the name
+<em>is</em> the documentation. Software design is a lot easier if
+peoples’ IDE naturally helps them understand what things mean instead of
+them having to consult a web page somewhere.</p>
+<hr />
+<h1 id="record">Record</h1>
+<p>Here’s how it looks as a record:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Character</span> <span class="ot">=</span> <span class="dt">Character</span> {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">    name ::</span> <span class="dt">String</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    health ::</span> <span class="dt">Int</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ot">    mana ::</span> <span class="dt">Int</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Looks straightforward enough, and works a lot of the way you would
+expect it.</p>
+<p>First, we can now pass a character to a function:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">isCharacterKnockedOut ::</span> <span class="dt">Character</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span></code></pre></div>
+<p>But how do we create a character?</p>
+<hr />
+<h1 id="record-constructors">Record constructors</h1>
+<p>It’s basically the same as defining them, only we use <code>=</code>
+instead of <code>::</code> and values instead of types:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">bob ::</span> <span class="dt">Character</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>bob <span class="ot">=</span> <span class="dt">Character</span> {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    name <span class="ot">=</span> <span class="st">&quot;Bob&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    health <span class="ot">=</span> <span class="dv">100</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    mana <span class="ot">=</span> <span class="dv">20</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>What happens if we forget a field? Very important: we get an error.
+Haskell does not permit any constructor to not be fully defined: record
+or otherwise.</p>
+<hr />
+<h1 id="questions">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="records-are-for-constructors">Records are for constructors</h1>
+<p>One important thing to understand: we don’t have to decide whether a
+type will be a record type or not.</p>
+<p>Records are something that are associated with <em>constructors</em>
+rather than types.</p>
+<p>It’s possible for types to have record constructors and ordinary data
+constructors at the same time.</p>
+<p>Here’s an example…</p>
+<hr />
+<h1 id="mixed-record-and-data-type-constructors">Mixed record and data
+type constructors</h1>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Character</span> <span class="ot">=</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Hero</span> {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ot">        name ::</span> <span class="dt">String</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ot">        health ::</span> <span class="dt">Int</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ot">        mana ::</span> <span class="dt">Int</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    } <span class="op">|</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Monster</span> <span class="dt">Int</span> <span class="co">-- maybe Monsters only have health</span></span></code></pre></div>
+<p>Now we have two ways to create a <code>Character</code>:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">aHero ::</span> <span class="dt">Character</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>aHero <span class="ot">=</span> <span class="dt">Hero</span> { name <span class="ot">=</span> <span class="st">&quot;Bob&quot;</span>, health <span class="ot">=</span> <span class="dv">100</span>, mana <span class="ot">=</span> <span class="dv">20</span> }</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ot">aMonster ::</span> <span class="dt">Character</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>aMonster <span class="ot">=</span> <span class="dt">Monster</span> <span class="dv">20</span></span></code></pre></div>
+<hr />
+<h1 id="important-terms-data-type-vs-constructor.">Important terms: data
+type vs constructor.</h1>
+<p>It’s now very important to understand the difference between a
+constructor and a type.</p>
+<p>A data type describes a set of values.</p>
+<p>A constructor is like a function that is permitted to create those
+values.</p>
+<p>One data type can have as many constructors as it wants.</p>
+<p>These constructors can either be record constructors (with curly
+braces) or regular constructors (no braces).</p>
+<hr />
+<h1 id="syntactic-sugar">Syntactic sugar</h1>
+<p>Deep down, records are product types, just like tuples and ordinary
+data types.</p>
+<p>[Can anyone remind me what a product type is?] [What about a sum
+type?]</p>
+<hr />
+<h1 id="syntactic-sugar-2">Syntactic sugar (2)</h1>
+<p>In fact, behind the scenes, record constructors aren’t really any
+different from non-record constructors.</p>
+<p>We can see that if we examine the type of a constructor like this one
+in GHCI:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Character</span> <span class="ot">=</span> <span class="dt">Hero</span> {<span class="ot"> name ::</span> <span class="dt">String</span>,<span class="ot"> health ::</span> <span class="dt">Int</span>,<span class="ot"> mana ::</span> <span class="dt">Int</span> }</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>ghci<span class="op">&gt;</span> <span class="op">:</span>t <span class="dt">Hero</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Hero</span><span class="ot"> ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Character</span> </span></code></pre></div>
+<p>This type indicates we can actually call <code>Hero</code> as a
+function, and indeed, we still can, even though it’s a record
+constructor:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>bob <span class="ot">=</span> <span class="dt">Hero</span> <span class="st">&quot;Bob&quot;</span> <span class="dv">100</span> <span class="dv">20</span> <span class="co">-- works fine</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>bob <span class="ot">=</span> <span class="dt">Hero</span> { name <span class="ot">=</span> <span class="st">&quot;Bob&quot;</span>, health <span class="ot">=</span> <span class="dv">100</span>, mana <span class="ot">=</span> <span class="dv">20</span> } <span class="co">-- also works </span></span></code></pre></div>
+<hr />
+<h1 id="so-why-bother">So why bother?</h1>
+<p>If record constructors are just data constructors behind the scenes,
+why even have them?</p>
+<p>Well, look at this constructor call again:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Hero</span> <span class="st">&quot;Bob&quot;</span> <span class="dv">100</span> <span class="dv">20</span></span></code></pre></div>
+<p>What is <code>100</code>? What is <code>20</code>? These end up being
+magic numbers.</p>
+<p>We have to remember that health comes before mana. What if it were
+backwards?</p>
+<p>When we have a lot of data we need to keep grouped together, it makes
+sense to use a record constructor, so that we can easily see what each
+data field means.</p>
+<p>There’s another benefit when it comes to taking data out we’ll see
+soon…</p>
+<hr />
+<h1 id="questions-1">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="getting-data-out-of-records">Getting data out of records</h1>
+<p>So, we know how to call a record constructor and put all our data in
+it.</p>
+<p>How do we get the data out?</p>
+<p>Well…[what do you think?]</p>
+<hr />
+<h1 id="pattern-matching-records">Pattern matching records</h1>
+<p>Yup, pattern matching.</p>
+<p>Here’s how it works:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">isKnockedOut ::</span> <span class="dt">Character</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>isKnockedOut <span class="dt">Character</span> { health <span class="ot">=</span> h } <span class="ot">=</span> h <span class="op">&lt;=</span> <span class="dv">0</span></span></code></pre></div>
+<p>Here, <code>h</code> is a variable that matches whatever health is.
+We can make it more specific if we want:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ot">healthIsExactlyZero ::</span> <span class="dt">Character</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>healthIsExactlyZero <span class="dt">Character</span> { health <span class="ot">=</span> <span class="dv">0</span> } <span class="ot">=</span> <span class="dt">True</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>healthIsExactlyZero _ <span class="ot">=</span> <span class="dt">False</span></span></code></pre></div>
+<hr />
+<h1 id="is-that-all">Is that all?</h1>
+<p>In C, we can do this:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>Hero bob <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;Bob&quot;</span><span class="op">,</span> <span class="dv">100</span><span class="op">,</span> <span class="dv">25</span> <span class="op">};</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>puts<span class="op">(</span>bob<span class="op">.</span>name<span class="op">);</span></span></code></pre></div>
+<p>That is, we can use <em>dot notation</em> to get values out of the
+struct instance.</p>
+<p>Can’t we just do that in Haskell?</p>
+<p>Well, sort of, but it’s weird…</p>
+<hr />
+<h1 id="record-selectors-in-haskell">Record selectors in Haskell</h1>
+<p>Imagine we define these constructors:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Character</span> <span class="ot">=</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Hero</span> {</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ot">        name ::</span> <span class="dt">String</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ot">        health ::</span> <span class="dt">Int</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ot">        mana ::</span> <span class="dt">Int</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    } <span class="op">|</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Monster</span> {</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="ot">        health ::</span> <span class="dt">Int</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="ot">        mana ::</span> <span class="dt">Int</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<p>Haskell will define some functions that we can use to get this data
+back out without having to use pattern matching.</p>
+<hr />
+<h1 id="record-selectors-2">Record selectors (2)</h1>
+<p>These functions get automatically defined:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ot">name ::</span> <span class="dt">Character</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ot">health ::</span> <span class="dt">Character</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ot">mana ::</span> <span class="dt">Character</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
+<p>So we don’t need pattern matching anymore:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>bob <span class="ot">=</span> <span class="dt">Hero</span> { name <span class="ot">=</span> <span class="st">&quot;Bob&quot;</span>, health <span class="ot">=</span> <span class="dv">100</span>, mana <span class="ot">=</span> <span class="dv">20</span> }</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="op">$</span> health bob <span class="co">-- prints &#39;100&#39;</span></span></code></pre></div>
+<p>Great, seems reasonable. But there are some problems with doing it
+this way…</p>
+<hr />
+<h1 id="record-selector-drawbacks">Record selector drawbacks</h1>
+<p>One major drawback is kind of subtle. Do you see it? What is the type
+of <code>name</code> again?</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Character</span> <span class="ot">=</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Hero</span> {</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ot">        name ::</span> <span class="dt">String</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="ot">        health ::</span> <span class="dt">Int</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="ot">        mana ::</span> <span class="dt">Int</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    } <span class="op">|</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Monster</span> {</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="ot">        health ::</span> <span class="dt">Int</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="ot">        mana ::</span> <span class="dt">Int</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<hr />
+<h1 id="record-selector-drawbacks-2">Record selector drawbacks (2)</h1>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ot">name ::</span> <span class="dt">Character</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span></code></pre></div>
+<p>That means we can pass <em>any</em> character to the
+<code>name</code> function and it will return its name.</p>
+<p>But…what about <code>Monster</code>? Characters that use that
+constructor don’t have a name…</p>
+<p>You might think that there’s some trick here, but no, Haskell
+actually just crashes:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>ooze <span class="ot">=</span> <span class="dt">Monster</span> <span class="dv">20</span> <span class="dv">0</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> <span class="op">$</span> name ooze <span class="co">-- this just crashes</span></span></code></pre></div>
+<hr />
+<h1 id="questions-2">Questions?</h1>
+<!-- _class: questions invert -->
+<hr />
+<h1 id="really">Really?</h1>
+<p>This is honestly kind of a shocking hole in Haskell’s type system.
+Normally Haskell is very strictly typed.</p>
+<p>It’s not as surprising when you consider that Haskell allows partial
+definitions of functions (definitions that don’t cover all the values
+that could be passed).</p>
+<p>However, it’s kind of a questionable programming language design
+feature.</p>
+<p>What programming language design principle is being violated?</p>
+<hr />
+<h1 id="orthogonality">Orthogonality</h1>
+<p>This is an area in which Haskell demonstrates poor orthogonality.</p>
+<p>Orthogonality is a property of a programming language’s features. If
+features are orthogonal, they can work together without interfering.</p>
+<p>Here, field selectors are not a very orthogonal feature. It
+interferes with the global function definitions <em>and</em> the type
+system in a pretty annoying way.</p>
+<hr />
+<h1 id="why">Why?</h1>
+<p>Consider this situation?</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Blip</span> <span class="ot">=</span> <span class="dt">Blip</span> {<span class="ot"> foo ::</span> <span class="dt">Int</span> }</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> <span class="dt">Blop</span> <span class="ot">=</span> <span class="dt">Blop</span> {<span class="ot"> foo ::</span> <span class="dt">Int</span> }</span></code></pre></div>
+<p>Looks reasonable enough. We have two record constructors that have a
+field with the same name.</p>
+<p>This is perfectly reasonable in C. What about Haskell?</p>
+<hr />
+<h1 id="nope">Nope</h1>
+<p>You can’t do this. You will get an error.</p>
+<p>The first data definition is okay:
+<code>data Blip = Blip { foo :: Int }</code></p>
+<p>This defines the <code>Blip</code> type and constructor and the field
+selector <code>foo :: Blip -&gt; Int</code>.</p>
+<p>However, the second one tries to define another field selector
+<code>foo :: Blop -&gt; Int</code> This is a multiple definition, which
+is not allowed.</p>
+<hr />
+<h1 id="overloading">Overloading?</h1>
+<p>Haskell does not allow trivial type overloading, and this is a pretty
+common restriction in functional languages.</p>
+<p>In Java or C++, we can define a method that has the same name but
+takes different types. This is called <em>overloading</em>.</p>
+<p>The problem with overloading is that it makes it so that the type of
+an expression involving a function can no longer be inferred. If there
+are two versions of <code>foo</code>, what is the type of
+<code>show . foo</code>?</p>
+<p>It could either be <code>Blip -&gt; String</code> or
+<code>Blop -&gt; String</code>. There is no way to know.</p>
+<hr />
+<h1 id="overloading-2">Overloading (2)</h1>
+<p>Rather than say “sometimes type inference will fail”, Haskell instead
+says “we can always get the type of simple expressions. It’s on you to
+make sure the names don’t conflict.”</p>
+<p>This isn’t as weird as it sounds. I’ve seen functional programmers
+say “if two functions have different types then they should have
+different names. Don’t overload by type.”</p>
+<p>Unfortunately, it interacts poorly with the field selector feature in
+Haskell.</p>
+<hr />
+<h1 id="actually-fixing-it">Actually fixing it</h1>
+<p>One thing we can do is put our types with record constructors inside
+of modules:</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">module</span> <span class="dt">Character</span> <span class="kw">where</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">data</span> <span class="dt">Character</span> <span class="ot">=</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Hero</span> {<span class="ot"> health ::</span> <span class="dt">Int</span> } <span class="op">|</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Monster</span> {<span class="ot"> health ::</span> <span class="dt">Int</span> } <span class="op">|</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">Npc</span> {<span class="ot"> health ::</span> <span class="dt">Int</span> }</span></code></pre></div>
+<p>Now, someone can <code>import qualified Character</code> in another
+file.</p>
+<p>The <code>qualified</code> specifier means they have to write
+<code>Character.</code> in front of anything in the module to refer to
+it.</p>
+<p>So now they write <code>Character.health</code> instead of just
+<code>health</code>, preventing conflicts with other record
+constructors.</p>
+<hr />
+<h1 id="is-it-fixed">Is it fixed?</h1>
+<p>Unfortunately, this solution has some drawbacks.</p>
+<p>First, modules have to go in their own files. This is really
+annoying, and it scatters data type definitions around our codebase.</p>
+<p>Second, it means that the type itself needs to be referred to as
+<code>Character.Character</code>.</p>
+<p>There are various ways of importing with different tradeoffs that can
+work around this annoyance, but none really fixes every problem
+satisfactorily in my opinion.</p>
+<p>Personally, modules are another weak point in Haskell’s feature set
+for me.</p>
+<hr />
+<h1 id="personal-opinion-time">Personal opinion time</h1>
+<p>I’ve been pretty Haskell-positive so far, and I still am: it’s a very
+elegant language.</p>
+<p>But sometimes the designers take elegance too far. If I had to
+propose a simple change to improve Haskell I would change how field
+selectors work.</p>
+<p>Specifically, I would require the name of the type when using them:
+<code>print $ Character.health bob</code> instead of just
+<code>print $ health bob</code>.</p>
+<p>This is already what happens if you use modules, but I would make it
+the default. Now we can make as many record constructors with
+<code>health</code> fields as we want.</p>
+<hr />
+<h1 id="personal-opinion-time-2">Personal opinion time (2)</h1>
+<p>My proposal isn’t perfect. Modules are already a thing.</p>
+<p>Instead, I could make <code>Character</code> by itself still refer to
+a type, and I would create an anonymous module that stores the field
+selectors.</p>
+<p>Is that a bad solution? It involves some hidden behavior. It might be
+<em>surprising</em>, which is a property we want to avoid when designing
+programming languages.</p>
+<p>Maybe all types should be modules. The module could store meta
+information about the type. But that would make the language more
+complicated. A type would now be a kind of module, instead of a totally
+orthogonal concept.</p>
+<hr />
+<h1 id="personal-opinion-time-3-language-design-is-hard">Personal
+opinion time (3) – language design is hard</h1>
+<p>These kinds of tradeoffs are why there is no perfect programming
+language.</p>
+<p>My proposal also <em>doesn’t</em> fix the issue with calling
+selectors on constructors that don’t have that field. To fix that, we’d
+need record constructors to be unique within a type. That’s a pretty
+major limitation, although it might be worth it for better type safety.
+[Thoughts?]</p>
+<hr />
+<h1 id="record-data-extraction-summary">Record data extraction
+summary</h1>
+<p>In summary, we have two features for getting data out of a record: 1.
+Pattern matching: a pattern specifies the fields we care about and what
+values they have. If the value is a variable, it will match anything,
+just like we’re used to:
+<code>someFunc Constructor {foo = 100, bar = b} = b</code> will return
+the <code>bar</code> field, but only if the <code>foo</code> field is
+exactly 100. 2. Data selectors: Haskell defines a function for every
+unique field of a record constructor. We can call these functions to get
+data out: <code>print $ health bob</code> will print <code>100</code> if
+<code>bob = Hero { name = "Bob", health = 100, mana = 25 }</code></p>
+<p>Data selectors have limitations: every field name must be unique
+within each type. Different constructors of a type can use the same
+name, but not different constructors of different types. They can crash
+if the data is absent for a given constructor.</p>
+<hr />
+<h1 id="questions-3">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="record-practice">Record practice</h1>
+<ol type="1">
+<li>Create a data type called <code>PongActor</code> with two record
+constructors: <code>Paddle</code> and <code>Ball</code></li>
+<li>Make both constructors have x,y coordinates and width and height.
+Store them however you want.</li>
+<li>Give ball fields for x and y velocity as well.</li>
+</ol>
+</body>
+</html>

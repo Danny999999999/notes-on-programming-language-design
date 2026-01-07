@@ -315,7 +315,7 @@ We didn't need a special operator for it that only works on strings. It actually
 
 Notice the Haskell mindset: find a way to encode a mathematical structure. They often elegantly describe coding patterns.
 
-Very cool: soon we will learn about monads, which are one way that Haskell represents commands to do IO. Many monads are also monoids (called `MonadPlus`es), which allows us to use `stimes` on them. So ``5 `stimes` putStrLn "hi"`` actually prints "hi" 5 times like you would expect.
+Very cool: soon we will learn about monads, which are one way that Haskell represents commands to do IO. Many monads are also monoids, which allows us to use `stimes` on them. So ``5 `stimes` putStrLn "hi"`` actually prints "hi" 5 times like you would expect.
 
 ---
 

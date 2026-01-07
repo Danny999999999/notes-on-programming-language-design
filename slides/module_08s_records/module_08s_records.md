@@ -6,7 +6,7 @@ paginate: true
 
 # Programming Language Design
 
-## Module 7: Parsing 
+## Module 8: Records 
 
 <br>
 <br>

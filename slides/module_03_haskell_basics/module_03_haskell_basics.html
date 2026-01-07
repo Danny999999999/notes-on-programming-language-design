@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>module_03_haskell_basics</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<h1 id="programming-language-design">Programming Language Design</h1>
+<h2 id="module-3-intro-to-haskell">Module 3: Intro to Haskell</h2>
+<p><br> <br></p>
+<p>Slides © Grant Williams, <a
+href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA
+4.0</a>.</p>
+<p><br></p>
+<p>This is an open educational resource. Feel free to submit fixes,
+improvements, and new material <a
+href="https://github.com/grantwill74/notes-on-programming-language-design">here</a>.</p>
+<hr />
+<h1 id="last-module">Last Module</h1>
+<p>We learned about Lambda Calculus.</p>
+<p>Lambda Calculus is a model for computation that treats every
+operation as either creating a function or calling it.</p>
+<p>Lambda calculus seems weird, but hopefully it became clear that you
+could do anything in it.</p>
+<p>Now it’s time to put it to use…</p>
+<hr />
+<h1 id="this-module">This module</h1>
+<p>We’re going to start learning Haskell.</p>
+<p>Haskell is a pure functional programming language.</p>
+<p>It has several weird features that you have never seen before.</p>
+<p>So, without further ado…</p>
+<hr />
+<h1 id="history-of-haskell">History of Haskell</h1>
+<p>Haskell was designed by a committe to specifically be a Lazy
+functional programming language. (We’ll explain what this means
+later).</p>
+<p>This has a specific technical meaning. It doesn’t mean that it’s
+chill. It’s actually way weirder than that.</p>
+<p>There are several Haskell compilers, but the main one is <a
+href="https://www.haskell.org/ghc/">GHC</a>, the Glasgow Haskell
+Compiler, named after the University of Glasgow where it was
+developed.</p>
+<hr />
+<h1 id="basic-programming-language-facts">Basic programming language
+facts</h1>
+<p>Haskell is (usulaly) a compiled language, meaning that we run the
+compiler on Haskell source code to generate an executable that can be
+run later.</p>
+<p>Haskell is statically typed, meaning that the types of variables and
+expressions is known at compile time (“statically” means at compile
+time, “dynamically” means at run time).</p>
+<p>Unlike C or other languages you may be familiar with, Haskell is
+implicitely typed. It is good at figuring out the types of expressions
+without you having to write them. Writing them is usually optional (but
+still a good idea for public functions).</p>
+<p>Haskell is <em>not</em> object-oriented. The class keyword is
+unrelated to Classes in an OO language. Instead, we organize our
+programs around functions, instead of classes.</p>
+<hr />
+<h1 id="functional-programming">Functional programming</h1>
+<p>What is functional programming?</p>
+<p>Fundamentally, functional programming means that your computer
+program is a function. The functionall programming paradigm treats all
+programs as functions.</p>
+<p>But wait, does that mean C is a functional language? After all, the
+program starts with the <code>main</code> function!</p>
+<p>No, because <code>main</code> (usually) is not actually a function.
+At least, a mathematician would not consider it to be a function.</p>
+<p>So what is a <em>real</em> function, then?</p>
+<hr />
+<h1 id="real-functions-are-pure">Real functions are <em>pure</em></h1>
+<p>Functions that we care about in this class are <em>pure</em>
+functions.</p>
+<p>A pure function has two properties: 1. Referential transparency. That
+is, every time the function is called with a particular argument, it
+should give the same result. The functions output should depend only on
+its input (and maybe constants). 2. Lack of side effects. That is,
+calling the function should not change anything elsewhere. This may
+sound extreme: it is! Variables aren’t allowed to change.</p>
+<p>Let’s examine these two properties.</p>
+<hr />
+<h1 id="referential-transparency">Referential transparency</h1>
+<p>In math, suppose I define a function: <span
+class="math inline">\(f(x) = 2x\)</span></p>
+<p>So <span class="math inline">\(f(2) = 4\)</span>, and <span
+class="math inline">\(f(7) = 14\)</span></p>
+<p>Those are not temporary values, they are definitional. <span
+class="math inline">\(f(7)\)</span> is <span
+class="math inline">\(14\)</span> because <span
+class="math inline">\(14\)</span> is <span class="math inline">\(2
+\times 7\)</span>.</p>
+<p>This would make no sense: <span class="math inline">\(f(7) = 14; f(7)
+= 15; f(7) = 16\)</span></p>
+<p>A mathemetician looking at that would not accept it. “Which is it? Is
+<span class="math inline">\(f(7)\)</span> 14, 15, or 16?”</p>
+<p>The term “referential transparency” can be hard to remember, so let’s
+see where it comes from…</p>
+<hr />
+<h1 id="referential-transparency-2">Referential transparency (2)</h1>
+<p>Discussion from an <a
+href="https://stackoverflow.com/questions/210835/what-is-referential-transparency#9859966">interesting
+stackoverflow post</a> (top response)</p>
+<p>The term comes from analytic philosophy. The idea was to determine
+which kind of verbs could simply have their “referrents” (the things
+they were about) replaced transparently.</p>
+<p>For example, in the phrase “Football is watched by millions of
+Americans every year”, “Football” can be replaced by “America’s most
+popular sport” without altering the meaning of the sentence.</p>
+<p>However, in the phrase “I watched the football game”, we cannot say
+“I watched the America’s most popular sport game.”</p>
+<p>So “is watched by” is referentially trasparent here, but “I watched
+the” is not.</p>
+<hr />
+<h1 id="referential-transparency-3">Referential transparency (3)</h1>
+<p>This idea was adapted to functional programming languages by treating
+arguments to functions as “referrents”.</p>
+<p>A referentially transparent function is one in which all the
+references to its arguments can be replaced by the argument.</p>
+<p>So that function from earlier, <span class="math inline">\(f(x) =
+2x\)</span> is referentially transparent, becuase <span
+class="math inline">\(f(7)\)</span> can be rewritten as <span
+class="math inline">\(f(7) = 2(7)\)</span> without getting something
+wrong.</p>
+<p>Can anyone think of a function that is <em>not</em> referentially
+transparent.</p>
+<hr />
+<h1 id="referential-transparency-4">Referential transparency (4)</h1>
+<p><code>input()</code> in Python is one example of a non-referentially
+transparent function.</p>
+<p>Sometimes, <code>input()</code> returns “Hello”. Other times, it
+returns “Bob”. It returns whatever string is in standard input at that
+time.</p>
+<p>But in Haskell, this would not be possible. It has to always return
+the same thing given the same arguments.</p>
+<p>And since <code>input</code> has no arguments, that means it has to
+always return the same thing. It would have to be a constant.</p>
+<p>Another example: in C, <code>scanf</code> returns the number of
+characters it read. That’s going to depend on what’s in standard
+input.</p>
+<hr />
+<h1 id="no-side-effects">No side effects</h1>
+<p>The other aspect of pure functions is that they have no <em>side
+effects</em>.</p>
+<p>A side effect is any kind of IO or variable change.</p>
+<p>So this means, a pure function never modifies a variable. It also
+never writes to a file, inserts into a database, or sends an internet
+packet.</p>
+<p>Haskell <em>only</em> has pure functions.</p>
+<p>So how does it do any of those things? Can you just not write
+database programs in Haskell?</p>
+<p>No, you can, you just have to change how you think about it. Don’t
+worry, we’ll see some examples of writing useful software in Haskell.
+There are <a
+href="https://wiki.haskell.org/Applications_and_libraries/Games">games</a>,
+<a href="https://pandoc.org/MANUAL.html">office software</a>, and even a
+<a href="https://xmonad.org/">Linux window manager</a> written in
+Haskell.</p>
+<hr />
+<h1 id="questions">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="lazy-evaluation">Lazy Evaluation</h1>
+<p>Almost every programming language you have ever used, is
+<em>eagerly</em> or <em>strictly</em> (both mean the same thing)
+evaluated.</p>
+<p>What does that mean?</p>
+<p>It means that expressions are evaluated in the order they are arrived
+at.</p>
+<p>That seems to straightforward that it’s impossible to imagine
+anything different, so here’s a concrete example.</p>
+<hr />
+<h1 id="eager-evaluation-in-c">Eager evaluation in C</h1>
+<p>C is a (mostly) eagerly evaluated language.</p>
+<p>Consider this C code:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> x <span class="op">=</span> <span class="dv">8</span> <span class="op">+</span> <span class="dv">8</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> y <span class="op">=</span> <span class="dv">4</span> <span class="op">+</span> <span class="dv">4</span><span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;x is </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> x<span class="op">);</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>What does it do?</p>
+<p>It first computes 8 + 8, and stores the result in a variable called
+<code>x</code>. It then computes 4 + 4 and stores the result in an
+unused variable <code>y</code>. It then prints out x. Finally, it exits
+with a code of 0.</p>
+<hr />
+<h1 id="how-else-could-it-possibly-work">How else could it possibly
+work?</h1>
+<p>Here is a similar looking bit of Haskell code:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> x <span class="ot">=</span> <span class="dv">8</span> <span class="op">+</span> <span class="dv">8</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> y <span class="ot">=</span> <span class="dv">4</span> <span class="op">+</span> <span class="dv">4</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> x</span></code></pre></div>
+<p>What does it do?</p>
+<p>It computes 8 + 8 and binds the result under the name <code>x</code>.
+Then it prints <code>x</code>.</p>
+<p>It <em>does not</em> compute <code>y</code>.</p>
+<p>Why? Because it doesn’t matter. You never print it, so it is never
+used.</p>
+<hr />
+<h1 id="how-does-it-know">How does it know?</h1>
+<p>Fundamentally, Haskell evaluates expressions from the “other
+direction”.</p>
+<p>Whatever actions are present in main need to happen to matter what.
+So it sees <code>print x</code> and realize that it needs to compute x
+at that point.</p>
+<p>Then it works backward and actually computes it, which means 8 +
+8.</p>
+<p>Nothing ever forces it to compute <code>y</code>, so it never
+does.</p>
+<p>There was an old Haskell benchmark that was supposed to compute
+digits of pi or something. The benchmark creator forgot to print, so
+briefly Haskell was the fastest language in the world, because the
+program ran in 0 seconds.</p>
+<hr />
+<h1 id="why">Why?</h1>
+<p>Lazy evaluation isn’t actually common, even in functional programming
+languages.</p>
+<p>Apparently, it was chosen as a way to <em>force</em> Haskell to be
+functionally pure.</p>
+<p>If you can’t rely on a particular order of computation, you can’t
+have side effects.</p>
+<p>It can be faster under certain circumstances. If there’s some
+variable that is expensive to compute and only occasionally necessary,
+you can save the cost if it isn’t used.</p>
+<p>It also means you can easily have infinite data structures without
+iterators. Nothing stops you from creating a list of all integers,
+because each element is created as it is read in the list, and not all
+at once.</p>
+<hr />
+<h1 id="why-not">Why not?</h1>
+<p>If lazy evaluation is so great, why isn’t it more common?</p>
+<p>Unfortunately, it makes memory usage very unpredictable.</p>
+<p>When haskell sees an expression, it creates a special value that kind
+of encodes the computation without running it (called a “thunk”).</p>
+<p>If the expression is a large or infinite list, as you pull data from
+it, you end up allocating a lot of memory all at once.</p>
+<p>It’s possible to disable this behavior, but the fact that it’s the
+default means that software that needs to be easily speed/memory audited
+tends to not be written in Haskell.</p>
+<hr />
+<h1 id="questions-1">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="so-what-about-print">So what about “print”?</h1>
+<p>But now, let me address a question you may have: if functions are all
+pure and have no side-effects, what does this mean?</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello, World&quot;</span></span></code></pre></div>
+<p>It’s clearly printing! It’s doing something! How can you say that all
+functions in Haskell are pure?</p>
+<hr />
+<h1 id="i-didnt-lie">I didn’t lie!</h1>
+<p>That function has no side effects.</p>
+<p>“But it prints!” No it doesn’t!</p>
+<p>That function actually does not print anything.</p>
+<p>Consider the strange syntax. Notice that we write:
+<code>main = ...</code> and not <code>main { ... }</code> or
+<code>main: ...</code>. Why is it an equals sign?</p>
+<p>Because it is a mathematical definition. We are saying that main is a
+constant that contains the value
+<code>putStrLn "Hello, World"</code>.</p>
+<p>But <code>putStrLn</code> is a function, not a value, right?</p>
+<hr />
+<h1 id="its-a-value">It’s a value</h1>
+<p>Let’s write the type above the program:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;Hello, World&quot;</span></span></code></pre></div>
+<p>You’ve already seen types in your readings so far. We write them with
+<code>::</code>. This is saying that <code>main</code> is something
+called an <code>IO</code>, and then there’s this <code>()</code> next to
+it.</p>
+<p><code>IO</code> is a kind of <em>monad</em>, a concept we will learn
+in detail much later in the course.</p>
+<p>However, we can think of an <code>IO</code> as a kind of program. An
+<code>IO</code> is a program that performs input and output when it is
+run.</p>
+<hr />
+<h1 id="when-does-it-run">When does it run?</h1>
+<p>When is it run? Not by us! We are returning it from
+<code>main</code>. The Haskell runtime is going to actually run it.</p>
+<p>So <em>in Haskell</em>, every function is pure. But the function can
+return a program, and a different system will run that program. It can
+have side effects.</p>
+<p>In fact, it probably <em>should</em> have side effects. Otherwise you
+could never print anything!</p>
+<p>The <code>()</code> after <code>IO</code> is the return type of the
+program. In this case, the program doesn’t return anything.
+<code>()</code> is pronounced “unit”, and it represents a type of value
+that is irrelevant or for which there is only one possibility (like
+“nothing”). It’s kind of like null, but it’s not only a value, but also
+a type.</p>
+<p><code>IO Int</code> would be an <code>IO</code> program that returns
+an <code>Int</code>. But main must be <code>IO ()</code>.</p>
+<hr />
+<h1 id="re-iterating-that">Re-iterating that</h1>
+<p>In Haskell, <em>main is not a function</em>.</p>
+<p>It is a constant. It is a program that never changes. Every time the
+runtime runs your program, it will reach inside and pull the program out
+of the <code>main</code> variable, and then run it.</p>
+<p>The program is allowed to have side effects. It can print and read
+and open files.</p>
+<p>However, <code>main</code> will always return the same program. Even
+if the program has side-effects, <code>main</code> is not running the
+program, only returning it.</p>
+<p>This is the mindset shift that we need to do in order to really
+<em>get</em> functional programming. Nothing changes; everything is a
+map from input to output.</p>
+<hr />
+<h1 id="the-lazy-evaluation-strategy">The lazy evaluation strategy</h1>
+<p>Inside your program, Haskell doesn’t actually do anything.</p>
+<p>When you return a value as <code>main</code>, the runtime starts
+evaluating the program you returned. This is when it starts evaluating
+expressions, and lazy evaluation happens.</p>
+<p>If <code>main</code> doesn’t use a value as part of IO it never gets
+evaluated.</p>
+<p>I’ll prove it:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> x <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;hi&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> ()</span></code></pre></div>
+<p>This doesn’t print anything. <code>putStrLn</code> is not
+evaluated.</p>
+<hr />
+<h1 id="how-does-outside-code-get-called">How does outside code get
+called?</h1>
+<p>So how can someone call a C library from Haskell?</p>
+<p>There is a way to do it. There are ways to call native programs.</p>
+<p>There’s also a function called <code>unsafePerformIO</code> that
+allows you to use a value computed from an IO action inside a pure
+function.</p>
+<p>But it still doesn’t actually run until the runtime’s lazy evaluator
+makes it.</p>
+<hr />
+<h1 id="questions-2">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="big-changes-from-imperative-programming">Big changes from
+imperative programming</h1>
+<p>Okay, so functional programming is weird. But if I kind of look at
+that earlier Haskell code side by side with the C code, it kind of looks
+the same! What’s the big difference?</p>
+<p>Well, for one thing, you can’t do this:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="dv">20</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="dv">10</span></span></code></pre></div>
+<p>That’s not valid. <code>x</code> can only be one thing.</p>
+<hr />
+<h1 id="big-changes-2">Big changes (2)</h1>
+<p>You <em>can</em> do this:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">do</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">return</span> <span class="dv">20</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">return</span> <span class="dv">10</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> x</span></code></pre></div>
+<p>But it doesn’t actually change <code>x</code>, it creates a different
+value in a different scope. (we’ll talk about the weird arrow
+later).</p>
+<p>So that means we can’t have loops!</p>
+<hr />
+<h1 id="no-loops">No loops</h1>
+<p>In C, a loop is a structure that executes a series of statements as
+long as a condition is true. Then it breaks when the condition
+fails.</p>
+<p>In Haskell, this would never happen, because the condition would
+either be true or false, and that would never change. Haskell does not
+have C-style loops.</p>
+<p>(There are alternatives, including things like for-each, but they
+involve those monad things, so let’s not worry about it for now)</p>
+<p>So what do we do if we can’t loop? Surely there has to be some kind
+of way? [What’s the alternative?]</p>
+<hr />
+<h1 id="recursion-instead">Recursion instead</h1>
+<p>Instead we use recursion.</p>
+<p>Let’s write a simple loop over a list to compute the sum. This
+already exists, but it’s a simple exercise.</p>
+<p>Here’s how we’d do it in C</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> sum<span class="op">(</span><span class="dt">int</span><span class="op">*</span> arr<span class="op">,</span> <span class="dt">size_t</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span><span class="op">(</span><span class="dt">size_t</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        sum <span class="op">+=</span> arr<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sum<span class="op">;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>But in Haskell…</p>
+<hr />
+<h1 id="lists">Lists</h1>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">sum&#39;&#39; ::</span> [<span class="dt">Int</span>] <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sum&#39;&#39; list <span class="ot">=</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> list <span class="op">==</span> [] <span class="kw">then</span> <span class="dv">0</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">else</span> <span class="fu">head</span> list <span class="op">+</span> sum&#39;&#39; (<span class="fu">tail</span> list)</span></code></pre></div>
+<p>This is a recursive function. It takes a list of ints and returns an
+int.</p>
+<p>It first checks if its argument is empty. If it is, the sum is
+zero.</p>
+<p>Otherwise, it returns the head of the list plus the sum of the
+tail.</p>
+<p>Take a second to convince yourself it works, and consider that we
+just “looped” without modifying anything.</p>
+<hr />
+<h1 id="running-it">Running it</h1>
+<p>Since you’ve been working the book exercises, I don’t need to put
+this here, but in the incredibly unlikely scenario you’ve been holding
+off on installing Haskell…</p>
+<p>Download <a href="https://www.haskell.org/ghcup/">GHCup</a> to
+install GHC, the compiler.</p>
+<p>In a new console window, you can write <code>ghci</code> to enter
+interactive mode, in which you type one line at a time, or
+<code>ghc &lt;filename&gt;.hs</code> to compile it to
+<code>&lt;filename&gt;.exe</code> on Windows or just a binary
+<code>&lt;filename&gt;</code> on *nix.</p>
+<p>Be sure to do the knowledge checks.</p>
+<hr />
+<h1 id="haskell-basics">Haskell Basics</h1>
+<p>Let’s understand that code better and review the basics of Haskell
+that you’ve already seen from your reading.</p>
+<p>First, Haskell is a statically-typed language. Every expression has a
+well-defined type that is known at compile time.</p>
+<p>A Haskell source file is a list of definitions where are largely
+either functions or constants (ignoring modules for now). Each
+definition has an equals sign: <code>=</code>.</p>
+<p>Each defition can have a type explicitely listed, or Haskell can try
+to infer it. Usually we like to list them, especially for functions, for
+documentation. Types can be hard to parse by eye.</p>
+<hr />
+<h1 id="expressions-vs.-statements">Expressions vs. statements</h1>
+<p>A definition looks like this:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ot">name ::</span> <span class="kw">type</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>name arg1 arg2 <span class="op">...</span> <span class="ot">=</span> expression</span></code></pre></div>
+<p>An expression is something that has a value.</p>
+<p>A statement is a command that changes state.</p>
+<p>Haskell <em>does not</em> have statements. It does not permit state
+to change (within the program). There is no <em>if statement</em>. It is
+an <em>if expression</em>.</p>
+<p>Every definition, including <code>main</code>, has an expression as
+its right-hand side.</p>
+<hr />
+<h1 id="names">Names</h1>
+<p>Variables in Haskell aren’t really variables, because they can’t
+change.</p>
+<p>But we call them that anyway.</p>
+<p>Anyway, they can be named the same as C variables: no number up
+front, but any combination of lowercase, uppercase, and numeric
+chars.</p>
+<p>Haskell usually uses camelCase rather than snake_case, but you can
+use either.</p>
+<p>However, unlike C, you can put a <code>\</code> ` (“prime”) anywhere
+but the first character.</p>
+<p>So <code>hello'</code> and <code>world''</code> and technically
+<code>w''orld</code> (but don’t do that) are valid names.</p>
+<hr />
+<h1 id="basic-types">Basic Types</h1>
+<p>Haskell has a number of basic types that should be pretty familiar: -
+Int: a fixed-width int that is at least 29 bits wide. - Bool: a boolean
+value (True or False) - Float: an IEEE-754 32-bit float - Double: an
+IEEE-754 64-bit float - Char: a unicode codepoint* - Integer: a bigint
+that can store integers of any length that fit in memory. - (): the
+“unit” type. Both a type and a value. Used when no meaningful value is
+necessary.</p>
+<div class="footnote">
+<ul>
+<li>most common printed characters have exactly one codepoint unless
+you’re doing Zalgo text or something. Can be more than one codepoint for
+complicated characters or visual characters.</li>
+</ul>
+</div>
+<hr />
+<h1 id="compound-types">Compound Types</h1>
+<p>Haskell also has an equivalent to structs. They are a little weirder,
+so we’ll be saving that for next module.</p>
+<p>However, some important compound types: - [Type]: a list of types.
+E.g., [Int] is a list of Ints. [Float] is a list of float. - String is
+just a renaming of [Char]. It’s a list of Chars. - Ratio (requires
+<code>import Data.Ratio</code>). A rational number, <em>not a
+float</em>, actually stores the fraction as numerator/denominator as two
+Integers, so e.g., 3/10 can be represented exactly. - IO Type: a program
+that, when it is eventually run (by someone else), it will result in
+“Type”. E.g., IO Int is a program that will do some I/O and then return
+an Int. - (TypeA, TypeB, …): a tuple. (Int, Float) is a pair of an int
+and a float.</p>
+<hr />
+<h1 id="the-most-important-type">The most important type</h1>
+<p>But the most important type of all is the function. It’s a functional
+language, after all.</p>
+<p>Function types are written with an arrow: <code>-&gt;</code></p>
+<p>Example: <code>Int -&gt; Int</code> is the type of a function that
+takes an <code>Int</code> and returns an <code>Int</code></p>
+<p><code>Float -&gt; String</code> is the type of a function that takes
+a <code>Float</code> and returns a <code>String</code>.</p>
+<p>[What is the type of a function that takes <em>two</em> ints and
+returns an int?]</p>
+<hr />
+<h1 id="functions-are-curried">Functions are curried</h1>
+<p><code>Int -&gt; Int -&gt; Int</code></p>
+<p>Functions are curried by default. This is equivalent to
+<code>Int -&gt; (Int -&gt; Int)</code>.</p>
+<p>Consider this function:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">add ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>add a b <span class="ot">=</span> a <span class="op">+</span> b</span></code></pre></div>
+<p>If you leave the type off, Haskell will try to infer it.</p>
+<p>What type will it infer of this?</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>add <span class="dv">7</span></span></code></pre></div>
+<hr />
+<h1 id="currying-and-partial-application">Currying and partial
+application</h1>
+<p>We filled in the first int in an
+<code>Int -&gt; (Int -&gt; Int)</code></p>
+<p>So the result is an <code>Int -&gt; Int</code>.</p>
+<p>Specifically, it’s a function that adds 7 to things.</p>
+<p>We can even partially apply the addition operation itself.
+<code>(+) :: Int -&gt; Int -&gt; Int</code></p>
+<p><code>(+7)</code> is a function that adds 7 to things, as is
+<code>(7+)</code>.</p>
+<p>And we can write this:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">add7 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>add7 <span class="ot">=</span> (<span class="dv">7</span><span class="op">+</span>) </span></code></pre></div>
+<p><code>add7</code> has type <code>Int -&gt; Int</code>, and so does
+<code>(7+)</code>, so this type checks successfully.</p>
+<hr />
+<h1 id="types-and-values-are-different">Types and values are
+different!</h1>
+<p>If I ask for the type of a function, like <code>(+)</code>, the
+answer is <code>Int -&gt; Int -&gt; Int</code></p>
+<p>If I ask for a function itself that adds two values together, you can
+say:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>whatever a b <span class="ot">=</span> a <span class="op">+</span> b</span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>whatever <span class="ot">=</span> (<span class="op">+</span>)</span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>whatever <span class="ot">=</span> \a <span class="ot">-&gt;</span> \b <span class="ot">-&gt;</span> a <span class="op">+</span> b <span class="co">-- these are lambdas btw</span></span></code></pre></div>
+<p>In Haskell we write <code>\a -&gt; expr</code> instead of <span
+class="math inline">\(\lambda a. \mathrm{expr}\)</span>, but it’s the
+same thing.</p>
+<hr />
+<h1 id="types-and-values-are-different-2">Types and values are
+different! (2)</h1>
+<p>A datatype represents a set of values. For example, <code>Int</code>
+is the set of all integers of a certain bit width.</p>
+<p>There is another kind of type called a <em>type class</em> (not the
+same thing as an object-oriented class) that we’ll talk about later.</p>
+<p>A value represents an element of a datatype.</p>
+<p>So <code>Int</code> is a type, and <code>7</code> is a value.</p>
+<p>You will never see:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ot">someFunction ::</span> <span class="dv">7</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span></code></pre></div>
+<p>Becuase <code>7</code> is not a type, so you can’t write a funciton
+that takes the type “<code>7</code>”.</p>
+<hr />
+<h1 id="the-distinction">The distinction</h1>
+<p>That doesn’t mean you can’t write a function that only is defined on
+seven:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>onlyTakes7 a <span class="ot">=</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> a <span class="op">==</span> <span class="dv">7</span> <span class="kw">then</span> <span class="dt">True</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">else</span> <span class="fu">error</span> <span class="st">&quot;Ahh!!! Only 7s!!!&quot;</span></span></code></pre></div>
+<p>But the type of that function is something like
+<code>Int -&gt; Bool</code>, not <code>7 -&gt; Bool</code>.</p>
+<p>Likewise, we can’t have a function return a type:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>returnsInt <span class="ot">=</span> <span class="dt">Int</span></span></code></pre></div>
+<p>You can define type aliases, which is kind of similar, but functions
+take and return values, and types describe other types. They are two
+separate categories.</p>
+<hr />
+<h1 id="are-they-entirely-separate-dependent-typing.">Are they entirely
+separate? Dependent typing.</h1>
+<p>In some programming languages, like <a
+href="https://rocq-prover.org/">this one</a>, types and values aren’t
+entirely different.</p>
+<p>You could write a function that takes 7. Well, it would take an Int,
+and then a proof that the Int is exactly 7.</p>
+<p>You could also write a function that takes a list of 7 values.</p>
+<p>The type can depend on values, so this is called <em>dependent
+typing</em>.</p>
+<p>But Haskell is not a dependently-typed language (unless extensions
+are used). Types and values are different, and it’s very important to
+understand the difference.</p>
+<hr />
+<h1 id="knowledge-check-1">Knowledge Check 1</h1>
+<ol type="1">
+<li>Define a function, named <code>foo</code> that takes a Float named
+<code>x</code> and doubles it.</li>
+<li>What is a type that function could be?</li>
+<li>Define a function with the type
+<code>Float -&gt; Float -&gt; Float -&gt; Float</code></li>
+<li>Define a function that takes an Integer and then ignores it and
+returns <code>7</code>. Give it a type as well.</li>
+</ol>
+<hr />
+<h1 id="knowledge-check-1-answers">Knowledge Check 1 answers</h1>
+<ol type="1">
+<li><code>foo x = 2.0 * x</code> or <code>foo = (2.0 *)</code></li>
+<li><code>Float -&gt; Float</code> or <code>Double -&gt; Double</code>
+are good answers.</li>
+<li><code>evalLinear a b x = a * x + b</code> is one answer.</li>
+<li></li>
+</ol>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ot">justBe7 ::</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>justBe7 x <span class="ot">=</span> <span class="dv">7</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- or</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="ot">justBe7 ::</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>justBe7 <span class="ot">=</span> <span class="fu">const</span> <span class="dv">7</span></span></code></pre></div>
+<p><code>const</code> is a function that takes a value, and then returns
+a function that throws its argument away and returns the value you gave
+to <code>const</code>.</p>
+<hr />
+<h1 id="questions-3">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="more-about-const">More about const</h1>
+<p>It’s sometimes possible to pretend functional programming languages
+are normal.</p>
+<p>But <code>const</code> illustrates how they’re not.</p>
+<p><code>const</code> is a function that returns a function. And the
+function it returns just returns whatever value you gave const.</p>
+<p>It’s kind of a good way to determine if you’ve mastered lambda
+calculus. [Try writing it?]</p>
+<hr />
+<h1 id="const">Const</h1>
+<p>A few options, assuming the type is <code>Int</code>:</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ot">const&#39; ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>const&#39; x <span class="ot">=</span> \ _ <span class="ot">-&gt;</span> x</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- or</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="ot">const&#39;&#39; ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>const&#39;&#39; x _ <span class="ot">=</span> x</span></code></pre></div>
+<p>The top one returns a lambda that returns <code>x</code>.</p>
+<p>The bottom one actually does too, because of currying.</p>
+<p>In general, if there’s a variable we don’t care about, we name it
+<code>_</code>. It’s a valid name, but it’s special because many
+variables can be named <code>_</code> without conflicting.</p>
+<p>but what if we don’t know the type?</p>
+<hr />
+<h1 id="type-parameters">Type parameters</h1>
+<p>Sometimes we want a function that works with any type, as long as its
+consistent.</p>
+<p>For example <code>x -&gt; x</code>, fill in <code>x</code>, but make
+sure the return is the same type.</p>
+<p>That’s one thing we can do:</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ot">const&#39;&#39;&#39; ::</span> x <span class="ot">-&gt;</span> x <span class="ot">-&gt;</span> x</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>const&#39;&#39;&#39; x _ <span class="ot">=</span> x</span></code></pre></div>
+<p>Every defined type is required to have an uppercase name. If a type
+name is lowercase, it is a type variable. Also called a type
+parameter.</p>
+<p>Here, the purpose is to make sure that the two values have the same
+type.</p>
+<p>But wait, we don’t ever use the second parameter. Why does it need to
+be the same? Could we do something else?</p>
+<hr />
+<h1 id="the-real-type-of-const">The real type of <code>const</code></h1>
+<p>The actual type is this:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">const</span><span class="ot"> ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">const</span> x _ <span class="ot">=</span> x</span></code></pre></div>
+<p>Notice the <code>b</code>. The function that is returned can take
+anything, it doesn’t have to be the same type that is returned.</p>
+<p>This is permitted, for example:</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ot">alwaysReturnHello ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">String</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>alwaysReturnHello <span class="ot">=</span> <span class="fu">const</span> <span class="st">&quot;Hello&quot;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- somewhere else:</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span> (alwaysReturnHello <span class="dv">29</span>) <span class="co">-- prints &quot;Hello&quot;</span></span></code></pre></div>
+<hr />
+<h1 id="parametric-type">Parametric type</h1>
+<p>A type that has at least one type parameter is called a parametric
+type.</p>
+<p>You’ve already seen these, in Java or C++, an
+<code>ArrayList&lt;Integer&gt;</code> or a
+<code>vector&lt;int&gt;</code> are both parametric types.</p>
+<p>You need to know what the list is storing to create it.</p>
+<p>In Haskell, there isn’t any special syntax to define parameteric
+types. No angle brackets. You just make the type parameter
+lowercase.</p>
+<p>So instead of <code>List&lt;T&gt;</code>, we write
+<code>[t]</code></p>
+<hr />
+<h1 id="parametric-polymorphism">Parametric polymorphism</h1>
+<p>We’ll talk more about polymorphism in future modules, but Haskell
+relies more on parametric polymorphism than Java or C++ do.</p>
+<p>Polymorphism is just the idea that a function can do something
+different based on the types of its arguments.</p>
+<p>For example, printing a list is different than printing an
+integer.</p>
+<p>Parametric polymorphism is when the parameters to a function can be
+different types, and those types are resolved at compile time.</p>
+<p>There’s also sub-type polymorphism, where we inherit from something
+to change its behavior. We’ll see this later.</p>
+<hr />
+<h1 id="knowledge-check-2">Knowledge check 2</h1>
+<ol type="1">
+<li>Define a type that takes three arguments of any type and returns
+something of the same type as the first argument.</li>
+<li>Define a function of that type.</li>
+<li>Define a function that’s like <code>const</code>, but the function
+it returns takes two values of any type (instead of one) before ignoring
+them and returning the argument to const (also of any type).</li>
+<li>What is the type of that function?</li>
+</ol>
+<hr />
+<h1 id="knowledge-check-2-answers">Knowledge check 2 answers</h1>
+<ol type="1">
+<li><code>x -&gt; y -&gt; z -&gt; x</code></li>
+<li><code>pickTheFirstOne a _ _ = a</code></li>
+<li>same as answer 2</li>
+<li>same as answer 1</li>
+</ol>
+<hr />
+<h1 id="questions-4">Questions?</h1>
+<!-- _class: invert questions  -->
+<hr />
+<h1 id="back-to-functions">Back to functions</h1>
+<p>In functional programming, functions are values just like any other.
+Just like ints.</p>
+<p>What can we do with ints? We can add them, multiply them, all kinds
+of stuff.</p>
+<p>What can we do with functions?</p>
+<hr />
+<h1 id="back-to-functions-2">Back to functions (2)</h1>
+<p>Well, one thing is we can call them. Easy.</p>
+<p>We can also define new ones.</p>
+<p>But how can we combine two functions? We can add two ints together.
+Are functions really like that?</p>
+<p>[what do you think? Maybe from one of the readings?]</p>
+<hr />
+<h1 id="yes-composition">Yes: composition</h1>
+<p>We can absolutely combine functions.</p>
+<p>In Haskell, it uses the ‘dot’ operator.</p>
+<p><code>f . g</code> is “f composed with g”.</p>
+<p>But what does that mean?</p>
+<hr />
+<h1 id="mathematically">Mathematically</h1>
+<p>In math, we write <span class="math inline">\((f \circ g)(x)\)</span>
+to mean <span class="math inline">\(f(g(x))\)</span></p>
+<p>It means “first do g, then do x”</p>
+<p>But why bother? For the math you’ve been introduced to so far, it’s
+not all that important.</p>
+<p>But the benefit is, it gives us a way to create new functions in very
+little code.</p>
+<hr />
+<h1 id="some-examples">Some examples</h1>
+<p>All of these pairs of functions are equivalent:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>something x <span class="ot">=</span> <span class="dv">2</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">7</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>something&#39; <span class="ot">=</span> (<span class="op">+</span><span class="dv">7</span>) <span class="op">.</span> (<span class="dv">2</span><span class="op">*</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>doubleAndPrint x <span class="ot">=</span> <span class="fu">print</span> (<span class="dv">2</span> <span class="op">*</span> x)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>doubleAndPrint&#39; <span class="ot">=</span> <span class="fu">print</span> <span class="op">.</span> (<span class="dv">2</span><span class="op">*</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>plus2 x <span class="ot">=</span> x <span class="op">+</span> <span class="dv">2</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>plus2&#39; <span class="ot">=</span> (<span class="op">+</span><span class="dv">2</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>plus2&#39;&#39; <span class="ot">=</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> (<span class="op">+</span><span class="dv">1</span>)</span></code></pre></div>
+<hr />
+<h1 id="why-1">Why?</h1>
+<p>We’ll see how this can be convenient later, but it enables us to
+think of functions as “pipelines” from one value to another.</p>
+<p>With a function like <code>stuff x = print (2*x + 1)</code>, notice
+that your attention has to bounce around. First the <code>x</code> gets
+multiplied by <code>2</code>, then we add <code>1</code> to it, but then
+we move back to the left to <code>print</code> it.</p>
+<p>Instead, <code>stuff' = print . (+1) . (2*x)</code> describes what
+happens as an exact pipeline. First we double, then we add 1, then we
+print. Done.</p>
+<p>This “pipeline” style of programming is central to functional
+programming. We don’t allow variables to change, so the “pipes” that
+feed one value to another are more important.</p>
+<hr />
+<h1 id="point-free-programming">Point-free programming</h1>
+<p>Notice that when we do this, the variable goes away on the left-hand
+side:</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>stuff x <span class="ot">=</span> <span class="fu">print</span> (<span class="dv">2</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">1</span>) <span class="co">-- versus</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>stuff&#39; <span class="ot">=</span> <span class="fu">print</span> <span class="op">.</span> (<span class="op">+</span><span class="dv">1</span>) <span class="op">.</span> (<span class="dv">2</span><span class="op">*</span>x)</span></code></pre></div>
+<p>The reason is that the composition operators create a function that
+takes a value, so we don’t need a variable.</p>
+<p>This style of coding is called “point free”. The point in question is
+the parameter*. Ironically there are a lot of points in the sense of
+<code>.</code> .</p>
+<p>It’s an optional coding style that is culturally popular in Haskell.
+It can be intimidating at first, but you’ll get better at reading
+it.</p>
+<div class="footnote">
+<p>* Calling parameters “points” comes from homotopic geometry or
+something.</p>
+</div>
+<hr />
+<h1 id="knowledge-check-3">Knowledge Check 3</h1>
+<ol type="1">
+<li>Define a function point free that evaluates the polynomial <span
+class="math inline">\(x^2 + 2x + 9\)</span> point free.</li>
+<li>What is a type that is compatible with the function you defined?
+(That is, it wouldn’t be wrong to put that type above it).</li>
+<li>What is the type of <code>(*2.5) . (*2.5) . (*2.5)</code>?</li>
+<li>Rewrite that function but not point-free.</li>
+</ol>
+<hr />
+<h1 id="knowledge-check-3-answers">Knowledge Check 3 answers</h1>
+<ol type="1">
+<li><code>f = (+9) . (2.5*) . (^2)</code></li>
+<li><code>Float -&gt; Float</code></li>
+<li><code>Float -&gt; Float</code></li>
+<li><code>f x = 2.5 * 2.5 * 2.5 * x</code> or
+<code>f x = 15.625 * x</code></li>
+</ol>
+<hr />
+<h1 id="let-where-and-guards">Let, where, and guards</h1>
+<p>So far, all of our variables have been definitions. At the top level,
+we’ve said:</p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>someName <span class="ot">=</span> some expression</span></code></pre></div>
+<p>This is fine, but we don’t want all of our names to be global.
+Sometimes we just want something named “foo” or “x” and we don’t want
+Haskell to complain that we’re redefining this important term.</p>
+<p>This is where let-expressions come in.</p>
+<hr />
+<h1 id="let">Let</h1>
+<p>The let keyword “lets” you define one or more temporary constants or
+functions that are only used in one expression.</p>
+<p>For example:</p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>add3 <span class="ot">=</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> add1 <span class="ot">=</span> (<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>        add2 <span class="ot">=</span> (<span class="op">+</span><span class="dv">2</span>)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span>  add1 <span class="op">.</span> add2 </span></code></pre></div>
+<p>Here, we’re basically saying “first define add1 and add2, and then
+replace the values in this expression here. The result is add3.</p>
+<p>Haskell is whitespace sensitive, but it’s more flexible than python.
+Here, the definitions in the let need to have the same indentation.</p>
+<hr />
+<h1 id="let-in-is-an-expression">Let-in is an expression</h1>
+<p>Note: this is not a statement! It is an expression. We can use “let”
+anywhere an expression is allowed.</p>
+<p><code>print (let x = 2 in x * x)</code> will print <code>4</code></p>
+<p>Inside of a <code>do</code> block, there is no <code>in</code>, the
+definition just continues throughout the block. We haven’t really talked
+about <code>do</code> blocks in detail yet, so we won’t say too much
+more about this now.</p>
+<p>So with <code>let</code>, we can just simplify complicated
+expressions into a single variable or define little temporary functions.
+Both can improve readability.</p>
+<hr />
+<h1 id="where">Where</h1>
+<p>Sometimes it’s nice to define the functions <em>after</em> they are
+needed. It can keep function bodies clean.</p>
+<p>For this, there is the <code>where</code> keyword:</p>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ot">add3andDouble ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>add3andDouble <span class="ot">=</span> double <span class="op">.</span> add1 <span class="op">.</span> add2</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">where</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="ot">    double ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="ot">    add1 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> </span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="ot">    add2 ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    double <span class="ot">=</span> (<span class="dv">2</span><span class="op">*</span>)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    add1 x <span class="ot">=</span> <span class="dv">1</span> <span class="op">+</span> x</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    add2 <span class="ot">=</span> add1 <span class="op">.</span> add1</span></code></pre></div>
+<hr />
+<h1 id="where-2">Where (2)</h1>
+<p>The <code>where</code> keyword needs to be more indented than the
+function it is describing, which is why I gave it that one space.</p>
+<p>One major benefit of <code>where</code> over <code>let</code> is that
+it lets you define types for the functions.</p>
+<p>The types don’t have to all be at the top of the where block either,
+I just did that to show you that type declarations don’t need to be
+directly adjacent to the function they are about.</p>
+<p><code>where</code> is not an expression though, you can’t just put it
+anywhere. It has to go beneath definitions.</p>
+<p>Which should you use? I like to use let for small temporaries, and
+where when the temporary functions have complicated types.</p>
+<hr />
+<h1 id="questions-5">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="important-extra-features">Important extra features</h1>
+<p>There are a few Haskell features that are important, but that deeper
+coverage of which requires some more time.</p>
+<p>We’ll learn more about these soon, but for now, here’s what you need
+to know.</p>
+<hr />
+<h1 id="pattern-matching">pattern matching</h1>
+<p>You can define a function on specific values, and Haskell will pick
+the definition that matches.</p>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ot">f ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>f <span class="dv">0</span> <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>f <span class="dv">1</span> <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>f x <span class="ot">=</span> x <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
+<p>In this case, if I write <code>f 7</code>, you get <code>8</code>,
+but if I write <code>f 0</code> you get <code>0</code>.</p>
+<p>When you write <code>f 7</code>, haskell checks “is it
+<code>0</code>? no, okay is it <code>1</code>?” in order from top to
+bottom. So order matters.</p>
+<hr />
+<h1 id="tuples">Tuples</h1>
+<p>What if we want a function to return two values?</p>
+<p>Well, we can. Using a tuple:</p>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>doubleAndAdd3 <span class="ot">=</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> (<span class="dt">Int</span>, <span class="dt">Int</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>doubleAndAdd3 x <span class="ot">=</span> (<span class="dv">2</span><span class="op">*</span>x, x <span class="op">+</span> <span class="dv">3</span>)</span></code></pre></div>
+<p>Here, <code>(Int, Int)</code> is the type “a pair of ints”.</p>
+<p>But how do we get values back out?</p>
+<hr />
+<h1 id="tuples-2">Tuples (2)</h1>
+<p>There are two functions, <code>fst</code> and <code>snd</code>:</p>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fst</span> (<span class="dv">1</span>, <span class="dv">2</span>) <span class="op">==</span> <span class="dv">1</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">snd</span> (<span class="dv">1</span>, <span class="dv">2</span>) <span class="op">==</span> <span class="dv">2</span></span></code></pre></div>
+<p>It feels weird to use functions to unpack a tuple. What if we want a
+triple? Do we need another set of functions?</p>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- these don&#39;t exist</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>fstOf3 (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>) <span class="op">==</span> <span class="dv">1</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>sndOf3 (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>) <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>thdOf3 (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>) <span class="op">==</span> <span class="dv">3</span></span></code></pre></div>
+<hr />
+<h1 id="pattern-matching-with-tuples">Pattern matching with tuples</h1>
+<p>In fact, we just use pattern matching again.</p>
+<p>In Haskell (and many functional languages), <strong>pattern matching
+is the main way that we get data out of compound data
+types</strong>.</p>
+<p>That is, there’s no “dot notation” here. And we don’t use array
+notation for tuples like we do in Python.</p>
+<p>Instead, we use definitions to break them apart…</p>
+<hr />
+<h1 id="pattern-matching-with-tuples-1">Pattern matching with
+tuples</h1>
+<p>One way to use pattern matching to get data out is to define a
+function on the patterns. This is how <code>fst</code> and
+<code>snd</code> are defined:</p>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fst</span><span class="ot"> ::</span> (a, b) <span class="ot">-&gt;</span> a</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fst</span> (x, _) <span class="ot">=</span> x</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">snd</span><span class="ot"> ::</span> (a, b) <span class="ot">-&gt;</span> b</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">snd</span> (_, y) <span class="ot">=</span> y</span></code></pre></div>
+<p>Here, when you call <code>fst (7, 8)</code>, Haskell sees that
+<code>fst</code> is defined on a tuple. It will bind <code>7</code> to
+<code>x</code>, and <code>8</code> to <code>_</code> (and remember that
+<code>_</code> means “we don’t care”). Then it returns
+<code>x</code>.</p>
+<hr />
+<h1 id="pattern-matching-with-let-2">Pattern matching with let (2)</h1>
+<p>Another way to use pattern matching is to use <code>let</code>.</p>
+<p>Suppose I want to get both the first and second values out of a pair.
+Suppose I have a pair, <code>nameAndEmployeeId = ("Bob", "12345")</code>
+I could do this (rather inefficiently):</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- this is not a great way to do it</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="ot">employeeData ::</span> <span class="dt">String</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>employeeData <span class="ot">=</span> </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> name <span class="ot">=</span> <span class="fu">fst</span> nameAndEmployeeId <span class="co">-- name == &quot;Bob&quot;</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>        employeeId <span class="ot">=</span> <span class="fu">snd</span> nameAndEmployeeId <span class="co">-- employeeId == &quot;12345&quot;</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span>  <span class="st">&quot;Employee: &quot;</span> <span class="op">++</span> name <span class="op">++</span> <span class="st">&quot;; Id: &quot;</span> <span class="op">++</span>  employeeId</span></code></pre></div>
+<p><code>++</code> is the operator for string concatenation.</p>
+<p>But this is inefficient. We’re having to use two function calls just
+to get some data out of a tuple. Is there a better way?</p>
+<hr />
+<h1 id="pattern-matching-with-let-3">Pattern matching with let (3)</h1>
+<p>Instead of doing that, try this:</p>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ot">employeeData ::</span> <span class="dt">String</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>employeeData <span class="ot">=</span> </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> (name, <span class="fu">id</span>) <span class="ot">=</span> nameAndEmployeeId  <span class="co">-- we do need the parentheses</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">in</span>  <span class="st">&quot;Employee: &quot;</span> <span class="op">++</span> name <span class="op">++</span> <span class="st">&quot;; Id: &quot;</span> <span class="op">++</span>  employeeId</span></code></pre></div>
+<p>Here, we use pattern matching. When Haskell sees <code>(x, y)</code>
+on the left of an equals, it looks to the right side and unpacks the
+first element into <code>x</code>, and the second into
+<code>y</code>.</p>
+<p>This also applies to triples, which brings me to the knowledge
+check…</p>
+<hr />
+<h1 id="knowledge-check-4">Knowledge check 4</h1>
+<ol type="1">
+<li>What should the type of <code>sndOf3</code> be?</li>
+<li>Write an implementation of <code>sndOf3</code>. (Note: implementing
+a function means defining it)</li>
+<li>Write both the type and implementation of a function that takes a
+4-tuple where the first and last elements are floats, but the middle
+elements can be anything. The function should return the sum of the
+first and last element.</li>
+<li>Is <code>sumFstAndLst (4, "blip", [1,2,3], 5)</code>
+correctly-typed? Haskell will interpret <code>4</code> as
+<code>4.0</code>, but what about the string and list?</li>
+</ol>
+<hr />
+<h1 id="knowledge-check-4-answers">Knowledge check 4 answers</h1>
+<ol type="1">
+<li><code>(a, b, c) -&gt; b</code></li>
+<li><code>sndOf3 (_, b, _) = b</code></li>
+<li></li>
+</ol>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="ot">sumFstAndLst ::</span> (<span class="dt">Float</span>, a, b, <span class="dt">Float</span>) <span class="ot">-&gt;</span> <span class="dt">Float</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>sumFstAndLst (a, _, _, b) <span class="ot">=</span> a <span class="op">+</span> b</span></code></pre></div>
+<p>Note for that last one: values are allowed to have the same name as
+type paramters.</p>
+<ol start="4" type="1">
+<li>Yes. The middle two shouldn’t matter if you wrote the right
+type.</li>
+</ol>
+<hr />
+<h1 id="questions-6">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="case">Case</h1>
+<p>Sometimes we want to do pattern matching outside of a function, but
+with more than one kind of pattern.</p>
+<p>For example, let is useful if we want to destructure a tuple:
+<code>let (x, y) = pair in ...</code></p>
+<p>But what if we want to do one thing if x is exactly 2?</p>
+<p>There’s another destructuring expression called
+<code>case</code>.</p>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> result <span class="ot">=</span> </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">case</span> pair <span class="kw">of</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>        (<span class="dv">2</span>, y) <span class="ot">-&gt;</span> y</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>        (x, y) <span class="ot">-&gt;</span> x</span></code></pre></div>
+<p>This makes <code>result == y</code> if <code>fst pair == 2</code>,
+and <code>snd pair</code> otherwise.</p>
+<hr />
+<h1 id="guards">Guards</h1>
+<p>Sometimes we want to define a function or expression with more
+complicated rules than just specifying all the patterns.</p>
+<p>Like maybe it does one thing for even values and a different thing
+for odd values. Or maybe it gives a different result for values greater
+than 10…</p>
+<p>We can do that like this:</p>
+<div class="sourceCode" id="cb41"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="ot">maxEsrbRatingForAge ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">String</span>  </span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>maxEsrbRatingForAge age </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> age <span class="op">&lt;=</span> <span class="dv">3</span> <span class="ot">=</span> <span class="st">&quot;EC&quot;</span> <span class="co">-- the indentation is significant</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> age <span class="op">&lt;=</span> <span class="dv">12</span> <span class="ot">=</span> <span class="st">&quot;E&quot;</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> age <span class="op">&lt;</span> <span class="dv">17</span> <span class="ot">=</span> <span class="st">&quot;T&quot;</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="st">&quot;M&quot;</span></span></code></pre></div>
+<hr />
+<h1 id="guards-2">Guards (2)</h1>
+<p>This is equivalent to using ifs, but nicer:</p>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>maxRating age <span class="ot">=</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> age <span class="op">&lt;=</span> <span class="dv">3</span> <span class="kw">then</span> <span class="st">&quot;EC&quot;</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">else</span> <span class="kw">if</span> age <span class="op">&lt;=</span> <span class="dv">12</span> <span class="kw">then</span> <span class="st">&quot;E&quot;</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">else</span> <span class="kw">if</span> age <span class="op">&lt;</span> <span class="dv">17</span> <span class="kw">then</span> <span class="st">&quot;T&quot;</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">else</span> <span class="st">&quot;M&quot;</span></span></code></pre></div>
+<p>Guards have a nicer syntax, but they can only be used when defining
+functions.</p>
+<hr />
+<h1 id="read-and-show">Read and show</h1>
+<p>How do we cast a value to a string?</p>
+<p>In Haskell, there isn’t really a special “cast” operator. We don’t do
+like <code>(String)20</code> or something. Instead, we call a
+function.</p>
+<p>The function for converting things into a string is
+<code>show</code>.</p>
+<p>For example, <code>show 20 == "20"</code>.</p>
+<p>If you look at the type of <code>show</code>, you get something a
+little weird: <code>show :: Show a =&gt; a -&gt; String</code></p>
+<hr />
+<h1 id="read-and-show-2">Read and show (2)</h1>
+<p>What is the capitalized <code>Show</code>? That’s called a
+typeclass.</p>
+<p>Despite the name, typeclasses aren’t classes. They are more like
+interfaces.</p>
+<p>In this case, the type is read: “given some type <code>a</code> that
+is an instance of <code>Show</code>, I will take an <code>a</code> and
+return a <code>String</code>.</p>
+<p>Basically, the thing you call <code>show</code> on has to be
+“showable”. Which most basic and even compound datatypes are.</p>
+<p>Int, Float, tuples of showable things, and lists of showable things,
+are all showable.</p>
+<hr />
+<h1 id="read-and-show-3">Read and show (3)</h1>
+<p>The opposite of <code>show</code> is <code>read</code>.</p>
+<p><code>show</code> is a function that turns things into strings.
+<code>read</code> is a funciton that turns strings into other
+things.</p>
+<p>Any type that supports construction from a string implements
+<code>Read</code>. For example, <code>Int</code> implements
+<code>Read</code>.</p>
+<div class="sourceCode" id="cb43"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="ot">foo ::</span> <span class="dt">Int</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">=</span> <span class="fu">read</span> <span class="st">&quot;123&quot;</span></span></code></pre></div>
+<p>If you pass an invalid string, you just get a runtime error.</p>
+<hr />
+<h1 id="mod-div-rem">Mod, div, rem</h1>
+<p>Lastly, there’s division. I put this off because it’s annoying.</p>
+<p>You can divide floats like this:</p>
+<div class="sourceCode" id="cb44"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="op">/</span> <span class="dv">5</span> <span class="op">==</span> <span class="fl">0.4</span></span></code></pre></div>
+<p>The <code>/</code> operator <em>only</em> works with floats, so here,
+<code>2</code> and <code>5</code> are being interpreted as floats (not
+casted, it’s as if you wrote <code>2.0</code> and <code>5.0</code>).</p>
+<p>You can’t do this:</p>
+<div class="sourceCode" id="cb45"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> x <span class="ot">=</span> <span class="dv">2</span><span class="ot"> ::</span> <span class="dt">Int</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    y <span class="ot">=</span> <span class="dv">5</span><span class="ot"> ::</span> <span class="dt">Int</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="kw">in</span> x <span class="op">/</span> y</span></code></pre></div>
+<hr />
+<h1 id="mod-div-rem-2">Mod, div, rem (2)</h1>
+<p>The problem here is that the <code>/</code> function is only defined
+on Fractional numbers, and Int doesn’t count:
+<code>(/) :: Fractional a =&gt; a -&gt; a -&gt; a</code></p>
+<p><code>Fractional</code> is another of those type class things. Floats
+and Doubles are fractional, and so are Ratios, but Ints are not.</p>
+<p>So how do you divide integers?</p>
+<hr />
+<h1 id="fixity">Fixity</h1>
+<p>You use the <code>div</code> function: <code>div 5 2 == 2</code></p>
+<p>“Eww, do I really have to write it like a function?`</p>
+<p>Sort of, but <code>div</code> is a binary function, meaning, it’s a
+function of two arguments. Haskell lets you write binary functions in
+<em>infix</em> position.</p>
+<p>The <em>fixity</em> of an operator tells us where it can appear. A
+prefix operator (which functions normally are) goes before its operand
+(argument).</p>
+<p>A postfix operator goes <em>after</em>. <code>++</code> in C can be
+either prefix (<code>++x</code>) or postfix (<code>x++</code>) in that
+language. Haskell does not have any postfix operators.</p>
+<hr />
+<h1 id="precedence">Precedence</h1>
+<p>However, Haskell allows you to turn <em>any</em> binary function into
+an infix operator by putting backticks <code>` `</code> around it.</p>
+<p>So you can do this: <code>5 `div` 2</code>, which returns
+<code>2</code>.</p>
+<p>Normally, when we talk about operators, we also talk about
+precedence, which is the order of operators being applied. For example,
+<code>*</code> has higher precedence than <code>+</code>, because
+<code>1 + 2 * 3 + 4</code> is treated as
+<code>1 + (2 * 3) + 4</code>.</p>
+<p>However, functions always have the highest possible precdence.</p>
+<hr />
+<h1 id="mod-div-rem-3">Mod, div, rem (3)</h1>
+<p>There are also <code>mod</code> for modulus, and <code>rem</code> for
+remainder.</p>
+<p>Wait, there’s a difference?</p>
+<p>For positive numbers, no. But for negative numbers:
+<code>(-2) `mod` 5</code> actually is <code>3</code>, because the
+<em>mod</em> function treats numbers like they’re on a clock.</p>
+<p>Since <code>4</code> is the largest number we can have mod
+<code>5</code>, <code>-1</code> is the same as <code>4</code> mod
+<code>5</code> (wrapping around from zero), and <code>-2</code> mod
+<code>5</code> is <code>3</code>.</p>
+<p>If you haven’t encountered this concept before, <a
+href="https://openstax.org/books/contemporary-mathematics/pages/3-7-clock-arithmetic">here’s
+an excerpt from a contemporary math textbook that explains it</a>.</p>
+<p><code>rem</code>, on the other hand, is just the remainder. So
+<code>(-2) `rem` 5</code> is just <code>-2</code>.</p>
+<p>But why did we need parentheses in <code>(-2) `mod` 5</code>?
+Well…</p>
+<hr />
+<h1 id="precedence-2-a-strange-unfortunate-interaction">Precedence (2):
+A strange, unfortunate interaction</h1>
+<p>…Because functions (whether infix or prefix) have the highest
+precedence, that means unary minus signs do not.</p>
+<p>So this: <code>-2 `mod` 5</code> means <code>-(2 `div` 5)</code>, and
+not <code>(-2) `mod` 5</code> like you would expect.</p>
+<p>This is easy to forget, but the basic rule that causes it is easy to
+remember: functions have the highest precedence, no matter what.</p>
+<p>Just remember, “<em>In functional programming, functions come
+first.</em>”</p>
+<hr />
+<h1 id="programming-language-design-1">Programming language design</h1>
+<p>This is actually a good illustration of how programming languages can
+be “designed”.</p>
+<p>You might think it’s dumb that <code>-x `mod` y</code> means
+<code>-(x `mod` y)</code>, and it kind of is, but how do you fix it?</p>
+<p>There’s a nice, simple rule in Haskell: functions first. Super easy
+to remember, and very useful when parsing expressions.</p>
+<p>If you make it something like “unary operators first, then functions,
+then everything else”, it’s now more complicated. And what if you don’t
+want unary operators to always come first? What if they need to be
+allowed to vary?</p>
+<hr />
+<h1 id="programming-language-design-2">Programming language design
+(2)</h1>
+<p>Here, we are balancing simplicity versus intuition.</p>
+<p>We could make things even simpler by removing operator precedence
+entirely, but then <code>x + y * z</code> would be
+<code>(x + y) * z</code>. That would fool a lot of people who are
+expecting a more mathematical order of operations.</p>
+<p>But, unironically, for me, I think it might be worth it. I kind of
+like precedence-free languages, and I’ll be showing you some later.</p>
+<p>When you don’t like something in a programming language, try
+considering what desires were being balanced, and what limitations
+prevented everything from being realized.</p>
+<hr />
+<h1 id="questions-7">Questions?</h1>
+<!-- _class: invert questions -->
+<hr />
+<h1 id="last-knowledge-check">Last Knowledge Check</h1>
+<ol type="1">
+<li>Write a recursive funciton, fully typed, that computes the
+factorial. It should take and return <code>Integer</code>.</li>
+<li>Write a point-free function and its type where it takes a string and
+prints three times its length.</li>
+<li>Write a function with appropriate type that takes two leg lengths of
+a right triangle and returns the length of the hypotenuse.</li>
+</ol>
+<hr />
+<h1 id="last-knowledge-check-answers">Last Knowledge Check Answers</h1>
+<ol type="1">
+<li></li>
+</ol>
+<div class="sourceCode" id="cb46"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="ot">fact ::</span> <span class="dt">Integer</span> <span class="ot">-&gt;</span> <span class="dt">Integer</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>fact <span class="dv">0</span> <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>fact n <span class="ot">=</span> n <span class="op">*</span> fact (n <span class="op">-</span> <span class="dv">1</span>)</span></code></pre></div>
+<ol start="2" type="1">
+<li></li>
+</ol>
+<div class="sourceCode" id="cb47"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="ot">thriceLength ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>thriceLength <span class="ot">=</span> (<span class="dv">3</span><span class="op">*</span>) <span class="op">.</span> <span class="fu">length</span></span></code></pre></div>
+<ol start="3" type="1">
+<li></li>
+</ol>
+<div class="sourceCode" id="cb48"><pre
+class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="ot">hypo ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>hypo a b <span class="ot">=</span> <span class="fu">sqrt</span> (a <span class="op">*</span> a <span class="op">+</span> b <span class="op">*</span> b)</span></code></pre></div>
+<hr />
+<h1 id="next-steps">Next steps</h1>
+<p>Work through the chapter on <a
+href="https://en.wikibooks.org/wiki/Haskell/Simple_input_and_output">Simple
+input and output</a></p>
+<p>Work through the chapter on <a
+href="https://en.wikibooks.org/wiki/Haskell/Recursion">Recursion</a>.</p>
+<p>The real grind: do some codewars! At this point, you should be able
+to do most Haskell problems of 8-kyu difficulty. Go <a
+href="https://www.codewars.com/kata/search/haskell?q=&amp;r%5B%5D=-8&amp;beta=false&amp;order_by=sort_date%20desc">here</a>
+and start grinding!</p>
+<p>This is the best practice. Don’t forget to look at the top solution!
+It will sometimes be bizarre, but you can learn a lot from ultra-elegant
+Haskell code.</p>
+</body>
+</html>
