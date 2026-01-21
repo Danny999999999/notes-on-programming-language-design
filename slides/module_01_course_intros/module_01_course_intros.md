@@ -1011,7 +1011,7 @@ This is the programming paradigm that we will use the most in this course.
 
 In a *pure* functional language, we don't even permit statements. That is, nothing is permitted to change state.
 
-If we say, mathetmatically `x = 7`, and then later write `x = 8`, that is either a redefinition or an error. We said `x = 7`, so either we want a new `x` or we made a mistake. It makes no sense to *change* it.
+If we say, mathematically `x = 7`, and then later write `x = 8`, that is either a redefinition or an error. We said `x = 7`, so either we want a new `x` or we made a mistake. It makes no sense to *change* it.
 
 Following this discipline of never changing variables sounds impossible at first, but it's not, and it leads to some interesting benefits. 
 
