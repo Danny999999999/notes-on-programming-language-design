@@ -196,7 +196,7 @@ Before we move on, let's have some abstraction practice.
 
 1. A function that takes a value and doubles it.
 2. A function that takes a value and ignores it and returns 0 instead.
-3. A function that computes the square root of a value. This one doesn't have to be a lambda abstraction.
+3. A function that computes the positive square root of a value. This one doesn't have to be a lambda abstraction.
 
 You can use ordinary math notation for the operations like doubling and square roots. You don't have to use numerical techniques or anything to get the square root.
 
