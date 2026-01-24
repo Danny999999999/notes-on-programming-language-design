@@ -399,21 +399,203 @@ In C, we might return an integer so that we could report failure, or maybe a boo
 // split_on_dots("123.12.1.2") == {"123", "12", "1", "2"}
 // writes the number of individual strings to number_of_elements
 char** split_on_dots(char* str, int* number_of_elements);
-bool parse_int(char* str, int* i); // returns false if it fails
-_Bool parse_ipv4(char* ip_str, int* result) {
+bool parse_uint32(char* str, uint32_t* i); // returns false if it fails
+_Bool parse_ipv4(char* ip_str, int* result) { // *result must be 0 to begin with
     int size;
     char** splitted = split_on_dots(ip_str, &size);
     if (size != 4) return false; // the first error
     // now, if *any* of the 4 integers fail to parse, we also bail
-    for (int i = 0; i < 4; i++) {
-        int* val; 
+    for (uint32_t i = 0; i < 4; i++) {
+        uint32_t val; 
         if(!parse_int(splitted[i], &val)) return false;
-        if(val < 0 || val > 255) return false;
-        result |= val << ((3 - i) * 8)       
+        if(val > 255) return false;
+        *result |= val << ((3 - i) * 8)       
     }
     return true;
-}
+} // omitted: free the strings in splitted and the array itself
 ```
 
+---
+
 # Why happy path?
+
+Notice that in the previous slide, we have a bunch of checks that return `false` as soon as there's an error.
+
+This is nice, because it allows us to focus on the primary intended code path. We can always "clean up" the condition that would cause it to break, so we no longer have to worry about it anymore.
+
+Here's what the code would look like if we *didn't* do that...
+
+
+---
+
+# Non-happy-path-style C
+
+
+```c
+_Bool parse_ipv4(char* ip_str, int* result) { // *result must be 0 to begin with
+    int size;
+    char** splitted = split_on_dots(ip_str, &size);
+    if (size == 4) {
+        // now, if *any* of the 4 integers fail to parse, we also bail
+        for (uint32_t i = 0; i < 4; i++) {
+            uint32_t val; 
+            if(parse_int(splitted[i], &val)) {
+                if(val <= 255) {
+                    *result |= val << ((3 - i) * 8)
+                } else return false;
+            } else return false;       
+        }
+        return true;
+    }
+    else return false;
+} // omitted: free the strings in splitted and the array itself
+```
+
+---
+
+# Non-happy-path-style C (2)
+
+Notice that when we don't "take care" of errors earlier, we end up having giant pyramids of if-statements.
+
+We also have to remember "okay this is the branch where we didn't have it work correctly so I need to return false".
+
+It's just kind of annoying. 
+
+Anyway, Haskell doesn't have built-in early-returns from functions.
+
+---
+
+# Why?
+
+One of the programming-design reasons is that they would break [*compositionality*](https://en.wikipedia.org/wiki/Principle_of_compositionality), which is the feature that the meaning of an expression is only determined by the meanings of its subexpressions and the combining syntax. Early returns are like a goto that do something based on the surrounding environment rather than representing a meaningful expression by themselves.
+
+You might have thought it was because of lazy evaluation, but there's actually no reason we can't have lazy evaluation and early returns. Actually, many functional programming languages with eager evaluation also don't support early returns for the reason above.
+
+
+---
+
+# So Haskell is just lame then?
+
+No, you can actually use the `Maybe` monad to add early returns into the language, but in a "well-behaved" way. There are some neat benefits that provides, but let's see the code, first.
+
+```haskell
+splitOnDots :: String -> [String]
+parseWord32 :: String -> Maybe Word32
+parseIpv4 :: String -> Maybe Word32
+parseIpv4 str = do
+    let splitted = splitOnDots str
+    if length splitted /= 4 then Nothing else Just ()
+    parsed <- mapM parseWord32 splitted -- if any are `Nothing`, early returns  
+    if any (> 255) parsed then Nothing else Just ()
+    let shifted = zipWith shiftL parsed [24, 16, 8, 0]
+    Just $ foldl1 xor shifted
+```
+
+---
+
+# Line by line explanation
+
+`let splitted = splitOnDots str`
+`splitted` is just a list of strings, each of the numbers in the ip address.
+
+`if length splitted /= 4 then Nothing else Just ()`
+This is the first early return. `Nothing` will cause everything after to be ignored. 
+
+We don't need to use this value, it just needs to be here so we don't return, that's why there's only `()` in the `Just`.
+
+---
+
+# Line by line (2)
+
+`parsed <- mapM parseWord32 splitted`
+
+`mapM` is like `map`, but it sequences the monad afterwards. If we had just `map parseWord32 splitted`, we would have a `[Maybe Word32, Maybe Word32, Maybe Word32, Maybe Word32]`. 
+
+`mapM` then inserts a `*>` in between each of those `Maybe`s. So if any of the parts of the ip address, the whole result is `Nothing`. Otherwise, the result is `Just [Word32, Word32, Word32, Word32]`
+
+`parsed <-` of a `Maybe [Word32, Word32, Word32, Word32]` will either skip the entire remainder of the `do` block and become `Nothing` the `Maybe` is `Nothing`, or `parsed` will become the list if it exists. This means that we early return automatically without an `if`.
+
+---
+
+# Line by line (3)
+
+`if any (> 255) parsed then Nothing else Just () `
+This is another early return (the third if we count `<-`), at this point, we can be sure that all of the values inside the list are valid bytes.
+
+`let shifted = zipWith shiftL parsed [24, 16, 8, 0]`
+Here we just shift the first byte left by 24, the second by 16, etc.  
+
+`Just $ foldl1 xor shifted` the `foldl1 xor` xors the words together to make one big word. `foldl1` is like `foldl`, but it uses the first element of the list 
+
+---
+
+# Cleaning it up
+
+Do we really have to write `if condition then Nothing else Just ()` every time?
+
+No, we can use a function: `when :: Applicative f => Bool -> f () -> f ()`
+
+This function is very simple:
+`when condition val = if condition then val else pure ()`
+
+Remember that `pure` is just a constructor for `Applicatives`. For the `Maybe` applicative, `pure = Just`. So `pure () == Just ()`.
+
+Now we can do this:
+`when (length /= 4) Nothing`
+
+
+---
+
+# Questions?
+<!-- _class: invert questions  -->
+
+---
+
+# How does it work?
+
+That's how we *use* the `Maybe` monad to add early returns to the language.
+
+But how do we *create* the `Maybe` monad?
+
+That is:
+```haskell
+instance Monad Maybe where
+    ...
+```
+
+What goes in the `instance` definition?
+
+What are the functions that have to be there for monads?
+
+---
+
+# How it works
+
+First, the two functions are `return` and `>>=` (bind)
+
+```haskell
+instance Monad Maybe where
+    return = pure
+    m >>= f = ...
+```
+
+`return` is just a constructor for monads. It has *nothing* to do with early returns. In:
+`if condition then Nothing else return ()`, `return ()` is just a synonym for `pure ()`, which is a synonym for `Just ()`. 
+
+Notice that `return ()` means "keep going"! It's the `Nothing` that means to return early. This is confusing and unfortunate, but the name `return` was chosen for this function because often it's the last thing you do in a `do` block. In our example, we could have used `return` instead of `Just`: `return $ foldl1 xor shifted`
+
+---
+
+# What about `>>=` (bind)?
+
+This is the key. Remember the type of this function:
+`(>>=) :: Monad m => m a -> (a -> m b) -> m b`
+
+So, for the `Maybe` monad: `(>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b`
+
+This type means "take a maybe and a function. The function will receive the value inside the maybe if it exists and then return a new maybe"
+
+The bind operator for `Maybe` 
+
+---
 
