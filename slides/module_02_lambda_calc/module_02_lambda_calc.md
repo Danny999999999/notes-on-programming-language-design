@@ -1108,6 +1108,7 @@ In addition to studying for the quiz, make sure you're keeping up on your readin
 We're assuming you already read the first two chapters of the Haskell Wikibook.
 
 Now, work through:
+- [Getting Set Up](https://en.wikibooks.org/wiki/Haskell/Getting_set_up) and [Variables and Functions](https://en.wikibooks.org/wiki/Haskell/Variables_and_functions)
 - [Truth Values](https://en.wikibooks.org/wiki/Haskell/Truth_values) to learn about boolean functions.
 - [Type Basics](https://en.wikibooks.org/wiki/Haskell/Type_basics) to learn how to describe types.
 - [Lists and Tuples](https://en.wikibooks.org/wiki/Haskell/Lists_and_tuples) to learn how to describe lists and tuples.
